@@ -14,6 +14,7 @@ import emission.storage.pipeline_queries as esp
 import emission.core.wrapper.pipelinestate as ecwp
 import bin.purge_user_timeseries as bput
 import bin.restore_user_timeseries as brut
+import bin.debug.load_multi_timeline_for_range as lmtfr
 
 class TestPurgeRestoreUserTimeseries(unittest.TestCase):
     def setUp(self):
@@ -35,11 +36,18 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
         
         # Without running intake pipeline, for both usercache and analysis, no entries exported, export file not created since no data in usercache
         # With intake pipeline, can see same 3 analysis key entries: 'analysis/cleaned_place', 'segmentation/raw_place', 'analysis/confirmed_place'
-        # export_databases = ['usercache'] 
+        # export_databases = ['usercache_db'] 
         # export_databases = ['analysis_timeseries_db'] 
         export_databases = ['timeseries_db'] 
-        bput.purgeUserTimeseries(str(self.testUUID), databases=export_databases, dir_name=tmpdirname)
+        export_file_name = bput.purgeUserTimeseries(str(self.testUUID), databases=export_databases, dir_name=tmpdirname)
+        export_file_name += ".gz"
 
+        import argparse
+        parser = argparse.ArgumentParser()
+        parser.add_argument("file_prefix", help="the name of the file or file prefix that contains the json representation of the timeline")
+        args = parser.parse_args(["--file_prefix", export_file_name])
+        print("In TestExportPurgeRestoreUserTimeseries: export_file_name: ", export_file_name)
+        lmtfr.load_multi_timeline_for_range(args)
 
 
            

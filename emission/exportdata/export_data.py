@@ -31,7 +31,7 @@ class ExportDataPipeline:
     def last_trip_done(self):
         return self._last_trip_done
 
-    def run_export_data_pipeline(self, user_id, databases=None, dir_name=None):
+    def run_export_data_pipeline(self, user_id, databases=None, dir_name='emission/archived'):
         ts = esta.TimeSeries.get_time_series(user_id)
         time_query = espq.get_time_range_for_export_data(user_id)
         if "DATA_DIR" in os.environ:

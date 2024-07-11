@@ -14,7 +14,7 @@ import json
 import emission.storage.json_wrappers as esj
 import argparse
 
-import common
+import bin.debug.common
 import os
 
 import gzip
@@ -109,38 +109,7 @@ def post_check(unique_user_list, all_rerun_list):
     else:
         logging.info("timeline contains a mixture of analysis results and raw data - complain to shankari!")
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("file_prefix",
-        help="the name of the file or file prefix that contains the json representation of the timeline")
-
-    parser.add_argument("-d", "--debug", type=int,
-        help="set log level to DEBUG")
-
-    parser.add_argument("-c", "--continue-on-error", default=False, action='store_true',
-        help="set log level to DEBUG")
-
-    parser.add_argument("-v", "--verbose", type=int,
-        help="after how many lines we should print a status message.")
-
-    parser.add_argument("-i", "--info-only", default=False, action='store_true',
-        help="only print entry analysis")
-
-    parser.add_argument("-s", "--batch-size", default=10000, type=int,
-        help="batch size to use for the entries")
-
-    group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument("-p", "--prefix", default="user",
-        help="prefix for the automatically generated usernames. usernames will be <prefix>-001, <prefix>-002...")
-    group.add_argument("-m", "--mapfile",
-        help="file containing email <-> uuid mapping for the uuids in the dump")
-
-    args = parser.parse_args()
-    if args.debug:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
-
+def load_multi_timeline_for_range(file_prefix, info_only, verbose, continue_on_error, mapfile, prefix):
     fn = args.file_prefix
     logging.info("Loading file or prefix %s" % fn)
     sel_file_list = common.read_files_with_prefix(fn)
@@ -183,5 +152,39 @@ if __name__ == '__main__':
             register_mapped_users(args.mapfile, unique_user_list)
         elif args.prefix is not None:
             register_fake_users(args.prefix, unique_user_list)
-       
+    
     post_check(unique_user_list, all_rerun_list) 
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file_prefix",
+        help="the name of the file or file prefix that contains the json representation of the timeline")
+
+    parser.add_argument("-d", "--debug", type=int,
+        help="set log level to DEBUG")
+
+    parser.add_argument("-c", "--continue-on-error", default=False, action='store_true',
+        help="set log level to DEBUG")
+
+    parser.add_argument("-v", "--verbose", type=int,
+        help="after how many lines we should print a status message.")
+
+    parser.add_argument("-i", "--info-only", default=False, action='store_true',
+        help="only print entry analysis")
+
+    parser.add_argument("-s", "--batch-size", default=10000, type=int,
+        help="batch size to use for the entries")
+
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument("-p", "--prefix", default="user",
+        help="prefix for the automatically generated usernames. usernames will be <prefix>-001, <prefix>-002...")
+    group.add_argument("-m", "--mapfile",
+        help="file containing email <-> uuid mapping for the uuids in the dump")
+
+    args = parser.parse_args()
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
+    load_multi_timeline_for_range(args)

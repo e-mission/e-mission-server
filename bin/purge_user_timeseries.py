@@ -118,14 +118,48 @@ def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEF
         logging.warning("CSV export was ignored")
     else: 
         logging.info("Fetched data, starting export")    
-        # eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False, databases)
-        epe.run_export_pipeline("single", [user_id], databases, dir_name)
-        # file_name += ".gz"
+        # epe.run_export_pipeline("single", [user_id], databases, dir_name)
+        
+        ts = esta.TimeSeries.get_time_series(user_id)
+        time_query = espq.get_time_range_for_export_data(user_id)
+        # file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+        file_name = os.environ.get('DATA_DIR', '/Users/mmahadik/Documents/Work/OpenPATH/Code/GitHub/logs/data/export_purge_restore/purge/tests') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+
+        import datetime
+        print("Start Time: ", datetime.datetime.fromtimestamp(time_query.startTs).strftime('%Y-%m-%d %H:%M:%S'))
+        print("Start Ts: ", time_query.startTs)
+        print("End Time: ", datetime.datetime.fromtimestamp(time_query.endTs).strftime('%Y-%m-%d %H:%M:%S'))
+        print("End Ts: ", time_query.endTs)
+
+        export_queries = eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False, databases)
+
+        database_dict = {
+            'timeseries_db': ts.timeseries_db,
+            'analysis_timeseries_db': ts.analysis_timeseries_db
+            # TODO: Add usercache
+        }
+
+        for database in databases:
+            for key, value in export_queries.items():
+                if value["type"] == "time":
+                    ts_query = ts._get_query(time_query=value["query"])
+                else: 
+                    ts_query = value["query"]
+                delete_query = {"user_id": user_id, **ts_query}
+
+                # Get the count of matching documents
+                count = database_dict[database].count_documents(delete_query)
+                print(f"Number of documents matching for {database_dict[database]} with {key} query: {count}")
+                # delete_result = database_dict[database].delete_many(delete_query)
+                # deleted_count = delete_result.deleted_count
+                # print(f"Number of documents deleted for {database_dict[database]} with {key} query: {deleted_count}")
+
 
         # logging.info("Deleting entries from database...")
         # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
         # logging.info("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
-    
+
+        return file_name
 
 
 if __name__ == '__main__':

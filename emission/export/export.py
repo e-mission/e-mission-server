@@ -62,8 +62,8 @@ def get_from_all_three_sources_with_retry(user_id, in_query, databases=None):
             geo_query=None, extra_query_list=None, sort_key = sort_key)
         source_db_calls.append(analysis_ts_call)
     
-    if databases is None or 'usercache' in databases:
-        logging.info("Fetching from usercache")
+    if databases is None or 'usercache_db' in databases:
+        logging.info("Fetching from usercache_db")
         uc_ts_call = lambda tq: (uc.getMessageCount(None, tq), uc.getMessage(None, tq))
         source_db_calls.append(uc_ts_call)
 
@@ -111,6 +111,13 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
         with gzip.open(combined_filename, "wt") as gcfd:
             json.dump(combined_list,
                 gcfd, default=esj.wrapped_default, allow_nan=False, indent=4)
+            
+        return {
+            'trip_time_query': { 'query': trip_time_query, 'type': "time" },
+            'place_time_query': { 'query': place_time_query, 'type': "time" },
+            'loc_time_query': { 'query': loc_time_query, 'type': "time" },
+            'first_place_extra_query': { 'query': first_place_extra_query, 'type': "extra" }
+        }
 
 
 def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):

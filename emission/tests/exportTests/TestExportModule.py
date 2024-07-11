@@ -38,7 +38,7 @@ class TestExportModule(unittest.TestCase):
 
         eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["timeseries_db"])
         # eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["analysis_timeseries_db"])
-        # eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["usercache"])
+        # eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["usercache_db"])
         file_name += ".gz"
 
         #Assert the file exists after the export process
