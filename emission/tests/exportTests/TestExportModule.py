@@ -33,7 +33,7 @@ class TestExportModule(unittest.TestCase):
         self.assertTrue(pl.Path(file_name).is_file()) 
         with gzip.open(file_name, 'r') as ef:
             exported_data = json.loads(ef.read().decode('utf-8'))
-
+            
         confirmed_trips_exported = []
         for t in exported_data:
             if t['metadata']['key'] == "analysis/confirmed_trip":

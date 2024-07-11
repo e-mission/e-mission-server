@@ -109,8 +109,8 @@ def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, u
         export_file_name = dir_name + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
 
         
-        start_ts_datetime = datetime.datetime.fromtimestamp(time_query.startTs).strftime('%Y-%m-%d %H:%M:%S')
-        end_ts_datetime = datetime.datetime.fromtimestamp(time_query.endTs).strftime('%Y-%m-%d %H:%M:%S')
+        start_ts_datetime = datetime.fromtimestamp(time_query.startTs).strftime('%Y-%m-%d %H:%M:%S')
+        end_ts_datetime = datetime.fromtimestamp(time_query.endTs).strftime('%Y-%m-%d %H:%M:%S')
         print("Start Time: ", start_ts_datetime)
         print("Start Ts: ", time_query.startTs)
         print("End Time: ", end_ts_datetime)
@@ -143,7 +143,7 @@ def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, u
             print(f"Key query: {key}")
             print("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
 
-        return file_name
+        return export_file_name
 
 
 if __name__ == '__main__':
