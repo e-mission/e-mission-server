@@ -219,7 +219,7 @@ def collapse_modes(section_entry, modes):
     if len(unique_modes) == 1:
         return list(unique_modes)[0]
 
-    supported_modes = set(['BUS', 'TRAIN', 'LIGHT_RAIL', 'SUBWAY', 'TRAM'])
+    supported_modes = set(['BUS', 'TRAIN', 'LIGHT_RAIL', 'SUBWAY', 'TRAM', 'TROLLEYBUS'])
 
     if not unique_modes.issubset(supported_modes):
         logging.error("unique_modes = %s, but we support only %s" %
