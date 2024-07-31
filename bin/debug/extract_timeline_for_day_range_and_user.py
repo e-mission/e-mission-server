@@ -54,8 +54,8 @@ def export_timeline_for_users(user_id_list, args):
     for curr_uuid in user_id_list:
         if curr_uuid != '':
             logging.info("=" * 50)
-            export_timeline(user_id=curr_uuid, start_day_str=args.start_day, 
-                end_day_str= args.end_day, timezone=args.timezone, 
+            export_timeline(user_id=curr_uuid, start_day_str=args.start_day,
+                end_day_str= args.end_day, timezone=args.timezone,
                 file_name=args.file_prefix)
 
 if __name__ == '__main__':
@@ -67,6 +67,7 @@ if __name__ == '__main__':
     group.add_argument("-u", "--user_uuid", nargs="+")
     group.add_argument("-a", "--all", action="store_true")
     group.add_argument("-f", "--file")
+
     parser.add_argument("--timezone", default="UTC")
     parser.add_argument("start_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
     parser.add_argument("end_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )

@@ -33,7 +33,7 @@ def run_export_pipeline(process_number, uuid_list):
     export_log_config["handlers"]["errors"]["filename"] = \
         export_log_config["handlers"]["errors"]["filename"].replace("export", "export_%s" % process_number)
 
-    # logging.config.dictConfig(export_log_config)
+    logging.config.dictConfig(export_log_config)
     np.random.seed(61297777)
 
     logging.info("processing UUID list = %s" % uuid_list)
