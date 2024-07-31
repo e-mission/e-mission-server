@@ -5,7 +5,6 @@ import logging
 import emission.storage.pipeline_queries as espq
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.purge_restore.import_timeseries as eprit
 import gzip
 import json
 import os
