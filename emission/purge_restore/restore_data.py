@@ -35,5 +35,4 @@ class RestoreDataPipeline:
         time_query = espq.get_time_range_for_restore_data(user_id)
         entries = json.load(gzip.open(file_name + ".gz"), object_hook = esj.wrapped_object_hook)
         self._last_processed_ts = entries[-1]['metadata']['write_ts']
-        # lmtfr.load_multi_timeline_for_range(file_name, continue_on_error=True)
-        lmtfr.load_multi_timeline_for_range(file_name)
+        lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
