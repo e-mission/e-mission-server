@@ -116,6 +116,7 @@ def load_multi_timeline_for_range(file_prefix, info_only=None, verbose=None, con
 
     all_user_list = []
     all_rerun_list = []
+    (tsdb_count, ucdb_count) = (0,0)
 
     for i, filename in enumerate(sel_file_list):
         if "pipelinestate" in filename:
@@ -154,6 +155,7 @@ def load_multi_timeline_for_range(file_prefix, info_only=None, verbose=None, con
             register_fake_users(prefix, unique_user_list, verbose)
     
     post_check(unique_user_list, all_rerun_list) 
+    return (tsdb_count, ucdb_count)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

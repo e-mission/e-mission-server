@@ -13,6 +13,7 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
+import logging
 
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
@@ -65,5 +66,10 @@ def insert_entries(uuid, entry_it, continue_on_error):
         except pymongo.errors.DuplicateKeyError as e:
             if not continue_on_error:
                 raise(e)
+            else:
+                if "write_fmt_time" in entry["metadata"]:
+                    logging.info("ignoring duplicate key error while restoring timeseries entries")
+                else:
+                    logging.info("ignoring duplicate key error while restoring usercache entries")
 
     return (tsdb_count, ucdb_count)

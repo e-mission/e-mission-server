@@ -2,11 +2,8 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import os
-from os import path
-import tempfile
 import unittest
 import json
-import bson.json_util as bju
 import pathlib as pl
 import emission.storage.timeseries.abstract_timeseries as esta
 import gzip
@@ -19,6 +16,8 @@ import emission.purge_restore.export_timeseries as epret
 import emission.purge_restore.purge_data as eprpd
 import bin.debug.load_multi_timeline_for_range as lmtfr
 import logging
+import gzip
+import emission.storage.json_wrappers as esj
 
 class TestPurgeRestoreModule(unittest.TestCase):
     def setUp(self):
@@ -78,7 +77,7 @@ class TestPurgeRestoreModule(unittest.TestCase):
         pdp.delete_timeseries_entries(self.testUUID, ts, time_query['startTs'], time_query['endTs'], export_queries)
 
         # Check how much data there is after
-        res = res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
         logging.info(f"Purging complete: {res} entries remaining")
         self.assertEqual(res, 0)
 
@@ -90,9 +89,17 @@ class TestPurgeRestoreModule(unittest.TestCase):
         lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
 
         # Check how much data there is after
-        res = res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
         logging.info(f"Restoring complete: {res} entries restored")
         self.assertEqual(res, 1906)
+
+        '''
+        Test 4 - Verify that restoring timeseries data fails if data already exists
+        Duplicate key error is ignored hence no entries should be inserted
+        '''
+        logging.info("Attempting to load duplicate data...")
+        (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+        self.assertEqual(tsdb_count, 0)
 
     def testPurgeRestorePipeline(self):
         file_name = epp.run_purge_pipeline_for_user(self.testUUID, os.environ.get('DATA_DIR', 'emission/archived'))
