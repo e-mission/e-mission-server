@@ -30,4 +30,4 @@ jobs:
       run: echo Smoke test
 
     - name: Run the tests using docker-compose
-      run: docker-compose -f setup/docker-compose.tests.yml up --exit-code-from web-server
+      run: docker compose -f setup/docker-compose.tests.yml up --exit-code-from web-server
