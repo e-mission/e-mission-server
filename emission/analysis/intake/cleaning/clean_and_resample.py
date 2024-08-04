@@ -254,7 +254,7 @@ def get_filtered_place(raw_place):
         reverse_geocoded_json = eco.Geocoder.get_json_reverse(filtered_place_data.location.coordinates[1],
                                                               filtered_place_data.location.coordinates[0])
         if reverse_geocoded_json is not None:
-            filtered_place_data['geocoded_address'] = reverse_geocoded_json['address']
+            filtered_place_data['reverse_geocode'] = reverse_geocoded_json
             filtered_place_data.display_name = format_result(reverse_geocoded_json)
     except KeyError as e:
         logging.info("nominatim result does not have an address, skipping")

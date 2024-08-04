@@ -65,10 +65,10 @@ class NominatimTest(unittest.TestCase):
         actual_display_name = fake_place_data.__getattr__("display_name")
         expected_display_name = "Dorrance Street, Providence"
         self.assertEqual(expected_display_name, actual_display_name)
-        actual_geocoded_address = fake_place_data["geocoded_address"]
-        expected_geocoded_address = {'road': 'Dorrance Street', 'city': 'Providence', 'postcode': '02903'}
-        for k in expected_geocoded_address:
-            self.assertEqual(expected_geocoded_address[k], actual_geocoded_address[k])
+        actual_reverse_geocode = fake_place_data["reverse_geocode"]
+        expected_address = {'road': 'Dorrance Street', 'city': 'Providence', 'postcode': '02903'}
+        for k in expected_address:
+            self.assertEqual(expected_address[k], actual_reverse_geocode['address'][k])
 
     #Testing make_url_geo, which creates a query URL from the input string. 
     def test_make_url_geo(self):
