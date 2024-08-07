@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-cat conf/storage/db.conf
-
 if [ -z ${LIVERELOAD_SRC} ] ; then
     echo "Live reload disabled, "
 else
