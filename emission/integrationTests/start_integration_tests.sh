@@ -3,7 +3,6 @@
 cd /src/e-mission-server
 
 echo ${DB_HOST}
-cat conf/storage/db.conf
 
 echo "Setting up conda..."
 source setup/setup_conda.sh Linux-x86_64
