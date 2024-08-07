@@ -5,9 +5,6 @@ cd /src/e-mission-server
 #set database URL using environment variable
 echo ${DB_HOST}
 
-export WEB_SERVER_HOST=0.0.0.0
-cat conf/storage/db.conf
-
 echo "Setting up conda..."
 source setup/setup_conda.sh Linux-x86_64
 
