@@ -1,7 +1,7 @@
 {
     "intake.segmentation.section_segmentation.sectionValidityAssertions": true,
-    "intake.cleaning.clean_and_resample.speedDistanceAssertions": true,
-    "intake.cleaning.clean_and_resample.sectionValidityAssertions": true,
+    "intake.cleaning.clean_and_resample.speedDistanceAssertions": false,
+    "intake.cleaning.clean_and_resample.sectionValidityAssertions": false,
     "intake.cleaning.filter_accuracy.enable": false,
     "classification.inference.mode.useAdvancedFeatureIndices": true,
     "classification.inference.mode.useBusTrainFeatureIndices": true,
@@ -10,5 +10,5 @@
     "section.startStopRadius": 150,
     "section.endStopRadius": 150,
     "analysis.result.section.key": "analysis/inferred_section",
-    "userinput.keylist": ["manual/mode_confirm", "manual/purpose_confirm", "manual/trip_user_input", "manual/place_user_input"]
+    "userinput.keylist": ["manual/mode_confirm", "manual/purpose_confirm", "manual/replaced_mode", "manual/trip_user_input", "manual/place_user_input"]
 }
