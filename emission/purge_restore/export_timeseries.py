@@ -84,6 +84,7 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
     logging.info("timeline has unique keys = %s" % unique_key_list)
     if len(combined_list) == 0 or unique_key_list == set(['stats/pipeline_time']):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
+        return None
     else:
         combined_filename = "%s.gz" % (file_name)
         logging.info("Combined list:")
@@ -95,9 +96,9 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
         # Returning these queries that were used to fetch the data entries that were exported.
         # Need these for use in the purge_user_timeseries.py script so that we only delete those entries that were exported
         return {
-            'trip_time_query': { 'query': trip_time_query, 'type': "time" },
-            'place_time_query': { 'query': place_time_query, 'type': "time" },
-            'loc_time_query': { 'query': loc_time_query, 'type': "time" },
+            'trip_time_query': trip_time_query,
+            'place_time_query': place_time_query,
+            'loc_time_query': loc_time_query
         }
 
 

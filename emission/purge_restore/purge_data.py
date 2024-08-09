@@ -11,15 +11,17 @@ import json
 import os
 import emission.core.get_database as edb
 import emission.storage.json_wrappers as esj
+import emission.core.wrapper.entry as ecwe
 
 def purge_data(user_id, archive_dir):
     try:
         pdp = PurgeDataPipeline()
         pdp.user_id = user_id
         file_name = pdp.run_purge_data_pipeline(user_id, archive_dir)
-        if pdp.last_trip_done is None:
-            logging.debug("After run, last_trip_done == None, must be early return")
-        espq.mark_purge_data_done(user_id, pdp.last_trip_done)
+        logging.debug("last_processed_ts with trips_to_export logic = %s" % (pdp.last_processed_ts))
+        if pdp.last_processed_ts is None:
+            logging.debug("After run, last_processed_ts == None, must be early return")
+        espq.mark_purge_data_done(user_id, pdp.last_processed_ts)
     except:
         logging.exception("Error while purging timeseries data, timestamp unchanged")
         espq.mark_purge_data_failed(user_id)
@@ -27,15 +29,19 @@ def purge_data(user_id, archive_dir):
 
 class PurgeDataPipeline:
     def __init__(self):
-        self._last_trip_done = None
+        self._last_processed_ts = None
 
     @property
-    def last_trip_done(self):
-        return self._last_trip_done
+    def last_processed_ts(self):
+        return self._last_processed_ts
 
     def run_purge_data_pipeline(self, user_id, archive_dir):
         ts = esta.TimeSeries.get_time_series(user_id)
         time_query = espq.get_time_range_for_purge_data(user_id)
+
+        initEndTs = time_query.endTs
+        logging.debug("Initial created: time_query.endTs = %s" % initEndTs)
+
         print("Inside: purge_data - Start time: %s" % time_query.startTs)
         print("Inside: purge_data - End time: %s" % time_query.endTs)
         if archive_dir is None:
@@ -46,11 +52,39 @@ class PurgeDataPipeline:
 
         if os.path.isdir(archive_dir) == False:
             os.mkdir(archive_dir) 
+
+        # time_query.endTs = entries[-1]['metadata']['write_ts']
+        # logging.debug("Updated from export data file: time_query.endTs = %s" % time_query.endTs)
+
         file_name = archive_dir + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
         print("Exporting to file: %s" % file_name)
+        
         export_queries = epret.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False)
-        self.export_pipeline_states(user_id, file_name)
-        self.delete_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
+
+        if export_queries is None:
+            logging.debug("No data to export, export_queries is None")
+        else:
+            trips_to_export = self.get_exported_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
+            self.export_pipeline_states(user_id, file_name)
+            self.delete_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
+            
+            '''
+            entries = json.load(gzip.open(file_name + ".gz"), object_hook = esj.wrapped_object_hook)
+
+            time_query.endTs = entries[-1]['metadata']['write_ts']
+            logging.debug("Updated from export data file: time_query.endTs = %s" % time_query.endTs)
+
+            if self._last_processed_ts is None or self._last_processed_ts < entries[-1]['metadata']['write_ts']:
+                self._last_processed_ts = entries[-1]['metadata']['write_ts']
+            logging.debug("Purging timeseries data, last_processed_ts = %s" % (self._last_processed_ts))
+            '''
+
+            if len(trips_to_export) == 0:
+                # Didn't process anything new so start at the same point next time
+                self._last_processed_ts = None
+            else:  
+                self._last_processed_ts = trips_to_export[-1]['data']['ts']
+
         return file_name
 
     def export_pipeline_states(self, user_id, file_name):
@@ -65,17 +99,26 @@ class PurgeDataPipeline:
 
     def delete_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime, export_queries):
         for key, value in export_queries.items():
-                if value["type"] == "time":
-                    ts_query = ts._get_query(time_query=value["query"])
-                    print(ts_query)
-                delete_query = {"user_id": user_id, **ts_query}
+            ts_query = ts._get_query(time_query=value)
+            print(ts_query)
+            delete_query = {"user_id": user_id, **ts_query}
 
-                # Get the count of matching documents
-                count = ts.timeseries_db.count_documents(delete_query)
-                print(f"Number of documents matching for {ts.timeseries_db} with {key} query: {count}")
+            # Get the count of matching documents
+            count = ts.timeseries_db.count_documents(delete_query)
+            logging.debug(f"Number of documents matching for {ts.timeseries_db} with {key} query: {count}")
 
-                print("Deleting entries from database...")
-                # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
-                result = ts.timeseries_db.delete_many(delete_query)
-                print(f"Key query: {key}")
-                print("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
+            logging.debug("Deleting entries from database...")
+            result = ts.timeseries_db.delete_many(delete_query)
+            logging.debug(f"Key query: {key}")
+            logging.debug("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
+
+    def get_exported_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime, export_queries):
+        trips_to_export = []
+        for key, value in export_queries.items():
+            tq = value
+            sort_key = ts._get_sort_key(tq)
+            (ts_db_count, ts_db_result) = ts._get_entries_for_timeseries(ts.timeseries_db, None, tq, geo_query=None, extra_query_list=None, sort_key = sort_key)
+            trips_to_export.extend(list(ts_db_result))
+            logging.debug(f"Key query: {key}")
+            logging.debug("{} fetched entries from {} to {}".format(ts_db_count, start_ts_datetime, end_ts_datetime))
+        return trips_to_export

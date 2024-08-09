@@ -29,8 +29,8 @@ class TestPurgeRestoreModule(unittest.TestCase):
     def tearDown(self):
         print("Clearing entries for test UUID from database...")
         # etc.dropAllCollections(edb._get_current_db())
-        # self.clearRelatedDb()
-        # self.clearAllDb()
+        self.clearRelatedDb()
+        self.clearAllDb()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
