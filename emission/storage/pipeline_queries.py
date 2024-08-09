@@ -237,18 +237,12 @@ def get_time_range_for_purge_data(user_id):
     tq.timeType = "data.end_ts"
     return tq
 
-def mark_purge_data_done(user_id, last_trip_done):
-    if last_trip_done is None:
+def mark_purge_data_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
         mark_stage_done(user_id, ps.PipelineStages.PURGE_TIMESERIES_DATA, None)
     else:
         mark_stage_done(user_id, ps.PipelineStages.PURGE_TIMESERIES_DATA,
-                        last_trip_done.data.ts + END_FUZZ_AVOID_LTE)
-# def mark_purge_data_done(user_id, last_processed_ts):
-#     if last_processed_ts is None:
-#         mark_stage_done(user_id, ps.PipelineStages.PURGE_TIMESERIES_DATA, None)
-#     else:
-#         mark_stage_done(user_id, ps.PipelineStages.PURGE_TIMESERIES_DATA,
-#                         last_processed_ts + END_FUZZ_AVOID_LTE)
+                        last_processed_ts + END_FUZZ_AVOID_LTE)
 
 def mark_purge_data_failed(user_id):    
     mark_stage_failed(user_id, ps.PipelineStages.PURGE_TIMESERIES_DATA)
@@ -264,12 +258,6 @@ def mark_restore_data_done(user_id, last_processed_ts):
     else:
         mark_stage_done(user_id, ps.PipelineStages.RESTORE_TIMESERIES_DATA,
                         last_processed_ts + END_FUZZ_AVOID_LTE)
-# def mark_restore_data_done(user_id, last_processed_ts):
-#     if last_processed_ts is None:
-#         mark_stage_done(user_id, ps.PipelineStages.RESTORE_TIMESERIES_DATA, None)
-#     else:
-#         mark_stage_done(user_id, ps.PipelineStages.RESTORE_TIMESERIES_DATA,
-#                         last_processed_ts + END_FUZZ_AVOID_LTE)
 
 def mark_restore_data_failed(user_id):    
     mark_stage_failed(user_id, ps.PipelineStages.RESTORE_TIMESERIES_DATA)
