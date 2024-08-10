@@ -33,7 +33,9 @@ def get_config(config_file_name, var_path_mapping):
             if type(ret_val[var]) is np.int64:
                 ret_val[var] = int(ret_val[var])
         config_file.close()
-    except:
+    except Exception as e:
+        if isinstance(e, KeyError) or isinstance(e, json.decoder.JSONDecodeError):
+            logging.exception(e)
         print("Config file not found, returning a copy of the environment variables instead...")
         # https://github.com/e-mission/e-mission-server/pull/961#issuecomment-2282209006
         ret_val = dict(os.environ)
