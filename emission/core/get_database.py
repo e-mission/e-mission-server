@@ -10,10 +10,14 @@ import pymongo
 import os
 import json
 
-import emission.core.config as ecc
+import emission.core.backwards_compat_config as ecbc
 
-url = ecc.get_config()["timeseries"]["url"]
-result_limit = ecc.get_config()["timeseries"]["result_limit"]
+config = ecbc.get_config('conf/storage/db.conf',
+    {"DB_HOST": "timeseries.url", "DB_RESULT_LIMIT": "timeseries.result_limit"})
+
+print("Retrieved config %s" % config)
+url = config.get("DB_HOST", "localhost")
+result_limit = config.get("DB_RESULT_LIMIT", 250000)
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
