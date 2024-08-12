@@ -21,13 +21,13 @@ def get_interface(push_config):
 
 class FirebasePush(pni.NotifyInterface):
     def __init__(self, push_config):
-        self.server_auth_token = push_config["PUSH_SERVER_AUTH_TOKEN"]
+        self.server_auth_token = push_config.get("PUSH_SERVER_AUTH_TOKEN")
         if "PUSH_APP_PACKAGE_NAME" in push_config:
-            self.app_package_name = push_config["PUSH_APP_PACKAGE_NAME"]
+            self.app_package_name = push_config.get("PUSH_APP_PACKAGE_NAME")
         else:
             logging.warning("No package name specified, defaulting to embase")
             self.app_package_name = "edu.berkeley.eecs.embase"
-        self.is_fcm_format = push_config["PUSH_IOS_TOKEN_FORMAT"] == "fcm"
+        self.is_fcm_format = push_config.get("PUSH_IOS_TOKEN_FORMAT") == "fcm"
 
     def get_and_invalidate_entries(self):
         # Need to figure out how to do this on firebase

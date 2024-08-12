@@ -30,7 +30,7 @@ except:
 class NotifyInterfaceFactory(object):
     @staticmethod
     def getDefaultNotifyInterface():
-        return NotifyInterfaceFactory.getNotifyInterface(push_config["PUSH_PROVIDER"])
+        return NotifyInterfaceFactory.getNotifyInterface(push_config.get("PUSH_PROVIDER"))
 
     @staticmethod
     def getNotifyInterface(pushProvider):
