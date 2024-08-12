@@ -7,7 +7,7 @@ def get_config_data():
         config_file = open('conf/analysis/debug.conf.json')
     except:
         if os.getenv("PROD_STAGE") == "TRUE":
-            print("In production environment, opening internal debug.conf")
+            print("In production environment, config not overridden, using default production debug.conf")
             config_file = open('conf/analysis/debug.conf.prod.json')
         else:
             print("analysis.debug.conf.json not configured, falling back to sample, default configuration")
