@@ -159,8 +159,8 @@ class TestTokenQueries(unittest.TestCase):
         # The first message is displayed when we run tests locally
         # The second is displayed when we run in the docker CI, since the `DB_HOST` is set to `db`
         self.assertIn(sp.stdout,
-            [b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
-            b'URL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
+            [b'Retrieved config {\'DB_HOST\': \'localhost\', \'DB_RESULT_LIMIT\': 250000}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
+            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'CONDA_EXE\': \'/root/miniconda-23.5.2/bin/conda\', \'_CE_M\': \'\', \'HOSTNAME\': \'a846a70e9205\', \'EXP_CONDA_VER\': \'23.5.2\', \'PWD\': \'/src/e-mission-server\', \'CONDA_PREFIX\': \'/root/miniconda-23.5.2/envs/emissiontest\', \'WEB_SERVER_HOST\': \'0.0.0.0\', \'HOME\': \'/root\', \'CONDA_PROMPT_MODIFIER\': \'(emissiontest) \', \'_CE_CONDA\': \'\', \'DB_HOST\': \'db\', \'CONDA_SHLVL\': \'1\', \'SHLVL\': \'2\', \'CONDA_PYTHON_EXE\': \'/root/miniconda-23.5.2/bin/python\', \'CONDA_DEFAULT_ENV\': \'emissiontest\', \'PATH\': \'/root/miniconda-23.5.2/envs/emissiontest/bin:/root/miniconda-23.5.2/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\', \'EXP_CONDA_VER_SUFFIX\': \'0\', \'OLDPWD\': \'/\', \'_\': \'/root/miniconda-23.5.2/envs/emissiontest/bin/python\', \'LC_CTYPE\': \'C.UTF-8\', \'KMP_DUPLICATE_LIB_OK\': \'True\', \'KMP_INIT_AT_FORK\': \'FALSE\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
         ])
 
     def test_run_script_empty(self):
@@ -168,8 +168,8 @@ class TestTokenQueries(unittest.TestCase):
         # The first message is displayed when we run tests locally
         # The second is displayed when we run in the docker CI, since the `DB_HOST` is set to `db`
         self.assertIn(sp.stdout,
-            [b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
-            b'URL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
+            [b'Retrieved config {\'DB_HOST\': \'localhost\', \'DB_RESULT_LIMIT\': 250000}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
+            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'CONDA_EXE\': \'/root/miniconda-23.5.2/bin/conda\', \'_CE_M\': \'\', \'HOSTNAME\': \'a846a70e9205\', \'EXP_CONDA_VER\': \'23.5.2\', \'PWD\': \'/src/e-mission-server\', \'CONDA_PREFIX\': \'/root/miniconda-23.5.2/envs/emissiontest\', \'WEB_SERVER_HOST\': \'0.0.0.0\', \'HOME\': \'/root\', \'CONDA_PROMPT_MODIFIER\': \'(emissiontest) \', \'_CE_CONDA\': \'\', \'DB_HOST\': \'db\', \'CONDA_SHLVL\': \'1\', \'SHLVL\': \'2\', \'CONDA_PYTHON_EXE\': \'/root/miniconda-23.5.2/bin/python\', \'CONDA_DEFAULT_ENV\': \'emissiontest\', \'PATH\': \'/root/miniconda-23.5.2/envs/emissiontest/bin:/root/miniconda-23.5.2/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\', \'EXP_CONDA_VER_SUFFIX\': \'0\', \'OLDPWD\': \'/\', \'_\': \'/root/miniconda-23.5.2/envs/emissiontest/bin/python\', \'LC_CTYPE\': \'C.UTF-8\', \'KMP_DUPLICATE_LIB_OK\': \'True\', \'KMP_INIT_AT_FORK\': \'FALSE\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
         ])
 
     #test that no two options can be used together
