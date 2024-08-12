@@ -11,22 +11,26 @@ import json
 import logging
 import importlib
 
+import emission.core.backwards_compat_config as ecbc
+
 # Note that the URL is hardcoded because the API endpoints are not standardized.
 # If we change a push provider, we will need to modify to match their endpoints.
 # Hardcoding will remind us of this :)
 # We can revisit this if push providers eventually decide to standardize...
 
+push_config = ecbc.get_config('conf/net/ext_service/push.json',
+    {"PUSH_PROVIDER": "provider", "PUSH_SERVER_AUTH_TOKEN": "server_auth_token",
+     "PUSH_APP_PACKAGE_NAME": "app_package_name", "PUSH_IOS_TOKEN_FORMAT": "ios_token_format"})
+
 try:
-    push_config_file = open('conf/net/ext_service/push.json')
-    push_config = json.load(push_config_file)
-    push_config_file.close()
+    logging.info(f"Push configured for app {push_config.get('PUSH_SERVER_AUTH_TOKEN')} using platform {os.getenv('PUSH_PROVIDER')} with token {os.getenv('PUSH_SERVER_AUTH_TOKEN')[:10]}... of length {len(os.getenv('PUSH_SERVER_AUTH_TOKEN'))}")
 except:
     logging.warning("push service not configured, push notifications not supported")
 
 class NotifyInterfaceFactory(object):
     @staticmethod
     def getDefaultNotifyInterface():
-        return NotifyInterfaceFactory.getNotifyInterface(push_config["provider"])
+        return NotifyInterfaceFactory.getNotifyInterface(push_config.get("PUSH_PROVIDER"))
 
     @staticmethod
     def getNotifyInterface(pushProvider):

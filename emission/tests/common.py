@@ -10,6 +10,7 @@ from builtins import *
 import logging
 from datetime import datetime, timedelta
 import json
+import os
 import emission.storage.json_wrappers as esj
 import uuid
 import pymongo
@@ -171,6 +172,13 @@ def setupIncomingEntries():
 
     return (entry_list, ios_entry_list)
 
+def restoreOriginalEnvVars(originalEnvVars, modifiedEnvVars):
+    for env_var_name, env_var_value in modifiedEnvVars.items():
+        del os.environ[env_var_name]
+    # Restoring original db environment variables
+    for env_var_name, env_var_value in originalEnvVars.items():
+        os.environ[env_var_name] = env_var_value
+
 def runIntakePipeline(uuid):
     # Move these imports here so that we don't inadvertently load the modules,
     # and any related config modules, before we want to
@@ -259,7 +267,7 @@ def set_analysis_config(key, value):
     import shutil
 
     analysis_conf_path = "conf/analysis/debug.conf.json"
-    shutil.copyfile("%s.sample" % analysis_conf_path,
+    shutil.copyfile("conf/analysis/debug.conf.dev.json",
                     analysis_conf_path)
     with open(analysis_conf_path) as fd:
         curr_config = json.load(fd)

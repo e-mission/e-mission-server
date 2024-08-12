@@ -23,39 +23,27 @@ import importlib
 
 class TestWebserver(unittest.TestCase):
     def setUp(self):
-        import shutil
+        self.originalWebserverEnvVars = {}
+        self.testModifiedEnvVars = {
+            'WEBSERVER_NOT_FOUND_REDIRECT' : "http://somewhere.else"
+        }
 
-        self.webserver_conf_path = "conf/net/api/webserver.conf"
-        shutil.copyfile(
-            "%s.sample" % self.webserver_conf_path, self.webserver_conf_path
-        )
-        with open(self.webserver_conf_path, "w") as fd:
-            fd.write(
-                json.dumps(
-                    {
-                        "paths": {
-                            "static_path": "webapp/www",
-                            "python_path": "main",
-                            "log_base_dir": ".",
-                            "log_file": "debug.log",
-                            "404_redirect": "http://somewhere.else",
-                        },
-                        "server": {
-                            "host": "0.0.0.0",
-                            "port": "8080",
-                            "timeout": "3600",
-                            "auth": "skip",
-                            "aggregate_call_auth": "no_auth",
-                        },
-                    }
-                )
-            )
-        logging.debug("Finished setting up %s" % self.webserver_conf_path)
-        with open(self.webserver_conf_path) as fd:
-            logging.debug("Current values are %s" % json.load(fd))
+        self.orginalDBEnvVars = dict(os.environ)
+
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            # Setting webserver environment variables with test values
+            os.environ[env_var_name] = env_var_value
+
+        logging.debug("Finished setting up test webserver environment variables")
+        logging.debug("Current original values are = %s" % self.originalWebserverEnvVars)
+        logging.debug("Current modified values are = %s" % self.testModifiedEnvVars)
 
     def tearDown(self):
-        os.remove(self.webserver_conf_path)
+        logging.debug("Deleting test webserver environment variables")
+        etc.restoreOriginalEnvVars(self.originalWebserverEnvVars,
+            self.testModifiedEnvVars)
+        logging.debug("Finished restoring original webserver environment variables")
+        logging.debug("Restored original values are = %s" % self.originalWebserverEnvVars)
 
     def test404Redirect(self):
         from emission.net.api.bottle import response

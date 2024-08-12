@@ -51,27 +51,22 @@ import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
 import emission.core.get_database as edb
+import emission.core.backwards_compat_config as ecbc
 
-try:
-    config_file = open('conf/net/api/webserver.conf')
-except:
-    logging.debug("webserver not configured, falling back to sample, default configuration")
-    config_file = open('conf/net/api/webserver.conf.sample')
-
-OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 
-config_data = json.load(config_file)
-config_file.close()
-static_path = config_data["paths"]["static_path"]
-python_path = config_data["paths"]["python_path"]
-server_host = config_data["server"]["host"]
-server_port = config_data["server"]["port"]
-socket_timeout = config_data["server"]["timeout"]
-log_base_dir = config_data["paths"]["log_base_dir"]
-auth_method = config_data["server"]["auth"]
-aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
-not_found_redirect = config_data["paths"].get("404_redirect", OPENPATH_URL)
+# Constants that we don't read from the configuration
+WEBSERVER_STATIC_PATH="webapp/www"
+WEBSERVER_HOST="0.0.0.0"
+
+config = ecbc.get_config('conf/net/api/webserver.conf',
+    {"WEBSERVER_PORT": "server.port", "WEBSERVER_TIMEOUT": "server.timeout",
+     "WEBSERVER_AUTH": "server.auth", "WEBSERVER_AGGREGATE_CALL_AUTH": "server.aggregate_call_auth"})
+server_port = config.get("WEBSERVER_PORT", 8080)
+socket_timeout = config.get("WEBSERVER_TIMEOUT", 3600)
+auth_method = config.get("WEBSERVER_AUTH", "skip")
+aggregate_call_auth = config.get("WEBSERVER_AGGREGATE_CALL_AUTH", "no_auth")
+not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nrel.gov/openpath")
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -89,7 +84,7 @@ app = app()
 #Simple path that serves up a static landing page with javascript in it
 @route('/')
 def index():
-  return static_file("index.html", static_path)
+  return static_file("index.html", WEBSERVER_STATIC_PATH)
 
 # Backward compat to handle older clients
 # Remove in 2023 after everybody has upgraded
@@ -603,6 +598,4 @@ if __name__ == '__main__':
     else:
       # Non SSL option for testing on localhost
       print("Running with HTTPS turned OFF - use a reverse proxy on production")
-      run(host=server_host, port=server_port, server='cheroot', debug=True)
-
-    # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)
+      run(host=WEBSERVER_HOST, port=server_port, server='cheroot', debug=True)
