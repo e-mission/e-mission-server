@@ -53,11 +53,7 @@ class TestMongodbAuth(unittest.TestCase):
     def tearDown(self):
         self.admin_auth.command({"dropAllUsersFromDatabase": 1})
         logging.debug("Deleting test db environment variables")
-        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
-            del os.environ[env_var_name]
-		# Restoring original db environment variables
-        for env_var_name, env_var_value in self.originalDBEnvVars.items():
-            os.environ[env_var_name] = env_var_value
+        ecc.restoreOriginalEnvVars(self.originalDBEnvVars, self.modifiedEnvVars)
         logging.debug("Finished restoring original db environment variables")
         logging.debug("Restored original values are = %s" % self.originalDBEnvVars)
         try:
@@ -80,10 +76,9 @@ class TestMongodbAuth(unittest.TestCase):
             'DB_HOST' : url
         }
 
+        self.orginalDBEnvVars = dict(os.environ)
+
         for env_var_name, env_var_value in self.testModifiedEnvVars.items():
-            if os.getenv(env_var_name) is not None:
-                # Storing original db environment variables before modification
-                self.originalDBEnvVars[env_var_name] = os.getenv(env_var_name)
             # Setting db environment variables with test values
             os.environ[env_var_name] = env_var_value
 

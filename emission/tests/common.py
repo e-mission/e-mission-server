@@ -10,6 +10,7 @@ from builtins import *
 import logging
 from datetime import datetime, timedelta
 import json
+import os
 import emission.storage.json_wrappers as esj
 import uuid
 import pymongo
@@ -170,6 +171,13 @@ def setupIncomingEntries():
     ios_entry_list = [ios_activity_entry, ios_location_entry, ios_transition_entry]
 
     return (entry_list, ios_entry_list)
+
+def restoreOriginalEnvVars(originalEnvVars, modifiedEnvVars):
+    for env_var_name, env_var_value in modifiedEnvVars.items():
+        del os.environ[env_var_name]
+    # Restoring original db environment variables
+    for env_var_name, env_var_value in originalEnvVars.items():
+        os.environ[env_var_name] = env_var_value
 
 def runIntakePipeline(uuid):
     # Move these imports here so that we don't inadvertently load the modules,

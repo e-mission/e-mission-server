@@ -25,13 +25,12 @@ class TestWebserver(unittest.TestCase):
     def setUp(self):
         self.originalWebserverEnvVars = {}
         self.testModifiedEnvVars = {
-            'WEB_SERVER_REDIRECT_URL' : "http://somewhere.else"
+            'WEBSERVER_NOT_FOUND_REDIRECT' : "http://somewhere.else"
         }
 
+        self.orginalDBEnvVars = dict(os.environ)
+
         for env_var_name, env_var_value in self.testModifiedEnvVars.items():
-            if os.getenv(env_var_name) is not None:
-                # Storing original webserver environment variables before modification
-                self.originalWebserverEnvVars[env_var_name] = os.getenv(env_var_name)
             # Setting webserver environment variables with test values
             os.environ[env_var_name] = env_var_value
 
@@ -41,11 +40,8 @@ class TestWebserver(unittest.TestCase):
 
     def tearDown(self):
         logging.debug("Deleting test webserver environment variables")
-        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
-            del os.environ[env_var_name]
-        # Restoring original webserver environment variables
-        for env_var_name, env_var_value in self.originalWebserverEnvVars.items():
-            os.environ[env_var_name] = env_var_value
+        etc.restoreOriginalEnvVars(self.originalWebserverEnvVars,
+            self.testModifiedEnvVars)
         logging.debug("Finished restoring original webserver environment variables")
         logging.debug("Restored original values are = %s" % self.originalWebserverEnvVars)
 
