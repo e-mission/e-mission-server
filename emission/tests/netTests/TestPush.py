@@ -121,7 +121,7 @@ class TestPush(unittest.TestCase):
         logging.debug("test token map = %s" % self.test_token_map)
 
         try:
-            fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key", "ios_token_format": "apns"})
+            fcm_instance = pnif.get_interface({"PUSH_SERVER_AUTH_TOKEN": "firebase_api_key", "PUSH_IOS_TOKEN_FORMAT": "apns"})
             (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
             # At this point, there is nothing in the database, so no iOS tokens will be mapped
             self.assertEqual(len(mapped_token_map["ios"]), 0)
@@ -176,7 +176,7 @@ class TestPush(unittest.TestCase):
             "android": self.test_token_list_android}
         logging.debug("test token map = %s" % self.test_token_map)
 
-        fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key", "ios_token_format": "fcm"})
+        fcm_instance = pnif.get_interface({"PUSH_SERVER_AUTH_TOKEN": "firebase_api_key", "PUSH_IOS_TOKEN_FORMAT": "fcm"})
         (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
         # These are assumed to be FCM tokens directly, so no mapping required
         self.assertEqual(len(mapped_token_map["ios"]), 10)
