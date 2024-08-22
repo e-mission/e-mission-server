@@ -169,6 +169,8 @@ class TestTokenQueries(unittest.TestCase):
         esdt.insert({'token':'z'})
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show"], capture_output=True)
         current_conda_env = os.environ.get('CONDA_DEFAULT_ENV', 'emission')
+        logging.debug("CONDA_DEFAULT_ENV: %s" % current_conda_env)
+        print("CONDA_DEFAULT_ENV: %s" % current_conda_env)
         # The first message is displayed when we run tests locally
         # The second is displayed when we run in the CI/CD, but with the local install 
         # The third is displayed when we run in the docker CI since the `DB_HOST` is set to `db`
@@ -181,6 +183,8 @@ class TestTokenQueries(unittest.TestCase):
     def test_run_script_empty(self):
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py"], capture_output=True)
         current_conda_env = os.environ.get('CONDA_DEFAULT_ENV', 'emission')
+        logging.debug("CONDA_DEFAULT_ENV: %s" % current_conda_env)
+        print("CONDA_DEFAULT_ENV: %s" % current_conda_env)
         # The first message is displayed when we run tests locally
         # The second is displayed when we run in the CI/CD, but with the local install 
         # The third is displayed when we run in the docker CI since the `DB_HOST` is set to `db`
