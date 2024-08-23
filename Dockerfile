@@ -3,6 +3,8 @@ FROM ubuntu:jammy-20240227
 
 MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 
+ADD https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /etc/ssl/certs/
+
 WORKDIR /usr/src/app
 
 RUN apt-get -y -qq update
