@@ -15,9 +15,9 @@ import emission.core.backwards_compat_config as ecbc
 config = ecbc.get_config('conf/storage/db.conf',
     {"DB_HOST": "timeseries.url", "DB_RESULT_LIMIT": "timeseries.result_limit"})
 
-print("Retrieved config %s" % config)
 url = config.get("DB_HOST", "localhost")
 result_limit = config.get("DB_RESULT_LIMIT", 250000)
+print("Retrieved config: {'DB_HOST': '%s', 'DB_RESULT_LIMIT': '%s'}" % (url, result_limit))
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
