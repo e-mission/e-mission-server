@@ -50,6 +50,14 @@ class RestoreDataPipeline:
         #     "pipeline_stage": ecwp.PipelineStages.RESTORE_TIMESERIES_DATA.value})
         # self._last_processed_ts = pipelineState["last_processed_ts"]
         # logging.debug("Restoring from file, last_processed_ts = %s" % (self._last_processed_ts))
-        lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
-        if self._last_processed_ts is None or self._last_processed_ts < entries[-1]['metadata']['write_ts']:
-            self._last_processed_ts = entries[-1]['metadata']['write_ts']
+        (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+        print("After load, tsdb_count = %s, ucdb_count = %s" % (tsdb_count, ucdb_count))
+        if tsdb_count == 0:
+            # Didn't process anything new so start at the same point next time
+            self._last_processed_ts = None
+        else:
+            ts_values = [entry['data']['ts'] for entry in entries]
+            self._last_processed_ts = max(ts_values)
+            print("After load, last_processed_ts = %s" % (self._last_processed_ts))
+        # if self._last_processed_ts is None or self._last_processed_ts < entries[-1]['metadata']['write_ts']:
+        #     self._last_processed_ts = entries[-1]['metadata']['write_ts']

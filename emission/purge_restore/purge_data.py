@@ -67,17 +67,6 @@ class PurgeDataPipeline:
             trips_to_export = self.get_exported_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
             self.export_pipeline_states(user_id, file_name)
             self.delete_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
-            
-            '''
-            entries = json.load(gzip.open(file_name + ".gz"), object_hook = esj.wrapped_object_hook)
-
-            time_query.endTs = entries[-1]['metadata']['write_ts']
-            logging.debug("Updated from export data file: time_query.endTs = %s" % time_query.endTs)
-
-            if self._last_processed_ts is None or self._last_processed_ts < entries[-1]['metadata']['write_ts']:
-                self._last_processed_ts = entries[-1]['metadata']['write_ts']
-            logging.debug("Purging timeseries data, last_processed_ts = %s" % (self._last_processed_ts))
-            '''
 
             if len(trips_to_export) == 0:
                 # Didn't process anything new so start at the same point next time
