@@ -480,6 +480,18 @@ def after_request():
         msTimeNow, duration)
   stats.store_server_api_time(request.params.user_uuid, "%s_%s_cputime" % (request.method, request.path),
         msTimeNow, new_duration)
+  
+  # add headers to allow CORS (Cross-Origin Resource Sharing)
+  # Note: this is only needed for requests made from browsers (i.e. JavaScript fetch)
+  # Requests made from native phone code do not have rules about CORS
+  response.headers['Access-Control-Allow-Origin'] = '*'
+  response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+  response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+# generic route accepting OPTIONS method, needed for CORS preflight
+@route('/<:re:.*>', method='OPTIONS')
+def enable_cors_generic_route():
+    pass
 
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
