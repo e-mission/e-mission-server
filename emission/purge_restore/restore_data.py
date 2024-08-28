@@ -35,7 +35,7 @@ class RestoreDataPipeline:
 
     def run_restore_data_pipeline(self, user_id, file_name):
         time_query = espq.get_time_range_for_restore_data(user_id)
-        entries = json.load(gzip.open(file_name + ".gz"), object_hook = esj.wrapped_object_hook)
+        entries_to_import = json.load(gzip.open(file_name + ".gz"), object_hook = esj.wrapped_object_hook)
         '''
         PipelineState({
             '_id': ObjectId('66b15dd496328b58cca9486d'), 
@@ -56,8 +56,7 @@ class RestoreDataPipeline:
             # Didn't process anything new so start at the same point next time
             self._last_processed_ts = None
         else:
-            ts_values = [entry['data']['ts'] for entry in entries]
-            self._last_processed_ts = max(ts_values)
+            self._last_processed_ts = entries_to_import[-1]['data']['ts']
             print("After load, last_processed_ts = %s" % (self._last_processed_ts))
-        # if self._last_processed_ts is None or self._last_processed_ts < entries[-1]['metadata']['write_ts']:
-        #     self._last_processed_ts = entries[-1]['metadata']['write_ts']
+        # if self._last_processed_ts is None or self._last_processed_ts < entries_to_import[-1]['metadata']['write_ts']:
+        #     self._last_processed_ts = entries_to_import[-1]['metadata']['write_ts']

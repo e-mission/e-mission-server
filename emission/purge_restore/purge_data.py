@@ -18,7 +18,7 @@ def purge_data(user_id, archive_dir):
         pdp = PurgeDataPipeline()
         pdp.user_id = user_id
         file_name = pdp.run_purge_data_pipeline(user_id, archive_dir)
-        logging.debug("last_processed_ts with trips_to_export logic = %s" % (pdp.last_processed_ts))
+        logging.debug("last_processed_ts with entries_to_export logic = %s" % (pdp.last_processed_ts))
         if pdp.last_processed_ts is None:
             logging.debug("After run, last_processed_ts == None, must be early return")
         espq.mark_purge_data_done(user_id, pdp.last_processed_ts)
@@ -64,15 +64,15 @@ class PurgeDataPipeline:
         if export_queries is None:
             logging.debug("No data to export, export_queries is None")
         else:
-            trips_to_export = self.get_exported_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
+            entries_to_export = self.get_exported_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
             self.export_pipeline_states(user_id, file_name)
             self.delete_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, export_queries)
 
-            if len(trips_to_export) == 0:
+            if len(entries_to_export) == 0:
                 # Didn't process anything new so start at the same point next time
                 self._last_processed_ts = None
             else:  
-                self._last_processed_ts = trips_to_export[-1]['data']['ts']
+                self._last_processed_ts = entries_to_export[-1]['data']['ts']
 
         return file_name
 
@@ -102,12 +102,12 @@ class PurgeDataPipeline:
             logging.debug("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
 
     def get_exported_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime, export_queries):
-        trips_to_export = []
+        entries_to_export = []
         for key, value in export_queries.items():
             tq = value
             sort_key = ts._get_sort_key(tq)
             (ts_db_count, ts_db_result) = ts._get_entries_for_timeseries(ts.timeseries_db, None, tq, geo_query=None, extra_query_list=None, sort_key = sort_key)
-            trips_to_export.extend(list(ts_db_result))
+            entries_to_export.extend(list(ts_db_result))
             logging.debug(f"Key query: {key}")
             logging.debug("{} fetched entries from {} to {}".format(ts_db_count, start_ts_datetime, end_ts_datetime))
-        return trips_to_export
+        return entries_to_export
