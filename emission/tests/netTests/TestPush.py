@@ -40,22 +40,33 @@ def generate_fake_result(successful_tokens, failed_tokens):
 
 class TestPush(unittest.TestCase):
     def setUp(self):
-        import shutil
-        self.push_conf_path = "conf/net/ext_service/push.json"
-        shutil.copyfile("%s.sample" % self.push_conf_path,
-                        self.push_conf_path)
-        with open(self.push_conf_path, "w") as fd:
-            fd.write(json.dumps({
-                "provider": "firebase",
-                "server_auth_token": "firebase_api_key",
-                "ios_token_format": "apns"
-            }))
-        logging.debug("Finished setting up %s" % self.push_conf_path)
-        with open(self.push_conf_path) as fd:
-            logging.debug("Current values are %s" % json.load(fd))
+        self.originalPushEnvVars = {}
+        self.testModifiedEnvVars = {
+            'PUSH_PROVIDER' : "firebase",
+            'PUSH_SERVER_AUTH_TOKEN' : "firebase_api_key",
+            'PUSH_IOS_TOKEN_FORMAT' : "apns"
+        }
+
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            if os.getenv(env_var_name) is not None:
+                # Storing original push environment variables before modification
+                self.originalPushEnvVars[env_var_name] = os.getenv(env_var_name)
+            # Setting push environment variables with test values
+            os.environ[env_var_name] = env_var_value
+
+        logging.debug("Finished setting up test push environment variables")
+        logging.debug("Current original values are = %s" % self.originalPushEnvVars)
+        logging.debug("Current modified values are = %s" % self.testModifiedEnvVars)
 
     def tearDown(self):
-        os.remove(self.push_conf_path)
+        logging.debug("Deleting test push environment variables")
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            del os.environ[env_var_name]
+        # Restoring original push environment variables
+        for env_var_name, env_var_value in self.originalPushEnvVars.items():
+            os.environ[env_var_name] = env_var_value
+        logging.debug("Finished restoring original push environment variables")
+        logging.debug("Restored original values are = %s" % self.originalPushEnvVars)
 
     def testGetInterface(self):
         import emission.net.ext_service.push.notify_interface as pni
@@ -110,7 +121,7 @@ class TestPush(unittest.TestCase):
         logging.debug("test token map = %s" % self.test_token_map)
 
         try:
-            fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key", "ios_token_format": "apns"})
+            fcm_instance = pnif.get_interface({"PUSH_SERVER_AUTH_TOKEN": "firebase_api_key", "PUSH_IOS_TOKEN_FORMAT": "apns"})
             (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
             # At this point, there is nothing in the database, so no iOS tokens will be mapped
             self.assertEqual(len(mapped_token_map["ios"]), 0)
@@ -165,7 +176,7 @@ class TestPush(unittest.TestCase):
             "android": self.test_token_list_android}
         logging.debug("test token map = %s" % self.test_token_map)
 
-        fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key", "ios_token_format": "fcm"})
+        fcm_instance = pnif.get_interface({"PUSH_SERVER_AUTH_TOKEN": "firebase_api_key", "PUSH_IOS_TOKEN_FORMAT": "fcm"})
         (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
         # These are assumed to be FCM tokens directly, so no mapping required
         self.assertEqual(len(mapped_token_map["ios"]), 10)

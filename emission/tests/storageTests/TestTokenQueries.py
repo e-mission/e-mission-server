@@ -2,11 +2,13 @@ import unittest
 import logging
 import uuid
 import json
+import os
 
 #changed all script runs from os() to subprocess.run() for consistency
 #TODO clean up commented out os() lines
 # import os
 import subprocess 
+import importlib
 
 import emission.core.get_database as edb
 
@@ -15,6 +17,16 @@ import emission.net.auth.token_list as enat
 
 
 class TestTokenQueries(unittest.TestCase):
+    def setUp(self):
+        # Delete irrelevant environment variables so that they don't mess up
+        # the expected comparison with the ground truth
+        # https://github.com/e-mission/e-mission-server/pull/961#issuecomment-2284668743
+        for var_name in os.environ.keys():
+            if not var_name.startswith("DB") and \
+                var_name not in ["PATH", "PYTHONPATH"]:
+                logging.debug("Deleting environment variable %s with value %s" % (var_name, os.environ.get(var_name)))
+                del os.environ[var_name]
+        importlib.reload(edb)
 
     def tearDown(self):
     #All tests insert tokens of length one. Delete them once the test is done.
@@ -157,19 +169,23 @@ class TestTokenQueries(unittest.TestCase):
         esdt.insert({'token':'z'})
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show"], capture_output=True)
         # The first message is displayed when we run tests locally
-        # The second is displayed when we run in the docker CI, since the `DB_HOST` is set to `db`
+        # The second is displayed when we run in the CI/CD, but with the local install 
+        # The third is displayed when we run in the docker CI since the `DB_HOST` is set to `db`
         self.assertIn(sp.stdout,
-            [b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
-            b'URL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
+            [b'Retrieved config {\'DB_HOST\': \'localhost\', \'DB_RESULT_LIMIT\': 250000}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
+            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'PATH\': \'/home/runner/miniconda-23.5.2/envs/emissiontest/bin:/home/runner/miniconda-23.5.2/condabin:/snap/bin:/home/runner/.local/bin:/opt/pipx_bin:/home/runner/.cargo/bin:/home/runner/.config/composer/vendor/bin:/usr/local/.ghcup/bin:/home/runner/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/runner/.dotnet/tools\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
+            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'DB_HOST\': \'db\', \'PATH\': \'/root/miniconda-23.5.2/envs/emissiontest/bin:/root/miniconda-23.5.2/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
         ])
 
     def test_run_script_empty(self):
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py"], capture_output=True)
         # The first message is displayed when we run tests locally
-        # The second is displayed when we run in the docker CI, since the `DB_HOST` is set to `db`
+        # The second is displayed when we run in the CI/CD, but with the local install 
+        # The third is displayed when we run in the docker CI since the `DB_HOST` is set to `db`
         self.assertIn(sp.stdout,
-            [b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
-            b'URL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
+            [b'Retrieved config {\'DB_HOST\': \'localhost\', \'DB_RESULT_LIMIT\': 250000}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
+            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'PATH\': \'/home/runner/miniconda-23.5.2/envs/emissiontest/bin:/home/runner/miniconda-23.5.2/condabin:/snap/bin:/home/runner/.local/bin:/opt/pipx_bin:/home/runner/.cargo/bin:/home/runner/.config/composer/vendor/bin:/usr/local/.ghcup/bin:/home/runner/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/runner/.dotnet/tools\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
+            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'DB_HOST\': \'db\', \'PATH\': \'/root/miniconda-23.5.2/envs/emissiontest/bin:/root/miniconda-23.5.2/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
         ])
 
     #test that no two options can be used together

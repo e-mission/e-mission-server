@@ -1,29 +1,22 @@
-# This is a basic workflow to help you get started with Actions
-
 name: docker image
 
-# Controls when the action will run. Triggers the workflow on push or pull request 
-# events but only for the master branch
 on:
   push:
     branches: [ master, gis-based-mode-detection ]
 
-
-# Env variable
+#Dockerhub credentials are set as environment variables
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    outputs:
+      date: ${{ steps.date.outputs.date }}
+
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
     - name: docker login
       run: | # log into docker hub account
@@ -46,3 +39,44 @@ jobs:
     - name: push docker image
       run: |
         docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
+
+    - name: Create a text file
+      run: |
+        echo ${{ steps.date.outputs.date }} > tag_file.txt
+        echo "Created tag text file"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image-tag
+        path: tag_file.txt
+        overwrite: true
+
+  dispatch:
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE_TAG: ${{ needs.build.outputs.date }}
+
+    strategy:
+      matrix:
+        include:
+          - repo: e-mission/op-admin-dashboard
+            branch: master
+          - repo: e-mission/em-public-dashboard
+            branch: main
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Trigger workflow in admin-dash, public-dash
+      # TODO: Create Fine-grained token with "Actions: write" permissions 
+      run: |
+        curl -L \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/${{ matrix.repo }}/actions/workflows/image_build_push.yml/dispatches \
+          -d '{"ref":"${{ matrix.branch }}", "inputs": {"docker_image_tag" : "${{ env.DOCKER_IMAGE_TAG }}"}}'
