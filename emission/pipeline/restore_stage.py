@@ -20,7 +20,7 @@ import emission.core.wrapper.pipelinestate as ecwp
 import emission.storage.decorations.stats_queries as esds
 import emission.purge_restore.restore_data as eprrd
 
-def run_restore_pipeline(process_number, uuid_list, file_name):
+def run_restore_pipeline(process_number, uuid_list, file_names):
     try:
         with open("conf/log/restore.conf", "r") as cf:
             restore_log_config = json.load(cf)
@@ -43,18 +43,18 @@ def run_restore_pipeline(process_number, uuid_list, file_name):
             continue
 
         try:
-            run_restore_pipeline_for_user(uuid, file_name)
+            run_restore_pipeline_for_user(uuid, file_names)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
                               "for user %s, skipping" % (e, uuid))
 
 
-def run_restore_pipeline_for_user(uuid, file_name):
+def run_restore_pipeline_for_user(uuid, file_names):
     with ect.Timer() as edt:
         logging.info("*" * 10 + "UUID %s: restoring timeseries data" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: restoring timeseries data" % uuid + "*" * 10)
-        eprrd.restore_data(uuid, file_name)
+        eprrd.restore_data(uuid, file_names)
 
     esds.store_pipeline_time(uuid, ecwp.PipelineStages.RESTORE_TIMESERIES_DATA.name,
                              time.time(), edt.elapsed)

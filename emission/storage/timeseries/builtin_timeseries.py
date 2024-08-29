@@ -135,8 +135,6 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ret_query.update({"$or": key_query_list})
         if time_query is not None:
             ret_query.update(time_query.get_query())
-            print("Inside builtintimeseries")
-            print("time_query = %s" % time_query.get_query())
         if geo_query is not None:
             ret_query.update(geo_query.get_query())
         if extra_query_list is not None:

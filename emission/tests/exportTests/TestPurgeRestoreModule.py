@@ -107,7 +107,7 @@ class TestPurgeRestoreModule(unittest.TestCase):
         (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
         self.assertEqual(tsdb_count, 0)
 
-    def testPurgeRestorePipeline(self):
+    def testPurgeRestorePipelineFull(self):
         '''
         Test 1 - Verify that purging timeseries data works with sample real data
         '''
@@ -115,19 +115,18 @@ class TestPurgeRestoreModule(unittest.TestCase):
         res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
         logging.info(f"About to purge {res} entries")
         print(f"About to purge {res} entries")
-        # self.assertEqual(res, 1906)
+        self.assertEqual(res, 1906)
 
         # Run the purge pipeline
-        # file_names = epp.run_purge_pipeline_for_user(self.testUUID, os.environ.get('DATA_DIR', 'emission/archived'), "full")
-        file_names = epp.run_purge_pipeline_for_user(self.testUUID, os.environ.get('DATA_DIR', 'emission/archived'), "incremental")
+        file_names = epp.run_purge_pipeline_for_user(self.testUUID, os.environ.get('DATA_DIR', 'emission/archived'), "full")
         print("Exported file names: %s" % file_names)
 
         '''
         Test 2 - Assert the file exists after the export process
         '''
-        # self.assertTrue(pl.Path(file_name + ".gz").is_file()) 
-        # with gzip.open(file_name + ".gz", 'r') as ef:
-            # exported_data = json.loads(ef.read().decode('utf-8'))
+        self.assertTrue(pl.Path(file_names[0] + ".gz").is_file()) 
+        with gzip.open(file_names[0] + ".gz", 'r') as ef:
+            exported_data = json.loads(ef.read().decode('utf-8'))
 
         '''
         Test 3 - Verify that purging timeseries data works with sample real data
@@ -141,13 +140,13 @@ class TestPurgeRestoreModule(unittest.TestCase):
         # A single entry with key 'stats/pipeline_time' should be present as this test involves running the pipeline
         stat_pipeline_key = entries[0].get('metadata').get('key')
         print(f"stat_pipeline_key = {stat_pipeline_key}")
-        # self.assertEqual(stat_pipeline_key,'stats/pipeline_time')
-        # self.assertEqual(res, 1)
+        self.assertEqual(stat_pipeline_key,'stats/pipeline_time')
+        self.assertEqual(res, 1)
 
         # Run the restore pipeline
         logging.info(f"About to restore entries")
         print(f"About to restore entries")
-        # epr.run_restore_pipeline_for_user(self.testUUID, file_names[0])
+        epr.run_restore_pipeline_for_user(self.testUUID, file_names[0])
 
         '''
         Test 4 - Verify that restoring timeseries data works with sample real data
@@ -160,8 +159,65 @@ class TestPurgeRestoreModule(unittest.TestCase):
 
         # Two entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
         print(f"res_stats_count = {res_stats_count}")
-        # self.assertEqual(res_stats_count, 2)
-        # self.assertEqual(res, 1908)
+        self.assertEqual(res_stats_count, 2)
+        self.assertEqual(res, 1908)
+
+    def testPurgeRestorePipelineIncremental(self):
+            '''
+            Test 1 - Verify that purging timeseries data works with sample real data
+            '''
+            # Check how much data there was before
+            res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+            logging.info(f"About to purge {res} entries")
+            print(f"About to purge {res} entries")
+            self.assertEqual(res, 1906)
+
+            # Run the purge pipeline
+            file_names = epp.run_purge_pipeline_for_user(self.testUUID, os.environ.get('DATA_DIR', 'emission/archived'), "incremental")
+            print("Exported file names: %s" % file_names)
+
+            '''
+            Test 2 - Assert the file exists after the export process
+            '''
+            for file_name in file_names:
+                self.assertTrue(pl.Path(file_name + ".gz").is_file()) 
+                # with gzip.open(file_name + ".gz", 'r') as ef:
+                #     exported_data = json.loads(ef.read().decode('utf-8'))
+
+            '''
+            Test 3 - Verify that purging timeseries data works with sample real data
+            '''
+            # Check how much data there is after
+            entries = edb.get_timeseries_db().find({"user_id" : self.testUUID})
+            res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+            logging.info(f"Purging complete: {res} entries remaining")
+            print(f"Purging complete: {res} entries remaining")
+            
+            # A single entry with key 'stats/pipeline_time' should be present as this test involves running the pipeline
+            stat_pipeline_key = entries[0].get('metadata').get('key')
+            print(f"stat_pipeline_key = {stat_pipeline_key}")
+            self.assertEqual(stat_pipeline_key,'stats/pipeline_time')
+            self.assertEqual(res, 1)
+
+            # Run the restore pipeline
+            logging.info(f"About to restore entries")
+            print(f"About to restore entries")
+            print("File names: %s" % file_names)
+            epr.run_restore_pipeline_for_user(self.testUUID, file_names)
+
+            '''
+            Test 4 - Verify that restoring timeseries data works with sample real data
+            '''
+            # Check how much data there is after
+            res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+            res_stats_count = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID, "metadata.key" : 'stats/pipeline_time'})
+            logging.info(f"Restoring complete: {res} entries restored")
+            print(f"Restoring complete: {res} entries restored")
+
+            # Two entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
+            print(f"res_stats_count = {res_stats_count}")
+            # self.assertEqual(res_stats_count, 2)
+            # self.assertEqual(res, 1908)
 
 
 if __name__ == '__main__':

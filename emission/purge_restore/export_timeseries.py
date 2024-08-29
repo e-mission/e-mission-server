@@ -63,8 +63,11 @@ def get_from_all_three_sources_with_retry(user_id, in_query, databases=None):
 
 def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
     logging.info("In export: Databases = %s" % databases)
+    print("In export: Databases = %s" % databases)
 
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
+                 (user_id, start_ts, end_ts, file_name))
+    print("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_ts, end_ts, file_name))
 
     loc_time_query = estt.TimeQuery("data.ts", start_ts, end_ts)
@@ -110,11 +113,11 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
 
 
 # def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
-def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
+def validate_truncation(loc_entry_list):
     MAX_LIMIT = 25 * 10000
     if len(loc_entry_list) == MAX_LIMIT:
         logging.warning("loc_entry_list length = %d, probably truncated" % len(loc_entry_list))
-    if len(trip_entry_list) == MAX_LIMIT:
-        logging.warning("trip_entry_list length = %d, probably truncated" % len(trip_entry_list))
-    if len(place_entry_list) == MAX_LIMIT:
-        logging.warning("place_entry_list length = %d, probably truncated" % len(place_entry_list))
+    # if len(trip_entry_list) == MAX_LIMIT:
+    #     logging.warning("trip_entry_list length = %d, probably truncated" % len(trip_entry_list))
+    # if len(place_entry_list) == MAX_LIMIT:
+    #     logging.warning("place_entry_list length = %d, probably truncated" % len(place_entry_list))
