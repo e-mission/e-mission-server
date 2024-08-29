@@ -39,22 +39,22 @@ def run_purge_pipeline(process_number, uuid, archive_dir=None):
     logging.info("processing UUID list = %s" % uuid)
 
     try:
-        file_name = run_purge_pipeline_for_user(uuid, archive_dir)
+        file_names = run_purge_pipeline_for_user(uuid, archive_dir)
     except Exception as e:
         esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
         logging.exception("Found error %s while processing pipeline "
                             "for user %s, skipping" % (e, uuid))
             
-    return file_name
+    return file_names
 
 
-def run_purge_pipeline_for_user(uuid, archive_dir):
+def run_purge_pipeline_for_user(uuid, archive_dir, export_type):
     with ect.Timer() as edt:
         logging.info("*" * 10 + "UUID %s: purging timeseries data" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: purging timeseries data" % uuid + "*" * 10)
-        file_name = eprpd.purge_data(uuid, archive_dir)
+        file_names = eprpd.purge_data(uuid, archive_dir, export_type)
 
     esds.store_pipeline_time(uuid, ecwp.PipelineStages.PURGE_TIMESERIES_DATA.name,
                              time.time(), edt.elapsed)
 
-    return file_name
+    return file_names

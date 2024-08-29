@@ -69,21 +69,28 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
 
     loc_time_query = estt.TimeQuery("data.ts", start_ts, end_ts)
     loc_entry_list = get_from_all_three_sources_with_retry(user_id, loc_time_query, databases)
-    trip_time_query = estt.TimeQuery("data.start_ts", start_ts, end_ts)
-    trip_entry_list = get_from_all_three_sources_with_retry(user_id, trip_time_query, databases)
-    place_time_query = estt.TimeQuery("data.enter_ts", start_ts, end_ts)
-    place_entry_list = get_from_all_three_sources_with_retry(user_id, place_time_query, databases)
+    # trip_time_query = estt.TimeQuery("data.start_ts", start_ts, end_ts)
+    # trip_entry_list = get_from_all_three_sources_with_retry(user_id, trip_time_query, databases)
+    # place_time_query = estt.TimeQuery("data.enter_ts", start_ts, end_ts)
+    # place_entry_list = get_from_all_three_sources_with_retry(user_id, place_time_query, databases)
     
-    combined_list = loc_entry_list + trip_entry_list + place_entry_list 
-    logging.info("Found %d loc-like entries, %d trip-like entries, %d place-like entries = %d total entries" %
-        (len(loc_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
+    # combined_list = loc_entry_list + trip_entry_list + place_entry_list 
+    combined_list = loc_entry_list 
+    # logging.info("Found %d loc-like entries, %d trip-like entries, %d place-like entries = %d total entries" %
+        # (len(loc_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
+    logging.info("Found %d loc-like entries = %d total entries" %
+        (len(loc_entry_list), len(combined_list)))
 
-    validate_truncation(loc_entry_list, trip_entry_list, place_entry_list)
+    validate_truncation(loc_entry_list)
+    # validate_truncation(loc_entry_list, trip_entry_list, place_entry_list)
 
     unique_key_list = set([e["metadata"]["key"] for e in combined_list])
     logging.info("timeline has unique keys = %s" % unique_key_list)
     if len(combined_list) == 0 or unique_key_list == set(['stats/pipeline_time']):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
+        print("No entries found in range for user %s, skipping save" % user_id)
+        print("Combined list length = %d" % len(combined_list))
+        print("Unique key list = %s" % unique_key_list)
         return None
     else:
         combined_filename = "%s.gz" % (file_name)
@@ -96,12 +103,13 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
         # Returning these queries that were used to fetch the data entries that were exported.
         # Need these for use in the purge_user_timeseries.py script so that we only delete those entries that were exported
         return {
-            'trip_time_query': trip_time_query,
-            'place_time_query': place_time_query,
+            # 'trip_time_query': trip_time_query,
+            # 'place_time_query': place_time_query,
             'loc_time_query': loc_time_query
         }
 
 
+# def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
 def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
     MAX_LIMIT = 25 * 10000
     if len(loc_entry_list) == MAX_LIMIT:
