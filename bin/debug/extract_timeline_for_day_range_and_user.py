@@ -25,10 +25,8 @@ import emission.storage.decorations.user_queries as esdu
 # only needed to read the motion_activity
 # https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
 import emission.export.export as eee
-import emission.purge_restore.export_timeseries as epret
-import emission.purge_restore.purge_data as eprpd
 
-def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name, purge_ts_entries):
+def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_day_str, end_day_str, file_name))
 
@@ -40,11 +38,7 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name, pu
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
 
     ts = esta.TimeSeries.get_time_series(user_id)
-    if purge_ts_entries:
-        export_queries = epret.export(user_id, ts, start_day_ts, end_day_ts, file_name, False)
-        eprpd.PurgeDataPipeline().delete_timeseries_entries(user_id, ts, start_day_ts, end_day_ts, export_queries)
-    else:
-        eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True)
+    eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True)
  
     import emission.core.get_database as edb
     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
@@ -62,7 +56,7 @@ def export_timeline_for_users(user_id_list, args):
             logging.info("=" * 50)
             export_timeline(user_id=curr_uuid, start_day_str=args.start_day,
                 end_day_str= args.end_day, timezone=args.timezone,
-                file_name=args.file_prefix, purge_ts_entries=args.purge)
+                file_name=args.file_prefix)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -78,7 +72,6 @@ if __name__ == '__main__':
     parser.add_argument("start_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
     parser.add_argument("end_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
     parser.add_argument("file_prefix", help="prefix for the filenames generated - e.g /tmp/dump_ will generate files /tmp/dump_<uuid1>.gz, /tmp/dump_<uuid2>.gz..." )
-    parser.add_argument("-p", "--purge", default=False, action='store_true', help="select whether to purge the timeseries database entries (only timeseries_db not analysis_db)")
 
     args = parser.parse_args()
 
