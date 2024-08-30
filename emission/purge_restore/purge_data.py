@@ -122,7 +122,7 @@ class PurgeDataPipeline:
             file_names.append(file_name)
             print("File names: %s" % file_names)
 
-            self.export_pipeline_states(user_id, file_name)
+            # self.export_pipeline_states(user_id, file_name)
             self.delete_timeseries_entries(user_id, ts, current_start_ts, current_end_ts, export_queries)
 
             print("Total entries to export: %s" % count_entries)
@@ -139,15 +139,15 @@ class PurgeDataPipeline:
         print("Exported file names: %s" %  file_names)
         return file_names
 
-    def export_pipeline_states(self, user_id, file_name):
-        pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
-        logging.info("Found %d pipeline states %s" %
-            (len(pipeline_state_list),
-            list([ps["pipeline_stage"] for ps in pipeline_state_list])))
-        pipeline_filename = "%s_pipelinestate_%s.gz" % (file_name, user_id)
-        with gzip.open(pipeline_filename, "wt") as gpfd:
-            json.dump(pipeline_state_list,
-            gpfd, default=esj.wrapped_default, allow_nan=False, indent=4)    
+    # def export_pipeline_states(self, user_id, file_name):
+    #     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
+    #     logging.info("Found %d pipeline states %s" %
+    #         (len(pipeline_state_list),
+    #         list([ps["pipeline_stage"] for ps in pipeline_state_list])))
+    #     pipeline_filename = "%s_pipelinestate_%s.gz" % (file_name, user_id)
+    #     with gzip.open(pipeline_filename, "wt") as gpfd:
+    #         json.dump(pipeline_state_list,
+    #         gpfd, default=esj.wrapped_default, allow_nan=False, indent=4)    
 
     def delete_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime, export_queries):
         for key, value in export_queries.items():

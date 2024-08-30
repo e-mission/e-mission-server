@@ -12,6 +12,7 @@ import bin.debug.load_multi_timeline_for_range as lmtfr
 import emission.storage.json_wrappers as esj
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ecwp
+import emission.purge_restore.import_timeseries as eprit
 
 def restore_data(user_id, file_names):
     try:
@@ -41,7 +42,8 @@ class RestoreDataPipeline:
             #     "pipeline_stage": ecwp.PipelineStages.RESTORE_TIMESERIES_DATA.value})
             # self._last_processed_ts = pipelineState["last_processed_ts"]
             # logging.debug("Restoring from file, last_processed_ts = %s" % (self._last_processed_ts))
-            (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+            # (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+            (tsdb_count, ucdb_count) = eprit.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
             print("After load, tsdb_count = %s, ucdb_count = %s" % (tsdb_count, ucdb_count))
             if tsdb_count == 0:
                 # Didn't process anything new so start at the same point next time
