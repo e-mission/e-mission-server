@@ -150,6 +150,11 @@ class TestPurgeRestoreModule(unittest.TestCase):
         self.assertEqual(stat_pipeline_key,'stats/pipeline_time')
         self.assertEqual(res, 1)
 
+        print("pipelineState_entries after full export purge =")
+        pipelineState_entries = edb.get_pipeline_state_db().find({"user_id":  self.testUUID})
+        for entry in pipelineState_entries:
+            print(entry)
+
         # Run the restore pipeline
         logging.info(f"About to restore entries")
         print(f"About to restore entries")
@@ -161,12 +166,29 @@ class TestPurgeRestoreModule(unittest.TestCase):
         # Check how much data there is after
         res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
         res_stats_count = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID, "metadata.key" : 'stats/pipeline_time'})
-        logging.info(f"Restoring complete: {res} entries restored")
-        print(f"Restoring complete: {res} entries restored")
+        logging.info(f"Restoring complete: {res-1} entries restored")
+        print(f"Restoring complete: {res-1} entries restored")
 
         # Two additional entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
         self.assertEqual(res_stats_count, 2)
         self.assertEqual(res, 1908)
+
+        # Test 5 - Verify that restoring timeseries data fails if data already exists
+        # Duplicate key error is ignored hence no entries should be inserted
+        logging.info("Attempting to load duplicate data...")
+        print("Attempting to load duplicate data...")
+        epr.run_restore_pipeline_for_user(self.testUUID, file_names)
+        # Check how much data there is after
+        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+        logging.info(f"Restoring complete: {res-1} entries restored")
+        print(f"Restoring complete: {res-1} entries restored")
+
+        print("pipelineState_entries after running restore again =")
+        pipelineState_entries = edb.get_pipeline_state_db().find({"user_id":  self.testUUID})
+        for entry in pipelineState_entries:
+            print(entry)
+        # self.assertEqual(stat_pipeline_key,'stats/pipeline_time')
+        # self.assertEqual(res, 1908)
 
     def testPurgeRestorePipelineIncremental(self):
             '''
@@ -211,6 +233,11 @@ class TestPurgeRestoreModule(unittest.TestCase):
             self.assertEqual(stat_pipeline_key,'stats/pipeline_time')
             self.assertEqual(res, 1)
 
+            print("pipelineState_entries after incremental export purge =")
+            pipelineState_entries = edb.get_pipeline_state_db().find({"user_id":  self.testUUID})
+            for entry in pipelineState_entries:
+                print(entry)
+
             # Run the restore pipeline
             logging.info(f"About to restore entries")
             print(f"About to restore entries")
@@ -223,8 +250,8 @@ class TestPurgeRestoreModule(unittest.TestCase):
             # Check how much data there is after
             res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
             res_stats_count = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID, "metadata.key" : 'stats/pipeline_time'})
-            logging.info(f"Restoring complete: {res} entries restored")
-            print(f"Restoring complete: {res} entries restored")
+            logging.info(f"Restoring complete: {res-1} entries restored")
+            print(f"Restoring complete: {res-1} entries restored")
 
             # Two additional entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
             self.assertEqual(res_stats_count, 2)
