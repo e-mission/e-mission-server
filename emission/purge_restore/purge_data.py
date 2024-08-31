@@ -63,8 +63,78 @@ class PurgeDataPipeline:
         current_start_ts = initStartTs if initStartTs is not None else entries_to_export[0]['data']['ts']
         batch_start_ts = current_start_ts
         current_batch_size = 0
-        batch_time_ranges = []
+        # batch_time_ranges = []
+        batch_time_range = ()
+        entries_to_process = []
 
+        while current_start_ts < initEndTs:
+            current_end_ts = min(current_start_ts + 3600, initEndTs) if export_type == 'incremental' else initEndTs
+
+            new_entries = self.get_export_timeseries_entries(user_id, ts, current_start_ts, current_end_ts)
+
+            if new_entries:
+                if current_batch_size + len(new_entries) > self.batch_size_limit:
+                    # If adding new entries exceeds the batch size limit
+                    entries_to_process = new_entries[:self.batch_size_limit - current_batch_size]
+                    current_end_ts = entries_to_process[-1]['data']['ts']
+                else:
+                    entries_to_process = new_entries
+
+                current_batch_size += len(entries_to_process)
+                self._last_processed_ts = entries_to_process[-1]['data']['ts']
+                print(f"Updated last_processed_ts {self._last_processed_ts}")
+
+                # batch_time_ranges.append((batch_start_ts, current_end_ts))
+                batch_time_range = (batch_start_ts, current_end_ts)
+
+                if current_batch_size >= self.batch_size_limit or current_end_ts >= initEndTs:
+                    print("Exporting batch size of %s entries from %s to %s" % (current_batch_size, batch_start_ts, current_end_ts))
+                    # file_names.extend(self.export_batches(user_id, ts, batch_time_ranges, archive_dir))
+                    file_names.extend(self.export_batches(user_id, ts, batch_time_range, archive_dir))
+                    # self.delete_batches(user_id, ts, batch_time_ranges)
+                    # self.delete_batches(user_id, ts, batch_time_range)
+        
+                    ids_to_delete = [entry['_id'] for entry in entries_to_process]
+                    self.delete_timeseries_entries(user_id, ts, ids_to_delete, batch_time_range[0], batch_time_range[1])
+                    
+                    # batch_time_ranges = []
+                    batch_time_range = ()
+
+                    current_batch_size = 0
+                    batch_start_ts = current_end_ts
+
+                current_start_ts = current_end_ts
+
+            else:
+                remaining_entries = self.get_export_timeseries_entries(user_id, ts, current_start_ts, initEndTs)
+                if not remaining_entries:
+                    print("No new data to export, breaking out of while loop")
+                    if current_batch_size > 0:
+                        # batch_time_ranges.append((batch_start_ts, current_start_ts))
+                        batch_time_range = (batch_start_ts, current_start_ts)
+                    break
+                else:
+                    print(f"No entries found in current time range from {current_start_ts} to {current_end_ts}")
+                    print("Incrementing time range")
+                    current_start_ts = current_end_ts
+
+        # Export any remaining batches
+        # if batch_time_ranges:
+        if batch_time_range:
+            print("Exporting accumulated entries of batch size of %s entries from %s to %s" % (current_batch_size, batch_start_ts, current_start_ts))
+            # file_names.extend(self.export_batches(user_id, ts, batch_time_ranges, archive_dir))
+            # self.delete_batches(user_id, ts, batch_time_ranges)
+            file_names.extend(self.export_batches(user_id, ts, batch_time_range, archive_dir))
+            # self.delete_batches(user_id, ts, batch_time_range)
+            ids_to_delete = [entry['_id'] for entry in entries_to_process]
+            self.delete_timeseries_entries(user_id, ts, ids_to_delete, batch_time_range[0], batch_time_range[1])
+
+        print(f"Exported data to {len(file_names)} files")
+        print(f"Exported file names: {file_names}")
+        return file_names
+
+
+    '''
         while current_start_ts < initEndTs:
             current_end_ts = min(current_start_ts + 3600, initEndTs) if export_type == 'incremental' else initEndTs
             
@@ -105,11 +175,26 @@ class PurgeDataPipeline:
             print("Exporting accumulated entries of batch size of %s entries from %s to %s" % (current_batch_size, batch_start_ts, current_start_ts))
             file_names.extend(self.export_batches(user_id, ts, batch_time_ranges, archive_dir))
             self.delete_batches(user_id, ts, batch_time_ranges)
-
+            
         print(f"Exported data to {len(file_names)} files")
         print(f"Exported file names: {file_names}")
         return file_names
+    '''
 
+    def export_batches(self, user_id, ts, batch_time_range, archive_dir):
+        file_names = []
+        (start_ts, end_ts) = batch_time_range
+        file_name = archive_dir + "/archive_%s_%s_%s" % (user_id, start_ts, end_ts)
+        print(f"Exporting entries from {start_ts} to {end_ts} to file: {file_name}")
+        epret.export(user_id, ts, start_ts, end_ts, file_name)
+        file_names.append(file_name)
+        return file_names
+
+    # def delete_batches(self, user_id, ts, batch_time_range):
+    #     (start_ts, end_ts) = batch_time_range
+    #     self.delete_timeseries_entries(user_id, ts, start_ts, end_ts)
+
+    '''
     def export_batches(self, user_id, ts, batch_time_ranges, archive_dir):
         file_names = []
         for start_ts, end_ts in batch_time_ranges:
@@ -122,6 +207,7 @@ class PurgeDataPipeline:
     def delete_batches(self, user_id, ts, batch_time_ranges):
         for start_ts, end_ts in batch_time_ranges:
             self.delete_timeseries_entries(user_id, ts, start_ts, end_ts)
+    '''
 
     # def export_pipeline_states(self, user_id, file_name):
     #     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
@@ -133,6 +219,15 @@ class PurgeDataPipeline:
     #         json.dump(pipeline_state_list,
     #         gpfd, default=esj.wrapped_default, allow_nan=False, indent=4)    
 
+    def delete_timeseries_entries(self, user_id, ts, ids_to_delete, start_ts_datetime, end_ts_datetime):
+        logging.debug("Deleting entries from database...")
+        print("Deleting entries from database...")
+        print("Number of entries to delete: %s" % len(ids_to_delete))
+        result = ts.timeseries_db.delete_many({'_id': {'$in': ids_to_delete}})
+        logging.debug("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
+        print("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
+
+    '''
     def delete_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime):
         export_queries = self.get_export_queries(start_ts_datetime, end_ts_datetime)
         for key, value in export_queries.items():
@@ -151,7 +246,8 @@ class PurgeDataPipeline:
             print(f"Key query: {key}")
             logging.debug("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
             print("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
-
+    '''
+            
     def get_export_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime):
         entries_to_export = []
         export_queries = self.get_export_queries(start_ts_datetime, end_ts_datetime)
