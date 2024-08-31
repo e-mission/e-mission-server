@@ -61,7 +61,7 @@ def get_from_all_three_sources_with_retry(user_id, in_query, databases=None):
 
     return retry_lists
 
-def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
+def export(user_id, ts, start_ts, end_ts, file_name, databases=None):
     logging.info("In export: Databases = %s" % databases)
     print("In export: Databases = %s" % databases)
 

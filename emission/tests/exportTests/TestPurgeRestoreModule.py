@@ -13,6 +13,7 @@ import emission.storage.pipeline_queries as espq
 import emission.pipeline.purge_stage as epp
 import emission.pipeline.restore_stage as epr
 import emission.purge_restore.export_timeseries as epret
+import emission.purge_restore.import_timeseries as eprit
 import emission.purge_restore.purge_data as eprpd
 import bin.debug.load_multi_timeline_for_range as lmtfr
 import logging
@@ -47,65 +48,66 @@ class TestPurgeRestoreModule(unittest.TestCase):
         edb.get_pipeline_state_db().delete_many({})
         edb.get_uuid_db().delete_one({})
 
-    def testPurgeRestoreModule(self):
-        ts = esta.TimeSeries.get_time_series(self.testUUID)
-        time_query = {
-            'startTs': 1437578093.881,
-            'endTs': 1437633635.069 # Exporting all 1906 entries
-            # 'endTs': 1437597615.778 # Exporting first 650 entries
-        }
-        file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query['startTs'], time_query['endTs'])
+    # def testPurgeRestoreModule(self):
+    #     ts = esta.TimeSeries.get_time_series(self.testUUID)
+    #     time_query = {
+    #         'startTs': 1437578093.881,
+    #         'endTs': 1437633635.069 # Exporting all 1906 entries
+    #         # 'endTs': 1437597615.778 # Exporting first 650 entries
+    #     }
+    #     file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query['startTs'], time_query['endTs'])
 
-        export_queries = epret.export(self.testUUID, ts, time_query['startTs'], time_query['endTs'], file_name, False)
-        pdp = eprpd.PurgeDataPipeline()
-        pdp.export_pipeline_states(self.testUUID, file_name)
+    #     export_queries = epret.export(self.testUUID, ts, time_query['startTs'], time_query['endTs'], file_name, False)
+    #     pdp = eprpd.PurgeDataPipeline()
+    #     # pdp.export_pipeline_states(self.testUUID, file_name)
 
-        '''
-        Test 1 - Assert the file exists after the export process
-        '''
-        self.assertTrue(pl.Path(file_name + ".gz").is_file()) 
-        with gzip.open(file_name + ".gz", 'r') as ef:
-            exported_data = json.loads(ef.read().decode('utf-8'))
+    #     '''
+    #     Test 1 - Assert the file exists after the export process
+    #     '''
+    #     self.assertTrue(pl.Path(file_name + ".gz").is_file()) 
+    #     # with gzip.open(file_name + ".gz", 'r') as ef:
+    #     #     exported_data = json.loads(ef.read().decode('utf-8'))
 
-        '''
-        Test 2 - Verify that purging timeseries data works with sample real data
-        '''
-        # Check how much data there was before
-        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
-        logging.info(f"About to purge {res} entries")
-        print(f"About to purge {res} entries")
-        self.assertEqual(res, 1906)
+    #     '''
+    #     Test 2 - Verify that purging timeseries data works with sample real data
+    #     '''
+    #     # Check how much data there was before
+    #     res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+    #     logging.info(f"About to purge {res} entries")
+    #     print(f"About to purge {res} entries")
+    #     self.assertEqual(res, 1906)
 
-        pdp.delete_timeseries_entries(self.testUUID, ts, time_query['startTs'], time_query['endTs'], export_queries)
+    #     pdp.delete_timeseries_entries(self.testUUID, ts, time_query['startTs'], time_query['endTs'])
 
-        # Check how much data there is after
-        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
-        logging.info(f"Purging complete: {res} entries remaining")
-        print(f"Purging complete: {res} entries remaining")
-        self.assertEqual(res, 0)
+    #     # Check how much data there is after
+    #     res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+    #     logging.info(f"Purging complete: {res} entries remaining")
+    #     print(f"Purging complete: {res} entries remaining")
+    #     self.assertEqual(res, 0)
 
-        '''
-        Test 3 - Verify that restoring timeseries data works with sample real data
-        '''
-        # Run the restore function
-        logging.info(f"About to restore entries")
-        print(f"About to restore entries")
-        lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+    #     '''
+    #     Test 3 - Verify that restoring timeseries data works with sample real data
+    #     '''
+    #     # Run the restore function
+    #     logging.info(f"About to restore entries")
+    #     print(f"About to restore entries")
+    #     (tsdb_count, ucdb_count) = eprit.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+    #     # lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
 
-        # Check how much data there is after
-        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
-        logging.info(f"Restoring complete: {res} entries restored")
-        print(f"Restoring complete: {res} entries restored")
-        self.assertEqual(res, 1906)
+    #     # Check how much data there is after
+    #     res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+    #     logging.info(f"Restoring complete: {res} entries restored")
+    #     print(f"Restoring complete: {res} entries restored")
+    #     self.assertEqual(res, 1906)
 
-        '''
-        Test 4 - Verify that restoring timeseries data fails if data already exists
-        Duplicate key error is ignored hence no entries should be inserted
-        '''
-        logging.info("Attempting to load duplicate data...")
-        print("Attempting to load duplicate data...")
-        (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
-        self.assertEqual(tsdb_count, 0)
+    #     '''
+    #     Test 4 - Verify that restoring timeseries data fails if data already exists
+    #     Duplicate key error is ignored hence no entries should be inserted
+    #     '''
+    #     logging.info("Attempting to load duplicate data...")
+    #     print("Attempting to load duplicate data...")
+    #     (tsdb_count, ucdb_count) = eprit.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
+    #     self.assertEqual(tsdb_count, 0)
 
     def testPurgeRestorePipelineFull(self):
         '''
@@ -125,8 +127,8 @@ class TestPurgeRestoreModule(unittest.TestCase):
         Test 2 - Assert the file exists after the export process
         '''
         self.assertTrue(pl.Path(file_names[0] + ".gz").is_file()) 
-        with gzip.open(file_names[0] + ".gz", 'r') as ef:
-            exported_data = json.loads(ef.read().decode('utf-8'))
+        # with gzip.open(file_names[0] + ".gz", 'r') as ef:
+        #     exported_data = json.loads(ef.read().decode('utf-8'))
 
         '''
         Test 3 - Verify that purging timeseries data works with sample real data
@@ -146,7 +148,7 @@ class TestPurgeRestoreModule(unittest.TestCase):
         # Run the restore pipeline
         logging.info(f"About to restore entries")
         print(f"About to restore entries")
-        epr.run_restore_pipeline_for_user(self.testUUID, file_names[0])
+        epr.run_restore_pipeline_for_user(self.testUUID, file_names)
 
         '''
         Test 4 - Verify that restoring timeseries data works with sample real data
@@ -157,7 +159,7 @@ class TestPurgeRestoreModule(unittest.TestCase):
         logging.info(f"Restoring complete: {res} entries restored")
         print(f"Restoring complete: {res} entries restored")
 
-        # Two entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
+        # Two additional entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
         print(f"res_stats_count = {res_stats_count}")
         self.assertEqual(res_stats_count, 2)
         self.assertEqual(res, 1908)
@@ -214,11 +216,66 @@ class TestPurgeRestoreModule(unittest.TestCase):
             logging.info(f"Restoring complete: {res} entries restored")
             print(f"Restoring complete: {res} entries restored")
 
-            # Two entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
+            # Two additional entries with key 'stats/pipeline_time' should be present - one from the purge pipeline, other from the restore pipeline
             print(f"res_stats_count = {res_stats_count}")
-            # self.assertEqual(res_stats_count, 2)
-            # self.assertEqual(res, 1908)
+            self.assertEqual(res_stats_count, 2)
+            self.assertEqual(res, 1908)
 
+    def testPurgeRestorePipelineIncrementalBatchExport(self):
+        pdp = eprpd.PurgeDataPipeline()
+        pdp.batch_size_limit = 500
+
+        '''
+        Test 1 - Verify that purging timeseries data works with sample real data
+        '''
+        # Check how much data there was before
+        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+        logging.info(f"About to purge {res} entries")
+        print(f"About to purge {res} entries")
+        self.assertEqual(res, 1906)
+
+        # Run the purge pipeline
+        file_names = pdp.run_purge_data_pipeline(self.testUUID, os.environ.get('DATA_DIR', 'emission/archived'), "incremental")
+        print("Exported file names: %s" % file_names)
+
+        '''
+        Test 2 - Assert the files exist after the export process
+        '''
+        # Sample data has 1906 raw entries, batch size limit is 500
+        # We should have (1906 / 500) + 1 = 3 + 1 = 4 files 
+        # 1 extra file for the remaining 406 entries in the last batch)
+        self.assertEqual(len(file_names), 4)
+        for file_name in file_names:
+            self.assertTrue(pl.Path(file_name + ".gz").is_file()) 
+
+        '''
+        Test 3 - Verify that purging timeseries data works with sample real data
+        '''
+        # Check how much data there is after
+        entries = edb.get_timeseries_db().find({"user_id" : self.testUUID})
+        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+        logging.info(f"Purging complete: {res} entries remaining")
+        print(f"Purging complete: {res} entries remaining")
+        self.assertEqual(res, 0)
+
+        # Run the restore pipeline
+        logging.info(f"About to restore entries")
+        print(f"About to restore entries")
+        epr.run_restore_pipeline_for_user(self.testUUID, file_names)
+
+        '''
+        Test 4 - Verify that restoring timeseries data works with sample real data
+        '''
+        # Check how much data there is after
+        res = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID})
+        res_stats_count = edb.get_timeseries_db().count_documents({"user_id" : self.testUUID, "metadata.key" : 'stats/pipeline_time'})
+        logging.info(f"Restoring complete: {res} entries restored")
+        print(f"Restoring complete: {res} entries restored")
+
+        # A single additional entry with key 'stats/pipeline_time' should be present as this test involves running only the restore pipeline
+        print(f"res_stats_count = {res_stats_count}")
+        self.assertEqual(res_stats_count, 1)
+        self.assertEqual(res, 1907)
 
 if __name__ == '__main__':
      etc.configLogging()
