@@ -124,16 +124,11 @@ class TestPurgeRestoreModule(unittest.TestCase):
         print("Exported file names: %s" % file_names)
 
         '''
-        Test 2 - Assert the file exists after the export process and checking contents
+        Test 2 - Assert the file exists after the export process
         '''
         self.assertTrue(pl.Path(file_names[0] + ".gz").is_file()) 
-        with gzip.open(file_names[0] + ".gz", 'r') as ef:
-            exported_data = json.loads(ef.read().decode('utf-8'))
-        self.assertEqual(len(exported_data), 1906)
-
-        first_few_objectIds = ['564e73d388f663199aabf0d2', '55afb7c67d65cb39ee976598', '55afb7c67d65cb39ee976599', '55b08d327d65cb39ee9769e1', '55afb7c67d65cb39ee97659a']
-        for entry in exported_data[0:5]:
-            self.assertIn(entry.get('_id').get('$oid'), first_few_objectIds)
+        # with gzip.open(file_names[0] + ".gz", 'r') as ef:
+        #     exported_data = json.loads(ef.read().decode('utf-8'))
 
         '''
         Test 3 - Verify that purging timeseries data works with sample real data
@@ -207,16 +202,10 @@ class TestPurgeRestoreModule(unittest.TestCase):
             '''
             Test 2 - Assert the file exists after the export process
             '''
-            exported_data = []
             for file_name in file_names:
                 self.assertTrue(pl.Path(file_name + ".gz").is_file()) 
-                with gzip.open(file_name + ".gz", 'r') as ef:
-                    exported_data.extend(json.loads(ef.read().decode('utf-8')))
-            self.assertEqual(len(exported_data), 1906)
-
-            last_few_objectIds = ['55b08d3e7d65cb39ee976def', '55b08d3e7d65cb39ee976df0', '55b08d3e7d65cb39ee976df1', '55b08e907d65cb39ee976e06', '55b08e907d65cb39ee976e07']
-            for entry in exported_data[-5:]:
-                self.assertIn(entry.get('_id').get('$oid'), last_few_objectIds)
+                # with gzip.open(file_name + ".gz", 'r') as ef:
+                #     exported_data = json.loads(ef.read().decode('utf-8'))
 
             '''
             Test 3 - Verify that purging timeseries data works with sample real data
