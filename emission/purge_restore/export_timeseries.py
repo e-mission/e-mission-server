@@ -38,7 +38,7 @@ def get_with_retry(retrieve_call, in_query):
         else:
             query.startTs = curr_batch[-1][timeTypeSplit[0]][timeTypeSplit[1]]
 
-    return list_so_far[:501]
+    return list_so_far
 
 def get_from_all_three_sources_with_retry(user_id, in_query, databases=None):
     import emission.storage.timeseries.builtin_timeseries as estb

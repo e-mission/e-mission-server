@@ -58,8 +58,6 @@ def get_load_ranges(entries, batch_size):
     start_indices = list(range(0, len(entries), batch_size))
     ranges = list(zip(start_indices, start_indices[1:]))
     ranges.append((start_indices[-1], len(entries)))
-    print("Start indices are %s" % start_indices)
-    print("Ranges are %s" % ranges)
     return ranges
 
 # def load_pipeline_states(file_prefix, all_uuid_list, continue_on_error, verbose):
