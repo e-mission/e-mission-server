@@ -123,35 +123,6 @@ class PurgeDataPipeline:
         print("Exported file names: %s" %  file_names)
         return file_names
 
-        #     new_entries = self.get_export_timeseries_entries(user_id, ts, current_start_ts, current_end_ts)
-
-        #     if new_entries:
-        #         self._last_processed_ts = new_entries[-1]['data']['ts']
-        #         print(f"Updated last_processed_ts {self._last_processed_ts}")
-
-        #         if current_end_ts >= initEndTs:
-        #             file_name = archive_dir + "/archive_%s_%s_%s" % (user_id, current_start_ts, current_end_ts)
-        #             print(f"Exporting entries from {current_start_ts} to {current_end_ts} to file: {file_name}")
-        #             epret.export(user_id, ts, current_start_ts, current_end_ts, file_name)
-        #             file_names.append(file_name)
-        #             self.delete_timeseries_entries(user_id, ts, current_start_ts, current_end_ts)
-
-        #         current_start_ts = current_end_ts
-
-        #     else:
-        #         remaining_entries = self.get_export_timeseries_entries(user_id, ts, initStartTs, initEndTs)
-        #         if not remaining_entries:
-        #             print("No new data to export, breaking out of while loop")
-        #             break
-        #         else:
-        #             print(f"No entries found in current time range from {current_start_ts} to {current_end_ts}")
-        #             print("Incrementing time range")
-        #             current_start_ts = current_end_ts
-
-        # print(f"Exported data to {len(file_names)} files")
-        # print(f"Exported file names: {file_names}")
-        # return file_names
-
     # def export_pipeline_states(self, user_id, file_name):
     #     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
     #     logging.info("Found %d pipeline states %s" %
