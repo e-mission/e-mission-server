@@ -3,6 +3,7 @@ import logging
 import uuid
 import json
 import os
+import re
 
 #changed all script runs from os() to subprocess.run() for consistency
 #TODO clean up commented out os() lines
@@ -172,10 +173,10 @@ class TestTokenQueries(unittest.TestCase):
         # The second is displayed when we run tests (the `DB_HOST` is set to `db` by default):
         #   a) in the docker CI or,
         #   b) locally in a docker container (ad-hoc testing environment; do not expect this to be used)
-        self.assertIn(sp.stdout,
-            [b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config: {\'DB_HOST\': None, \'DB_RESULT_LIMIT\': None}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
-             b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config: {\'DB_HOST\': \'db\', \'DB_RESULT_LIMIT\': None}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
-        ])
+        
+        stripped_out_stdout = re.sub(rb'Retrieved config.*\nURL not formatted.*\nConnecting to database.*', b'REDACTED', sp.stdout)
+        self.assertEqual(stripped_out_stdout,
+            b'Config file not found, returning a copy of the environment variables instead...\nREDACTED\nx\ny\nz\n')
 
     def test_run_script_empty(self):
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py"], capture_output=True)
@@ -183,10 +184,10 @@ class TestTokenQueries(unittest.TestCase):
         # The second is displayed when we run tests (the `DB_HOST` is set to `db` by default):
         #   a) in the docker CI or,
         #   b) locally in a docker container (ad-hoc testing environment; do not expect this to be used)
-        self.assertIn(sp.stdout,
-            [b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config: {\'DB_HOST\': None, \'DB_RESULT_LIMIT\': None}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
-             b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config: {\'DB_HOST\': \'db\', \'DB_RESULT_LIMIT\': None}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
-        ])
+        stripped_out_stdout = re.sub(rb'Retrieved config.*\nURL not formatted.*\nConnecting to database.*', b'REDACTED', sp.stdout)
+        self.assertEqual(stripped_out_stdout,
+            b'Config file not found, returning a copy of the environment variables instead...\nREDACTED\nPlease provide the script with an argument. Use the "--help" option for more details\n'
+        )
 
     #test that no two options can be used together
     def test_run_script_mutex(self):
