@@ -3,6 +3,7 @@ import logging
 import uuid
 import json
 import os
+import re
 
 #changed all script runs from os() to subprocess.run() for consistency
 #TODO clean up commented out os() lines
@@ -168,25 +169,25 @@ class TestTokenQueries(unittest.TestCase):
         esdt.insert({'token':'y'})
         esdt.insert({'token':'z'})
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show"], capture_output=True)
-        # The first message is displayed when we run tests locally
-        # The second is displayed when we run in the CI/CD, but with the local install 
-        # The third is displayed when we run in the docker CI since the `DB_HOST` is set to `db`
-        self.assertIn(sp.stdout,
-            [b'Retrieved config {\'DB_HOST\': \'localhost\', \'DB_RESULT_LIMIT\': 250000}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
-            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'PATH\': \'/home/runner/miniconda-23.5.2/envs/emissiontest/bin:/home/runner/miniconda-23.5.2/condabin:/snap/bin:/home/runner/.local/bin:/opt/pipx_bin:/home/runner/.cargo/bin:/home/runner/.config/composer/vendor/bin:/usr/local/.ghcup/bin:/home/runner/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/runner/.dotnet/tools\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
-            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'DB_HOST\': \'db\', \'PATH\': \'/root/miniconda-23.5.2/envs/emissiontest/bin:/root/miniconda-23.5.2/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
-        ])
+        # The first message is displayed when we run tests locally or run in the CI/CD, but with the local install 
+        # The second is displayed when we run tests (the `DB_HOST` is set to `db` by default):
+        #   a) in the docker CI or,
+        #   b) locally in a docker container (ad-hoc testing environment; do not expect this to be used)
+        
+        stripped_out_stdout = re.sub(rb'Retrieved config.*\nURL not formatted.*\nConnecting to database.*', b'REDACTED', sp.stdout)
+        self.assertEqual(stripped_out_stdout,
+            b'Config file not found, returning a copy of the environment variables instead...\nREDACTED\nx\ny\nz\n')
 
     def test_run_script_empty(self):
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py"], capture_output=True)
-        # The first message is displayed when we run tests locally
-        # The second is displayed when we run in the CI/CD, but with the local install 
-        # The third is displayed when we run in the docker CI since the `DB_HOST` is set to `db`
-        self.assertIn(sp.stdout,
-            [b'Retrieved config {\'DB_HOST\': \'localhost\', \'DB_RESULT_LIMIT\': 250000}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
-            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'PATH\': \'/home/runner/miniconda-23.5.2/envs/emissiontest/bin:/home/runner/miniconda-23.5.2/condabin:/snap/bin:/home/runner/.local/bin:/opt/pipx_bin:/home/runner/.cargo/bin:/home/runner/.config/composer/vendor/bin:/usr/local/.ghcup/bin:/home/runner/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/runner/.dotnet/tools\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
-            b'Config file not found, returning a copy of the environment variables instead...\nRetrieved config {\'PYTHONPATH\': \'.\', \'DB_HOST\': \'db\', \'PATH\': \'/root/miniconda-23.5.2/envs/emissiontest/bin:/root/miniconda-23.5.2/condabin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\', \'LC_CTYPE\': \'C.UTF-8\'}\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
-        ])
+        # The first message is displayed when we run tests locally or run in the CI/CD, but with the local install 
+        # The second is displayed when we run tests (the `DB_HOST` is set to `db` by default):
+        #   a) in the docker CI or,
+        #   b) locally in a docker container (ad-hoc testing environment; do not expect this to be used)
+        stripped_out_stdout = re.sub(rb'Retrieved config.*\nURL not formatted.*\nConnecting to database.*', b'REDACTED', sp.stdout)
+        self.assertEqual(stripped_out_stdout,
+            b'Config file not found, returning a copy of the environment variables instead...\nREDACTED\nPlease provide the script with an argument. Use the "--help" option for more details\n'
+        )
 
     #test that no two options can be used together
     def test_run_script_mutex(self):

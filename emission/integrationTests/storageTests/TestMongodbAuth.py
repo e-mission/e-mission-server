@@ -38,6 +38,8 @@ import pymongo
 import importlib
 import os
 
+import emission.tests.common as etc
+
 class TestMongodbAuth(unittest.TestCase):
     def setUp(self):
         self.admin_default = pymongo.MongoClient('localhost', username="admin", 
@@ -53,7 +55,7 @@ class TestMongodbAuth(unittest.TestCase):
     def tearDown(self):
         self.admin_auth.command({"dropAllUsersFromDatabase": 1})
         logging.debug("Deleting test db environment variables")
-        ecc.restoreOriginalEnvVars(self.originalDBEnvVars, self.modifiedEnvVars)
+        etc.restoreOriginalEnvVars(self.originalDBEnvVars, self.modifiedEnvVars)
         logging.debug("Finished restoring original db environment variables")
         logging.debug("Restored original values are = %s" % self.originalDBEnvVars)
         try:

@@ -10,6 +10,7 @@ from builtins import object
 import json
 import logging
 import importlib
+import os
 
 import emission.core.backwards_compat_config as ecbc
 

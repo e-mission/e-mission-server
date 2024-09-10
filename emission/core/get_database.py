@@ -15,7 +15,13 @@ import emission.core.backwards_compat_config as ecbc
 config = ecbc.get_config('conf/storage/db.conf',
     {"DB_HOST": "timeseries.url", "DB_RESULT_LIMIT": "timeseries.result_limit"})
 
-print("Retrieved config %s" % config)
+db_config = {}
+for key in ["DB_HOST", "DB_RESULT_LIMIT"]:
+    if key in config:
+        db_config[key] = config.get(key)
+    else:
+        db_config[key] = None
+print("Retrieved config: %s" % db_config)
 url = config.get("DB_HOST", "localhost")
 result_limit = config.get("DB_RESULT_LIMIT", 250000)
 

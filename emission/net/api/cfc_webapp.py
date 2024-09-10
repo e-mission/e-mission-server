@@ -61,7 +61,8 @@ WEBSERVER_HOST="0.0.0.0"
 
 config = ecbc.get_config('conf/net/api/webserver.conf',
     {"WEBSERVER_PORT": "server.port", "WEBSERVER_TIMEOUT": "server.timeout",
-     "WEBSERVER_AUTH": "server.auth", "WEBSERVER_AGGREGATE_CALL_AUTH": "server.aggregate_call_auth"})
+     "WEBSERVER_AUTH": "server.auth", "WEBSERVER_AGGREGATE_CALL_AUTH": "server.aggregate_call_auth", 
+     "WEBSERVER_NOT_FOUND_REDIRECT": "paths.404_redirect"})
 server_port = config.get("WEBSERVER_PORT", 8080)
 socket_timeout = config.get("WEBSERVER_TIMEOUT", 3600)
 auth_method = config.get("WEBSERVER_AUTH", "skip")
