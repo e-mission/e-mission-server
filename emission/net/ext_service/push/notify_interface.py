@@ -24,8 +24,9 @@ push_config = ecbc.get_config('conf/net/ext_service/push.json',
      "PUSH_APP_PACKAGE_NAME": "app_package_name", "PUSH_IOS_TOKEN_FORMAT": "ios_token_format"})
 
 try:
-    logging.info(f"Push configured for app {push_config.get('PUSH_SERVER_AUTH_TOKEN')} using platform {os.getenv('PUSH_PROVIDER')} with token {os.getenv('PUSH_SERVER_AUTH_TOKEN')[:10]}... of length {len(os.getenv('PUSH_SERVER_AUTH_TOKEN'))}")
-except:
+    logging.warning(f"Push configured for app {push_config.get('PUSH_APP_PACKAGE_NAME')} using platform {push_config.get('PUSH_PROVIDER')} with token {push_config.get('PUSH_SERVER_AUTH_TOKEN')[:10]}... of length {len(push_config.get('PUSH_SERVER_AUTH_TOKEN'))}")
+except Exception as e:
+    logging.exception(e)
     logging.warning("push service not configured, push notifications not supported")
 
 class NotifyInterfaceFactory(object):
