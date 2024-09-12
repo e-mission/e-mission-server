@@ -9,6 +9,7 @@ import logging
 import requests
 import copy
 import time
+import pyfcm
 
 # Our imports
 import emission.core.get_database as edb
@@ -21,7 +22,8 @@ def get_interface(push_config):
 
 class FirebasePush(pni.NotifyInterface):
     def __init__(self, push_config):
-        self.server_auth_token = push_config.get("PUSH_SERVER_AUTH_TOKEN")
+        self.service_account_file = push_config.get("PUSH_SERVICE_ACCOUNT_FILE")
+        self.project_id = push_config.get("PUSH_PROJECT_ID")
         if "PUSH_APP_PACKAGE_NAME" in push_config:
             self.app_package_name = push_config.get("PUSH_APP_PACKAGE_NAME")
         else:
@@ -32,6 +34,30 @@ class FirebasePush(pni.NotifyInterface):
     def get_and_invalidate_entries(self):
         # Need to figure out how to do this on firebase
         pass
+
+    def notify_multiple_devices(self, push_service, fcm_token_list,
+        notification_title=None, notification_body=None, data_payload=None):
+        results = {}
+        n_success = 0
+        n_failure = 0
+        for t in fcm_token_list:
+            trunc_t = t[:10]
+            try:
+                result = push_service.notify(fcm_token=t,
+                                             notification_title=notification_title,
+                                             notification_body=notification_body,
+                                             data_payload=data_payload)
+                results.update({trunc_t: result['name']})
+                n_success = n_success + 1
+                print("Successfully sent to %s..." % (trunc_t))
+            except (pyfcm.errors.FCMNotRegisteredError, pyfcm.errors.InvalidDataError) as e:
+                results.update({trunc_t: str(e)})
+                n_failure = n_failure + 1
+                print("Found error %s while sending to token %s... skipping" % (e, trunc_t))
+        response = {"success": n_success, "failure": n_failure, "results": results}
+        print(response)
+        logging.debug(response)
+        return response
 
     @staticmethod
     def print_dev_flag_warning():
@@ -128,20 +154,22 @@ class FirebasePush(pni.NotifyInterface):
         # convert tokens if necessary
         fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
 
-        push_service = FCMNotification(api_key=self.server_auth_token)
-        data_message = {
-           "data": json_data,
-           "payload": json_data
-        }
+        push_service = FCMNotification(
+            service_account_file=self.service_account_file,
+            project_id=self.project_id)
         # Send android and iOS messages separately because they have slightly
         # different formats
         # https://github.com/e-mission/e-mission-server/issues/564#issuecomment-360720598
-        android_response = push_service.notify_multiple_devices(registration_ids=fcm_token_map["android"],
-                                               data_message=data_message)
-        ios_response = push_service.notify_multiple_devices(registration_ids=fcm_token_map["ios"],
-                                               message_body = message,
-                                               message_title = title,
-                                               data_message=data_message)
+        android_response = self.notify_multiple_devices(push_service,
+                                               fcm_token_map["android"],
+                                               notification_body = message,
+                                               notification_title = title,
+                                               data_payload = json_data)
+        ios_response = self.notify_multiple_devices(push_service,
+                                               fcm_token_map["ios"],
+                                               notification_body = message,
+                                               notification_title = title,
+                                               data_payload = json_data)
         combo_response = {"ios": ios_response, "android": android_response}
         logging.debug(combo_response)
         return combo_response
@@ -155,20 +183,23 @@ class FirebasePush(pni.NotifyInterface):
         # multiplying by 10^6 gives us the maximum resolution possible while still
         # being not a float. Have to see if that is too big.
         # Hopefully we will never send a push notification a millisecond to a single phone
-        ios_raw_data.update({"notId": int(time.time() * 10**6)})
+        ios_raw_data.update({"notId": str(int(time.time() * 10**6))})
         ios_raw_data.update({"payload": ios_raw_data["notId"]})
 
-        push_service = FCMNotification(api_key=self.server_auth_token)
+        push_service = FCMNotification(
+            service_account_file=self.service_account_file,
+            project_id=self.project_id)
 
         # convert tokens if necessary
         fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
 
         response = {}
-        response["ios"] = push_service.notify_multiple_devices(registration_ids=fcm_token_map["ios"],
-                                                   data_message=ios_raw_data,
-                                                   content_available=True)
+        response["ios"] = self.notify_multiple_devices(push_service,
+                            fcm_token_map["ios"], data_payload=ios_raw_data)
+
         response["android"] = {"success": "skipped", "failure": "skipped",
                                "results": "skipped"}
+        print(response)
         logging.debug(response)
         return response
 

@@ -21,7 +21,8 @@ import emission.core.backwards_compat_config as ecbc
 
 push_config = ecbc.get_config('conf/net/ext_service/push.json',
     {"PUSH_PROVIDER": "provider", "PUSH_SERVER_AUTH_TOKEN": "server_auth_token",
-     "PUSH_APP_PACKAGE_NAME": "app_package_name", "PUSH_IOS_TOKEN_FORMAT": "ios_token_format"})
+     "PUSH_APP_PACKAGE_NAME": "app_package_name", "PUSH_IOS_TOKEN_FORMAT": "ios_token_format",
+     "PUSH_PROJECT_ID": "project_id", "PUSH_SERVICE_ACCOUNT_FILE": "service_account_file"})
 
 try:
     logging.warning(f"Push configured for app {push_config.get('PUSH_APP_PACKAGE_NAME')} using platform {push_config.get('PUSH_PROVIDER')} with token {push_config.get('PUSH_SERVER_AUTH_TOKEN')[:10]}... of length {len(push_config.get('PUSH_SERVER_AUTH_TOKEN'))}")

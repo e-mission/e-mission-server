@@ -2,5 +2,7 @@
     "provider": "firebase",
     "server_auth_token": "Get from firebase console",
     "app_package_name": "full package name from config.xml. e.g. edu.berkeley.eecs.emission or edu.berkeley.eecs.embase. Defaults to edu.berkeley.eecs.embase",
-    "ios_token_format": "fcm"
+    "ios_token_format": "fcm",
+    "project_id": "Get from the General project settings (https://console.cloud.google.com/project/_/settings/general/) tab of the Firebase console.",
+    "service_account_file": "Download according to the instructions at https://firebase.google.com/docs/cloud-messaging/migrate-v1#provide-credentials-manually and put the path to the file here"
 }
