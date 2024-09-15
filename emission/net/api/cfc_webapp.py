@@ -236,7 +236,8 @@ def getFromCache():
   logging.debug("Called userCache.get")
   user_uuid=getUUID(request)
   logging.debug("user_uuid %s" % user_uuid)
-  to_phone = usercache.sync_server_to_phone(user_uuid)
+  # to_phone = usercache.sync_server_to_phone(user_uuid)
+  to_phone = []
   return {'server_to_phone': to_phone}
 
 @post('/usercache/put')
