@@ -5,7 +5,6 @@ import logging
 import emission.storage.pipeline_queries as espq
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.purge_restore.export_timeseries as epret
 import gzip
 import json
 import os
@@ -13,6 +12,7 @@ import emission.core.get_database as edb
 import emission.storage.json_wrappers as esj
 import emission.core.wrapper.entry as ecwe
 import emission.storage.timeseries.timequery as estt
+import emission.export.export as eee
 
 def purge_data(user_id, archive_dir, export_type):
     file_names = None
@@ -20,8 +20,6 @@ def purge_data(user_id, archive_dir, export_type):
         pdp = PurgeDataPipeline()
         pdp.user_id = user_id
         file_names = pdp.run_purge_data_pipeline(user_id, archive_dir, export_type)
-        logging.debug("last_processed_ts with entries_to_export logic = %s" % (pdp.last_processed_ts))
-        print("last_processed_ts with entries_to_export logic = %s" % (pdp.last_processed_ts))
         if pdp.last_processed_ts is None:
             logging.debug("After run, last_processed_ts == None, must be early return")
         espq.mark_purge_data_done(user_id, pdp.last_processed_ts)
@@ -50,108 +48,96 @@ class PurgeDataPipeline:
 
         initStartTs = time_query.startTs
         initEndTs = time_query.endTs
-        print("Inside: purge_data - Start time: %s" % initStartTs)
-        print("Inside: purge_data - End time: %s" % initEndTs)
+        logging.debug("Initial pipeline purge query range = start_time: %s , end_time: %s" % (initStartTs, initEndTs))
 
         file_names = []
-        entries_to_export = self.get_export_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs)
-        count_entries =  len(entries_to_export)
+        total_entries_to_export = eee.get_exported_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, ['timeseries_db'])[1]
 
         # If running the pipeline PURGE stage for first time, choose the first timestamp from the timeseries as the starting point 
         # Otherwise cannot add 1 hour (3600 seconds) to a NoneType value if incremental option is selected
-        current_start_ts = initStartTs if initStartTs is not None else entries_to_export[0]['data']['ts']
+        current_start_ts = initStartTs if initStartTs is not None else total_entries_to_export[0]['data']['ts']
 
-        # while current_start_ts < initEndTs:
         while True:
-            print("Inside while loop: current_start_ts = %s" % current_start_ts)
+            logging.debug("Inside while loop: current_start_ts = %s" % current_start_ts)
             current_end_ts = min(current_start_ts + 3600, initEndTs) if export_type == 'incremental' else initEndTs
 
             if export_type == 'incremental':
                 current_end_ts = min(current_start_ts + 3600, initEndTs)
-                print("Inside export_type incremental, increasing current_end_ts: %s" % current_end_ts)
+                logging.debug("Performing incremental export, increasing current_end_ts: %s" % current_end_ts)
             elif export_type == 'full':
                 current_end_ts = initEndTs
-                print("Inside export_type full, setting current_end_ts to current time: %s" % current_end_ts)
+                logging.debug("Performing full export, setting current_end_ts to current time: %s" % current_end_ts)
             else:
                 raise ValueError("Unknown export_type %s" % export_type)
             
-            print(f"Processing data from {current_start_ts} to {current_end_ts}")
+            logging.debug(f"Processing current batch from {current_start_ts} to {current_end_ts}")
 
             file_name = archive_dir + "/archive_%s_%s_%s" % (user_id, current_start_ts, current_end_ts)
-            export_queries = epret.export(user_id, ts, current_start_ts, current_end_ts, file_name)
-            # epret.export(user_id, ts, current_start_ts, current_end_ts, file_name)
+            current_batch_exported_entries = eee.export(user_id, ts, current_start_ts, current_end_ts, file_name, False, ['timeseries_db'])
 
-            entries_to_export_1 = self.get_export_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs)
-            count_entries_1 =  len(entries_to_export_1)
+            # Recompute total entries from pipeline initial start time to end time since we are deleting entries iteratively
+            # This is used to keep a track of remaining entries to export
+            remaining_timeseries_entries = eee.get_exported_timeseries_entries(user_id, ts, time_query.startTs, time_query.endTs, ['timeseries_db'])[1]
 
-            if export_queries is None and count_entries_1 > 0:
-                print("No entries found in current time range from %s to %s" % (current_start_ts, current_end_ts))
-                print("Incrementing time range by 1 hour")
+            if current_batch_exported_entries is None and len(remaining_timeseries_entries) > 0:
+                logging.debug("No entries found in current time range from %s to %s" % (current_start_ts, current_end_ts))
+                logging.debug("Incrementing time range by 1 hour to process remaining timeseries entries")
                 current_start_ts = current_end_ts
                 continue
-            # if count_entries_2 == 0 and count_entries_1 == 0:
-            elif export_queries is None and count_entries_1 == 0:
-                # Didn't process anything new so start at the same point next time
-                # self._last_processed_ts = None
+            elif current_batch_exported_entries is None and len(remaining_timeseries_entries) == 0:
                 logging.debug("No new data to export, breaking out of while loop")
-                print("No new data to export, breaking out of while loop")
                 break
-
-            entries_to_export_2 = self.get_export_timeseries_entries(user_id, ts, current_start_ts, current_end_ts)
-            count_entries_2 = len(entries_to_export_2)
-            print("count_entries_2 = %s" % count_entries_2)
-
             
-            logging.debug("Exporting to file: %s" % file_name)
-            print("Exporting to file: %s" % file_name)
+            logging.debug("Exported to file: %s" % file_name)
             file_names.append(file_name)
-            print("File names: %s" % file_names)
+            logging.debug("List of exported file names: %s" % file_names)
 
             self.delete_timeseries_entries(user_id, ts, current_start_ts, current_end_ts)
 
-            print("Total entries to export: %s" % count_entries)
-            print("Entries exported in timerange %s to %s: %s" % (current_start_ts, current_end_ts, count_entries_2))
-            print("New count entries to export: %s" % count_entries_1)
-            self._last_processed_ts = entries_to_export_2[-1]['data']['ts']
-            print("Updated last_processed_ts %s" % self._last_processed_ts)
+            logging.debug("Total entries to export: %s" % len(total_entries_to_export))
+            logging.debug("Entries exported in timerange %s to %s: %s" % (current_start_ts, current_end_ts, len(current_batch_exported_entries)))
+            logging.debug("Remaining entries to export: %s" % len(remaining_timeseries_entries))
+            
+            self._last_processed_ts = current_batch_exported_entries[-1]['data']['ts']
+            logging.debug("Updated last_processed_ts to last entry in current export batch = %s" % self._last_processed_ts)
 
             current_start_ts = current_end_ts
             if current_start_ts >= initEndTs:
                 break
 
-        print("Exported data to %s files" % len(file_names))
-        print("Exported file names: %s" %  file_names)
+        logging.debug("Exported data to %s files: %s" % (len(file_names), file_names))
         return file_names
+    
 
-    # def export_pipeline_states(self, user_id, file_name):
-    #     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
-    #     logging.info("Found %d pipeline states %s" %
-    #         (len(pipeline_state_list),
-    #         list([ps["pipeline_stage"] for ps in pipeline_state_list])))
-    #     pipeline_filename = "%s_pipelinestate_%s.gz" % (file_name, user_id)
-    #     with gzip.open(pipeline_filename, "wt") as gpfd:
-    #         json.dump(pipeline_state_list,
-    #         gpfd, default=esj.wrapped_default, allow_nan=False, indent=4)    
+    def delete_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime):
+        export_timequery = estt.TimeQuery("data.ts", start_ts_datetime, end_ts_datetime)
+        ts_query = ts._get_query(time_query=export_timequery)
+        delete_query = {"user_id": user_id, **ts_query}
 
+        count_entries_to_delete = ts.timeseries_db.count_documents(delete_query)
+        logging.debug(f"Number of matching entries for deletion = {count_entries_to_delete}")
+
+        logging.debug("Deleting entries from database...")
+        result = ts.timeseries_db.delete_many(delete_query)
+        assert(result.deleted_count == count_entries_to_delete)
+        logging.debug("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
+
+    '''
     def delete_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime):
         export_queries = self.get_export_queries(start_ts_datetime, end_ts_datetime)
         for key, value in export_queries.items():
             ts_query = ts._get_query(time_query=value)
-            print(ts_query)
+            logging.debug(ts_query)
             delete_query = {"user_id": user_id, **ts_query}
 
             count = ts.timeseries_db.count_documents(delete_query)
             logging.debug(f"Number of documents matching for {ts.timeseries_db} with {key} query: {count}")
-            print(f"Number of documents matching for {ts.timeseries_db} with {key} query: {count}")
 
             logging.debug("Deleting entries from database...")
-            print("Deleting entries from database...")
             result = ts.timeseries_db.delete_many(delete_query)
             logging.debug(f"Key query: {key}")
-            print(f"Key query: {key}")
             logging.debug("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
-            print("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
-            
+
     def get_export_timeseries_entries(self, user_id, ts, start_ts_datetime, end_ts_datetime):
         entries_to_export = []
         export_queries = self.get_export_queries(start_ts_datetime, end_ts_datetime)
@@ -163,6 +149,7 @@ class PurgeDataPipeline:
             logging.debug(f"Key query: {key}")
             logging.debug("{} fetched entries from {} to {}".format(ts_db_count, start_ts_datetime, end_ts_datetime))
         return entries_to_export
+  
     
     def get_export_queries(self, start_ts, end_ts):
         export_queries = {
@@ -171,4 +158,4 @@ class PurgeDataPipeline:
             'loc_time_query': estt.TimeQuery("data.ts", start_ts, end_ts)
         }
         return export_queries
-    
+    '''

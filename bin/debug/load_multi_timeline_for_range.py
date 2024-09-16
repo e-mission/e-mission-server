@@ -109,7 +109,7 @@ def post_check(unique_user_list, all_rerun_list):
     else:
         logging.info("timeline contains a mixture of analysis results and raw data - complain to shankari!")
 
-def load_multi_timeline_for_range(file_prefix, info_only=None, verbose=None, continue_on_error=None, mapfile=None, prefix=None, batch_size=10000):
+def load_multi_timeline_for_range(file_prefix, info_only=None, verbose=None, continue_on_error=None, mapfile=None, prefix=None, batch_size=10000, raw_timeseries_only=False):
     fn = file_prefix
     logging.info("Loading file or prefix %s" % fn)
     sel_file_list = common.read_files_with_prefix(fn)
@@ -144,11 +144,12 @@ def load_multi_timeline_for_range(file_prefix, info_only=None, verbose=None, con
                     logging.info("About to load range %s -> %s" % (curr_range[0], curr_range[1]))
                 wrapped_entries = [ecwe.Entry(e) for e in entries[curr_range[0]:curr_range[1]]]
                 (tsdb_count, ucdb_count) = estcs.insert_entries(curr_uuid, wrapped_entries, continue_on_error)
-        print("For uuid %s, finished loading %d entries into the usercache and %d entries into the timeseries" % (curr_uuid, ucdb_count, tsdb_count))
+        logging.debug("For uuid %s, finished loading %d entries into the usercache and %d entries into the timeseries" % (curr_uuid, ucdb_count, tsdb_count))
 
     unique_user_list = set(all_user_list)
     if not info_only:
-        load_pipeline_states(file_prefix, unique_user_list, continue_on_error, verbose)
+        if not raw_timeseries_only:
+            load_pipeline_states(file_prefix, unique_user_list, continue_on_error, verbose)
         if mapfile is not None:
             register_mapped_users(mapfile, unique_user_list, verbose)
         elif prefix is not None:
@@ -176,6 +177,9 @@ if __name__ == '__main__':
 
     parser.add_argument("-s", "--batch-size", default=10000, type=int,
         help="batch size to use for the entries")
+    
+    parser.add_argument("-t", "--raw-timeseries-only", default=False, action='store_true',
+        help="load only raw timeseries data; if not set load both raw and analysis timeseries data")
 
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument("-p", "--prefix", default="user",
@@ -189,4 +193,5 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    load_multi_timeline_for_range(args.file_prefix, args.info_only, args.verbose, args.continue_on_error, args.mapfile, args.prefix, args.batch_size)
+    # load_multi_timeline_for_range(args.file_prefix, args.info_only, args.verbose, args.continue_on_error, args.mapfile, args.prefix, args.batch_size)
+    load_multi_timeline_for_range(args.file_prefix, args.info_only, args.verbose, args.continue_on_error, args.mapfile, args.prefix, args.batch_size, args.raw_timeseries_only)

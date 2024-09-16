@@ -350,9 +350,6 @@ def get_time_range_for_stage(user_id, stage):
     Returns the start ts and the end ts of the entries in the stage
     """
     curr_state = get_current_state(user_id, stage)
-    print("Inside get_time_range_for_stage")
-    if curr_state is not None:
-        print("curr_state last_processed_ts = %s" % curr_state.last_processed_ts)
 
     if curr_state is None:
         start_ts = None

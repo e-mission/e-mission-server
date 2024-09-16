@@ -12,7 +12,6 @@ import bin.debug.load_multi_timeline_for_range as lmtfr
 import emission.storage.json_wrappers as esj
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ecwp
-import emission.purge_restore.import_timeseries as eprit
 
 def restore_data(user_id, file_names):
     try:
@@ -38,18 +37,11 @@ class RestoreDataPipeline:
         time_query = espq.get_time_range_for_restore_data(user_id)
         for file_name in file_names:
             entries_to_import = json.load(gzip.open(file_name + ".gz"), object_hook = esj.wrapped_object_hook)
-            # pipelineState = edb.get_pipeline_state_db().find_one({"user_id": user_id,
-            #     "pipeline_stage": ecwp.PipelineStages.RESTORE_TIMESERIES_DATA.value})
-            # self._last_processed_ts = pipelineState["last_processed_ts"]
-            # logging.debug("Restoring from file, last_processed_ts = %s" % (self._last_processed_ts))
-            # (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
-            (tsdb_count, ucdb_count) = eprit.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True)
-            print("After load, tsdb_count = %s, ucdb_count = %s" % (tsdb_count, ucdb_count))
+            (tsdb_count, ucdb_count) = lmtfr.load_multi_timeline_for_range(file_prefix=file_name, continue_on_error=True, raw_timeseries_only=True)
+            logging.debug("After load, tsdb_count = %s, ucdb_count = %s" % (tsdb_count, ucdb_count))
             if tsdb_count == 0:
                 # Didn't process anything new so start at the same point next time
                 self._last_processed_ts = None
             else:
                 self._last_processed_ts = entries_to_import[-1]['data']['ts']
-                print("After load, last_processed_ts = %s" % (self._last_processed_ts))
-            # if self._last_processed_ts is None or self._last_processed_ts < entries_to_import[-1]['metadata']['write_ts']:
-            #     self._last_processed_ts = entries_to_import[-1]['metadata']['write_ts']
+                logging.debug("After load, last_processed_ts = %s" % (self._last_processed_ts))
