@@ -64,18 +64,6 @@ jobs:
           git push origin 
         fi
 
-    - name: Create a text file
-      run: |
-        echo ${{ steps.date.outputs.date }} > tag_file.txt
-        echo "Created tag text file"
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-image-tag
-        path: tag_file.txt
-        overwrite: true
-
   dispatch:
     needs: build
     runs-on: ubuntu-latest
