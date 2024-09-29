@@ -10,8 +10,15 @@ env:
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
 
 jobs:
+  test-with-docker:
+    uses: e-mission/e-mission-server/.github/workflows/test-with-docker.yml@master
+
+  test-with-manual-install:
+    uses: e-mission/e-mission-server/.github/workflows/test-with-manual-install.yml@master
+
   build:
     runs-on: ubuntu-latest
+    needs: [test-with-docker, test-with-manual-install]
 
     outputs:
       date: ${{ steps.date.outputs.date }}
