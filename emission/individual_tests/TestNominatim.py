@@ -116,7 +116,7 @@ class NominatimTest(unittest.TestCase):
     #Testing reverse_geocode, which reverse geocodes from a lat and lon and returns only the display name. 
     def test_reverse_geocode(self):
         NominatimTest.nominatim("geofabrik")
-        expected_result = "India Street, Fox Point, Providence, Providence County, Rhode Island, 02906, United States"
+        expected_result = "Portugal Parkway, Fox Point, Providence, Providence County, Rhode Island, 02906, United States"
         actual_result = eco.Geocoder.reverse_geocode(41.8174476, -71.3903767)
         self.assertEqual(expected_result, actual_result)
 
