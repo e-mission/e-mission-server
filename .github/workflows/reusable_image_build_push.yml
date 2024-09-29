@@ -1,0 +1,141 @@
+name: Reusable Docker Image Build and Push
+
+on:
+  workflow_call:
+    inputs:
+      repo:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+
+env:
+  DOCKER_USER: ${{secrets.DOCKER_USER}}
+  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: e-mission/${{ inputs.repo }}
+          ref: ${{ inputs.branch }}
+          token: ${{ secrets.GH_FG_PAT_TAGS }}
+    
+      - name: Fetch server image tag
+        id: get-server-tag
+        run: |
+          if [ "${{ inputs.repo }}" = "op-admin-dashboard" ] || [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then
+            response=$(curl -s https://raw.githubusercontent.com/e-mission/e-mission-server/refs/heads/cleanup-cicd/.env)
+            SERVER_IMAGE_TAG=$(echo "$response" | grep "SERVER_IMAGE_TAG=" | cut -d'=' -f2)
+            echo "SERVER_IMAGE_TAG=$SERVER_IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set docker image tags
+        id: set-tags
+        run: |
+          ls -al
+          set -a; source .env; set +a
+          if [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
+            echo "JOIN_IMAGE_TAG=${JOIN_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
+            echo "ADMIN_DASH_IMAGE_TAG=${ADMIN_DASH_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then
+            echo "PUBLIC_DASH_NOTEBOOK_IMAGE_TAG=${PUBLIC_DASH_NOTEBOOK_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+            echo "PUBLIC_DASH_FRONTEND_IMAGE_TAG=${PUBLIC_DASH_FRONTEND_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          fi
+         
+      - name: Print input docker image tags
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          if [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
+            echo "Current join-page image tag: ${{ steps.set-tags.outputs.JOIN_IMAGE_TAG }}"
+          elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
+            echo "Current admin-dash image tag: ${{ steps.set-tags.outputs.ADMIN_DASH_IMAGE_TAG }}"
+            echo "Latest server image tag (${{ github.event_name }}): ${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}"
+          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then            
+            echo "Current notebook image tag (push): ${{ steps.set-tags.outputs.PUBLIC_DASH_NOTEBOOK_IMAGE_TAG }}"
+            echo "Current frontend image tag (push): ${{ steps.set-tags.outputs.PUBLIC_DASH_FRONTEND_IMAGE_TAG }}"
+            echo "Latest server image tag (${{ github.event_name }}): ${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}"
+          fi
+
+      - name: docker login
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      - name: Get current date # get the date of the build
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_OUTPUT"
+
+      - name: Run a one-line script
+        run: echo running image build for repo ${{ inputs.repo }} branch ${{ inputs.branch }} on ${{ steps.date.outputs.date }}
+
+      - name: build docker image
+        run: |
+          if [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
+            docker build -t $DOCKER_USER/${{ inputs.repo }}:${{ inputs.branch }}_${{ steps.date.outputs.date }} ./frontend
+          elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
+            SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }} docker compose -f docker-compose-prod.yml build
+          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then            
+            SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }} docker compose -f docker-compose.yml build
+          fi
+          docker images
+
+      - name: rename docker image
+        run: |
+          if [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
+            docker image tag e-mission/opdash:0.0.1 $DOCKER_USER/${{ inputs.repo }}:${{ inputs.branch }}_${{ steps.date.outputs.date }}
+          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then      
+            if [ "${{ github.event_name }}" == "push" ]; then
+              docker image tag em-pub-dash-prod/frontend:latest $DOCKER_USER/${{ inputs.repo }}_frontend:${{ inputs.branch }}_${{ steps.date.outputs.date }}
+            fi
+            docker image tag em-pub-dash-prod/viz-scripts:latest $DOCKER_USER/${{ inputs.repo }}_notebook:${{ inputs.branch }}_${{ steps.date.outputs.date }}
+          fi
+  
+      - name: push docker image
+        run: |
+          if [ "${{ inputs.repo }}" = "op-admin-dashboard" ] || [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
+            docker push $DOCKER_USER/${{ inputs.repo }}:${{ inputs.branch }}_${{ steps.date.outputs.date }}
+          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then      
+            if [ "${{ github.event_name }}" == "push" ]; then
+              docker push $DOCKER_USER/${{ inputs.repo }}_frontend:${{ inputs.branch }}_${{ steps.date.outputs.date }}
+            fi
+            docker push $DOCKER_USER/${{ inputs.repo }}_notebook:${{ inputs.branch }}_${{ steps.date.outputs.date }}
+          fi
+        
+      - name: Update .env file 
+        run: |
+          if [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
+            echo "JOIN_IMAGE_TAG=${{ inputs.branch }}_${{ steps.date.outputs.date }}" > .env
+          elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
+            echo "ADMIN_DASH_IMAGE_TAG=${{ inputs.branch }}_${{ steps.date.outputs.date }}" > .env
+            echo "SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}" >> .env
+          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then
+            echo "PUBLIC_DASH_NOTEBOOK_IMAGE_TAG=${{ inputs.branch }}_${{ steps.date.outputs.date }}" > .env
+            if [ "${{ github.event_name }}" == "push" ]; then
+              echo "Push event: Update frontend image tag"
+              echo "PUBLIC_DASH_FRONTEND_IMAGE_TAG=${{ inputs.branch }}_${{ steps.date.outputs.date }}" >> .env
+            else
+              echo "Workflow_dispatch: Reuse existing frontend image tag"
+              echo "PUBLIC_DASH_FRONTEND_IMAGE_TAG=${{ steps.set-tags.outputs.PUBLIC_DASH_FRONTEND_IMAGE_TAG }}" >> .env
+            fi
+            echo "SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}" >> .env
+          fi
+          cat .env
+
+      - name: Add, Commit, Push changes to .env file
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Github Actions bot to update .env with latest tags"
+          # echo ${{ github.actor }}
+          if git diff --quiet; then
+            echo "Latest timestamp already present in .env file, no changes to commit"
+          else
+            git add .env
+            git commit -m "Updated docker image tags in .env file to the latest timestamp"
+            git push origin
+          fi
+          cat .env
