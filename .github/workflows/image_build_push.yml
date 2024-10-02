@@ -3,6 +3,8 @@ name: docker image
 on:
   push:
     branches: [ master, gis-based-mode-detection ]
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 #Dockerhub credentials are set as environment variables
 env:
@@ -16,60 +18,33 @@ jobs:
   test-with-manual-install:
     uses: e-mission/e-mission-server/.github/workflows/test-with-manual-install.yml@master
 
-  build:
+  get-branch-name:
     runs-on: ubuntu-latest
-    needs: [test-with-docker, test-with-manual-install]
-
     outputs:
-      date: ${{ steps.date.outputs.date }}
-
+      branch_name: ${{ steps.get-branch-name.outputs.branch_name }}
     steps:
-    - uses: actions/checkout@v2
+      - name: Get branch name based on ref_type
+        id: get-branch-name
+        run: |
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref name: ${{ github.ref_name }}"
+          echo "Ref type: ${{ github.ref_type }}"
+          echo "Github event base ref: ${{ github.event.base_ref }}"
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            base_ref=${{ github.event.base_ref }}
+            echo "branch_name=${base_ref#refs/heads/}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.ref_type }}" == "branch" ]; then
+            echo "branch_name=${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"    
+          fi
 
-    - name: Set docker image tags
-      id: set-tags
-      run: |
-        set -a; source .env; set +a
-        echo "SERVER_IMAGE_TAG=${SERVER_IMAGE_TAG}" >> "$GITHUB_OUTPUT"
-        echo "Current server image tag (push): ${SERVER_IMAGE_TAG}"
-  
-    - name: docker login
-      run: | # log into docker hub account
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-
-    - name: Get current date # get the date of the build
-      id: date
-      run: echo "date=$(date +'%Y-%m-%d--%M-%S')" >> "$GITHUB_OUTPUT"
-
-    #Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo running in repo ${GITHUB_REPOSITORY#*/} branch ${GITHUB_REF##*/} on ${{ steps.date.outputs.date }}
-
-    # Runs a set of commands using the runners shell
-    - name: build docker image
-      run: |
-        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }} .
-        docker images
-
-    - name: push docker image
-      run: |
-        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
-
-    - name: Update .env file 
-      run: |
-        echo "SERVER_IMAGE_TAG=${GITHUB_REF##*/}_${{ steps.date.outputs.date }}" > .env
-
-    - name: Add, Commit, Push changes to .env file
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "Github Actions bot to update .env with latest tags"
-        if git diff --quiet; then
-          echo "Latest timestamp already present in .env file, no changes to commit"
-        else
-          git add .env
-          git commit -m "Updated docker image tags in .env file to the latest timestamp"
-          git push origin 
-        fi
+  build:
+    if: ${{ !contains(github.event.head_commit.author.name, 'Github Actions bot to update .env with latest tags') && github.ref_type == 'tag' }}
+    needs: [test-with-docker, test-with-manual-install, get-branch-name]
+    uses: e-mission/e-mission-server/.github/workflows/reusable_image_build_push.yml@master
+    with:
+      repo: ${{ github.event.repository.name }}
+      branch: ${{ needs.get-branch-name.outputs.branch_name }}
+    secrets: inherit
 
   dispatch:
     needs: build
