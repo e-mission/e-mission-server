@@ -60,6 +60,8 @@ class Entry(ecwb.WrapperBase):
             "stats/server_api_error": "statsevent",
             # pipeline stage time, measured on the server
             "stats/pipeline_time": "statsevent",
+            # function time, measured on the server
+            "stats/function_time": "statsevent",
             # intended to log the occurrence of errors in the pipeline
             "stats/pipeline_error": "statsevent",
             # time for various client operations, measured on the client
