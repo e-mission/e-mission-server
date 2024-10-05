@@ -64,50 +64,6 @@ def store_function_time(user_id: str, stage_string: str, ts: float, reading: flo
     store_stats_entry(user_id, "stats/function_time", stage_string, ts, reading)
 
 
-def time_and_store_function(user_id: str):
-    """
-    Decorator to measure execution time of functions and store the stats under 'stats/function_time'.
-
-    Parameters:
-    - user_id (str): The ID of the user associated with the stats.
-
-    Usage:
-    @time_and_store_function(user_id="user123")
-    def my_function(...):
-        ...
-    """
-    def decorator(func: Callable):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            print(f"Decorator invoked for {func.__name__}")
-            stage_string = func.__name__
-            ts = time.time()
-            logging.info(f"Starting '{stage_string}' execution.")
-            start_time = time.time()
-            try:
-                result = func(*args, **kwargs)
-                success = True
-                return result
-            except Exception as e:
-                success = False
-                logging.error(f"Error in '{stage_string}': {e}", exc_info=True)
-                raise
-            finally:
-                end_time = time.time()
-                duration_ms = (end_time - start_time) * 1000  # Convert to milliseconds
-                logging.info(f"Finished '{stage_string}' in {duration_ms:.2f} ms.")
-                # Store the timing stats
-                try:
-                    store_function_time(
-                        user_id=user_id,
-                        stage_string=stage_string,
-                        ts=ts,
-                        reading=duration_ms
-                    )
-                except Exception as storage_error:
-                    logging.error(f"Failed to store timing stats for '{stage_string}': {storage_error}", exc_info=True)
-                if not success:
-                    logging.warning(f"'{stage_string}' encountered an error.")
-        return wrapper
-    return decorator
+def store_function_error(user_id, stage_string, ts, reading):
+  store_stats_entry(user_id, "stats/function_time", stage_string, ts, reading)
 
