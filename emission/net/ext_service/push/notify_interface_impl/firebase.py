@@ -23,6 +23,7 @@ def get_interface(push_config):
 class FirebasePush(pni.NotifyInterface):
     def __init__(self, push_config):
         self.service_account_file = push_config.get("PUSH_SERVICE_ACCOUNT_FILE")
+        self.server_auth_token = push_config.get("PUSH_SERVER_AUTH_TOKEN")
         self.project_id = push_config.get("PUSH_PROJECT_ID")
         if "PUSH_APP_PACKAGE_NAME" in push_config:
             self.app_package_name = push_config.get("PUSH_APP_PACKAGE_NAME")
