@@ -1,6 +1,7 @@
 import arrow
 import json
 import logging
+logging.basicConfig(level=logging.INFO)
 import os
 import requests
 import sys
@@ -55,7 +56,6 @@ def bin_users_by_lang(uuid_list, langs, lang_key='phone_lang'):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
 
     STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-study")
@@ -68,12 +68,12 @@ if __name__ == '__main__':
         sys.exit(1)
     
     dynamic_config = json.loads(r.text)
-    logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
+    logging.info(f"Successfully downloaded config with version {dynamic_config['version']} "\
         f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
         f"and data collection URL {dynamic_config['server']['connectUrl']}")
     
     if "reminderSchemes" in dynamic_config:
-        logging.debug("Found flexible notification configuration, skipping server-side push")
+        logging.info("Found flexible notification configuration, skipping server-side push")
         sys.exit(0)
 
     # get push notification config (if not present in dynamic_config, use default)
@@ -99,9 +99,9 @@ if __name__ == '__main__':
     # for each language, send a push notification to the selected users in that language
     for lang, uuids_to_notify in filtered_uuids_by_lang.items():
         if len(uuids_to_notify) == 0:
-            logging.debug(f"No users to notify in lang {lang}")
+            logging.info(f"No users to notify in lang {lang}")
             continue
-        logging.debug(f"Sending push notifications to {len(uuids_to_notify)} users in lang {lang}")
+        logging.info(f"Sending push notifications to {len(uuids_to_notify)} users in lang {lang}")
         json_data = {
             "title": push_config["title"][lang],
             "message": push_config["message"][lang],    
