@@ -103,7 +103,7 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
             eaum.match_incoming_user_inputs(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USER_INPUT_MATCH_INCOMING.name,
-                                 time.time(), uct.elapsed)
+                                 time.time(), uit.elapsed)
 
         # Hack until we delete these spurious entries
         # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868

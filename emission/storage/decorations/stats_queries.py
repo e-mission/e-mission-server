@@ -8,6 +8,8 @@ standard_library.install_aliases()
 from builtins import *
 import logging
 import time
+from functools import wraps
+from typing import Callable, Any
 
 # Our imports
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -45,4 +47,23 @@ def store_stats_entry(user_id, metadata_key, name, ts, reading):
   }
   new_entry = ecwe.Entry.create_entry(user_id, metadata_key, data)
   return esta.TimeSeries.get_time_series(user_id).insert(new_entry)
+
+def store_function_time(user_id: str, stage_string: str, ts: float, reading: float):
+    """
+    Stores the execution time of a function.
+
+    Parameters:
+    - user_id (str): The ID of the user.
+    - stage_string (str): The name of the function being timed.
+    - ts (float): The timestamp when the function execution started.
+    - reading (float): The duration of the function execution in milliseconds.
+
+    Returns:
+    - InsertResult: The result of the insert operation.
+    """
+    store_stats_entry(user_id, "stats/function_time", stage_string, ts, reading)
+
+
+def store_function_error(user_id, stage_string, ts, reading):
+  store_stats_entry(user_id, "stats/function_time", stage_string, ts, reading)
 
