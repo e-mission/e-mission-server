@@ -54,7 +54,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "stats/server_api_time": self.timeseries_db,
                 "stats/server_api_error": self.timeseries_db,
                 "stats/pipeline_time": self.timeseries_db,
-                "stats/function_time": self.timeseries_db,
+                "stats/dashboard_time": self.timeseries_db,
                 "stats/pipeline_error": self.timeseries_db,
                 "stats/client_time": self.timeseries_db,
                 "stats/client_nav_event": self.timeseries_db,
