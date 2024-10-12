@@ -50,14 +50,12 @@ def store_stats_entry(user_id, metadata_key, name, ts, reading):
 
 def store_function_time(user_id: str, stage_string: str, ts: float, reading: float):
     """
-    Stores the execution time of a function.
-
+    Stores statistics about execution times in dashboard code. Both of our current dashboards generate _aggregate_ metrics. I don't see that changing in the foreseeable future, since we don't really want to work at a per-user level in the python dashboards. So we don't pass in the user_id, only a string indicating the name of the step being instrumented, and the value.
+    
     Parameters:
-    - user_id (str): The ID of the user.
-    - stage_string (str): The name of the function being timed.
+    - code_fragment_name (str): The name of the function being timed.
     - ts (float): The timestamp when the function execution started.
     - reading (float): The duration of the function execution in milliseconds.
-
     Returns:
     - InsertResult: The result of the insert operation.
     """
