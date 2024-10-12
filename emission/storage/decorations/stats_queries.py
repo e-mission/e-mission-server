@@ -59,7 +59,7 @@ def store_function_time(user_id: str, stage_string: str, ts: float, reading: flo
     Returns:
     - InsertResult: The result of the insert operation.
     """
-    store_stats_entry(user_id, "stats/function_time", stage_string, ts, reading)
+    store_stats_entry(None, "stats/function_time", stage_string, ts, reading)
 
 
 def store_function_error(user_id, stage_string, ts, reading):
