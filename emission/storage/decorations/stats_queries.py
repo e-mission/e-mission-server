@@ -48,7 +48,7 @@ def store_stats_entry(user_id, metadata_key, name, ts, reading):
   new_entry = ecwe.Entry.create_entry(user_id, metadata_key, data)
   return esta.TimeSeries.get_non_user_time_series().insert(new_entry)
 
-def store_function_time(user_id: str, stage_string: str, ts: float, reading: float):
+def store_dashboard_time(code_fragment_name: str, ts: float, reading: float):
     """
     Stores statistics about execution times in dashboard code. Both of our current dashboards generate _aggregate_ metrics. I don't see that changing in the foreseeable future, since we don't really want to work at a per-user level in the python dashboards. So we don't pass in the user_id, only a string indicating the name of the step being instrumented, and the value.
     
