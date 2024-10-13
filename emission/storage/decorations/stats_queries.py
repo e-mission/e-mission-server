@@ -56,12 +56,13 @@ def store_dashboard_time(code_fragment_name: str, ts: float, reading: float):
     - code_fragment_name (str): The name of the function being timed.
     - ts (float): The timestamp when the function execution started.
     - reading (float): The duration of the function execution in milliseconds.
+    
     Returns:
     - InsertResult: The result of the insert operation.
     """
-    store_stats_entry(None, "stats/function_time", stage_string, ts, reading)
+    return store_stats_entry(None, "stats/dashboard_time", code_fragment_name, ts, reading)
 
 
-def store_function_error(user_id, stage_string, ts, reading):
-  store_stats_entry(user_id, "stats/function_time", stage_string, ts, reading)
+def store_dashboard_error(code_fragment_name: str, ts: float, reading: float):
+    store_stats_entry(None, "stats/dashboard_error", code_fragment_name, ts, reading)
 

@@ -64,6 +64,8 @@ class Entry(ecwb.WrapperBase):
             "stats/dashboard_time": "statsevent",
             # intended to log the occurrence of errors in the pipeline
             "stats/pipeline_error": "statsevent",
+            # intended to log the occurrence of errors in the dashboard
+            "stats/dashboard_error": "statsevent",
             # time for various client operations, measured on the client
             # comparison with the server_api_time can help debug networking issues
             "stats/client_time": "statsevent",
