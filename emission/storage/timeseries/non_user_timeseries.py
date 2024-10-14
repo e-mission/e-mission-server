@@ -27,8 +27,8 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
     # df_row_to_entry: not overridden
     # get_entry_from_id: not overridden
 
-    def find_entries(self, key_list=None, time_query=None, geo_query=None,
-                    extra_query_list=None):
+    def find_entries(self, key_list = None, time_query = None, geo_query = None,
+                     extra_query_list=None):
         sort_key = self._get_sort_key(time_query)
         logging.debug("curr_query = %s, sort_key = %s" % 
             (self._get_query(key_list, time_query, geo_query,
@@ -91,6 +91,7 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         versioned objects
         """
         raise AttributeError("non_user_timeseries does not support updates")
+
 
     @staticmethod
     def update_data(user_id, key, obj_id, data):
