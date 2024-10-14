@@ -19,7 +19,7 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         return []
 
     def get_timeseries_db(self, key):
-        return self.non_user_timeseries_db
+        return self.timeseries_db
 
     # _get_query: not overridden
     # _get_sort_query: not overridden
