@@ -69,14 +69,12 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         # Verification: Adjusted Query to Match Document Structure
         timeseries_db = gdb.get_timeseries_db()
         
-        # Define a time window (e.g., +/- 5 seconds) to account for any timing discrepancies
-        time_window = 5  # seconds
-        current_time = time.time()
+
         query = {
             "metadata.key": "stats/dashboard_time",
             "data.name": function_name,
-            "data.ts": {"$gte": timestamp - time_window, "$lte": timestamp + time_window},
-            "data.reading": {"$gte": elapsed_ms - 10, "$lte": elapsed_ms + 10}  # 10 ms tolerance
+            "data.ts": {"$gte": timestamp, "$lte": timestamp},
+            "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms} 
         }
         
         # Retrieve the most recent document for the function
@@ -118,12 +116,12 @@ def execute_and_time_function(func: t.Callable[[], bool]):
 
         # Verification: Adjusted Error Query to Match Document Structure
         timeseries_db = gdb.get_timeseries_db()
-        current_time = time.time()
+
         error_query = {
             "metadata.key": "stats/dashboard_error",
             "data.name": function_name,
-            "data.ts": {"$gte": timestamp - 5, "$lte": timestamp + 5},  # 5 second window
-            "data.reading": {"$gte": elapsed_ms - 10, "$lte": elapsed_ms + 10}  # 10 ms tolerance
+            "data.ts": {"$gte": timestamp, "$lte": timestamp},
+            "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms}
         }
         stored_error = timeseries_db.find_one(
             error_query,

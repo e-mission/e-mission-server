@@ -102,3 +102,4 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         versioned objects
         """
         raise AttributeError("non_user_timeseries does not support updates")
+
