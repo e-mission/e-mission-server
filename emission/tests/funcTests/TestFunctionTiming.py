@@ -2,17 +2,16 @@
 
 import logging
 import time
-from typing import Callable, List
+import typing as t
 
 # Import the store_dashboard_time and store_dashboard_error functions
-from emission.storage.decorations.stats_queries import (
-    store_dashboard_time,
-    store_dashboard_error
-)
+import emission.storage.decorations.stats_queries as sdq
 
 # Import the existing Timer context manager
-from emission.core.timer import Timer as ECT_Timer
+import emission.core.timer as ec_timer
 
+# Import the database module for verification
+import emission.core.get_database as gdb
 
 # Define test functions
 def test_function_1():
@@ -35,11 +34,13 @@ def test_function_3():
     time.sleep(3)
     return True
 
-def execute_and_time_function(func: Callable[[], bool]):
+def execute_and_time_function(func: t.Callable[[], bool]):
     """
     Executes a given function, measures its execution time using ECT_Timer,
-    and stores the timing information using store_dashboard_time.
-    If the function raises an exception, it stores the error using store_dashboard_error.
+    stores the timing information using store_dashboard_time, and verifies
+    that the data was stored successfully by querying the timeseries database.
+    If the function raises an exception, it stores the error using store_dashboard_error
+    and verifies the error storage.
 
     Parameters:
     - func (Callable[[], bool]): The test function to execute and time.
@@ -50,14 +51,14 @@ def execute_and_time_function(func: Callable[[], bool]):
     logging.info(f"Starting timing for function: {function_name}")
 
     try:
-        with ECT_Timer() as timer:
+        with ec_timer.Timer() as timer:
             result = func()  # Execute the test function
 
         elapsed_seconds = timer.elapsed  # Accessing the float attribute directly
         elapsed_ms = elapsed_seconds * 1000  # Convert to milliseconds
 
         # Store the execution time
-        store_dashboard_time(
+        sdq.store_dashboard_time(
             code_fragment_name=function_name,
             ts=timestamp,
             reading=elapsed_ms
@@ -65,13 +66,49 @@ def execute_and_time_function(func: Callable[[], bool]):
         print(f"Function '{function_name}' executed successfully in {elapsed_ms:.2f} ms.")
         logging.info(f"Function '{function_name}' executed successfully in {elapsed_ms:.2f} ms.")
 
+        # Verification: Adjusted Query to Match Document Structure
+        timeseries_db = gdb.get_timeseries_db()
+        
+        # Define a time window (e.g., +/- 5 seconds) to account for any timing discrepancies
+        time_window = 5  # seconds
+        current_time = time.time()
+        query = {
+            "metadata.key": "stats/dashboard_time",
+            "data.name": function_name,
+            "data.ts": {"$gte": timestamp - time_window, "$lte": timestamp + time_window},
+            "data.reading": {"$gte": elapsed_ms - 10, "$lte": elapsed_ms + 10}  # 10 ms tolerance
+        }
+        
+        # Retrieve the most recent document for the function
+        stored_document = timeseries_db.find_one(
+            query,
+            sort=[("data.ts", -1)]
+        )
+
+        if stored_document:
+            # Inspect the stored document
+            stored_ts = stored_document.get("data", {}).get("ts", 0)
+            stored_reading = stored_document.get("data", {}).get("reading", 0)
+            logging.debug(f"Stored Document for '{function_name}': ts={stored_ts}, reading={stored_reading}")
+
+            # Check if the reading is within a reasonable tolerance (e.g., ±100 ms)
+            if abs(stored_reading - elapsed_ms) <= 100:
+                print(f"Verification passed: Data for '{function_name}' is stored correctly.")
+                logging.info(f"Verification passed: Data for '{function_name}' is stored correctly.")
+            else:
+                print(f"Verification failed: 'reading' value for '{function_name}' is outside the expected range.")
+                logging.error(f"Verification failed: 'reading' value for '{function_name}' is outside the expected range.")
+        else:
+            print(f"Verification failed: Data for '{function_name}' was not found in the database.")
+            logging.error(f"Verification failed: Data for '{function_name}' was not found in the database.")
+
     except Exception as e:
         # Even if the function fails, capture the elapsed time up to the exception
         elapsed_seconds = timer.elapsed if 'timer' in locals() else 0  # Accessing the float attribute directly
         elapsed_ms = elapsed_seconds * 1000
 
         # Store the error timing
-        store_dashboard_error(
+        sdq.store_dashboard_error(
             code_fragment_name=function_name,
             ts=timestamp,
             reading=elapsed_ms
@@ -79,9 +116,38 @@ def execute_and_time_function(func: Callable[[], bool]):
         print(f"Function '{function_name}' failed after {elapsed_ms:.2f} ms with error: {e}")
         logging.error(f"Function '{function_name}' failed after {elapsed_ms:.2f} ms with error: {e}")
 
+        # Verification: Adjusted Error Query to Match Document Structure
+        timeseries_db = gdb.get_timeseries_db()
+        current_time = time.time()
+        error_query = {
+            "metadata.key": "stats/dashboard_error",
+            "data.name": function_name,
+            "data.ts": {"$gte": timestamp - 5, "$lte": timestamp + 5},  # 5 second window
+            "data.reading": {"$gte": elapsed_ms - 10, "$lte": elapsed_ms + 10}  # 10 ms tolerance
+        }
+        stored_error = timeseries_db.find_one(
+            error_query,
+            sort=[("data.ts", -1)]
+        )
+
+        if stored_error:
+            stored_ts = stored_error.get("data", {}).get("ts", 0)
+            stored_reading = stored_error.get("data", {}).get("reading", 0)
+            logging.debug(f"Stored Error Document for '{function_name}': ts={stored_ts}, reading={stored_reading}")
+
+            if abs(stored_reading - elapsed_ms) <= 100:
+                print(f"Error verification passed: Error for '{function_name}' is stored correctly.")
+                logging.info(f"Error verification passed: Error for '{function_name}' is stored correctly.")
+            else:
+                print(f"Error verification failed: 'reading' value for '{function_name}' error is outside the expected range.")
+                logging.error(f"Error verification failed: 'reading' value for '{function_name}' error is outside the expected range.")
+        else:
+            print(f"Error verification failed: Error for '{function_name}' was not found in the database.")
+            logging.error(f"Error verification failed: Error for '{function_name}' was not found in the database.")
+
 def main():
     # Define the list of test functions, including the faulty one
-    function_list: List[Callable[[], bool]] = [
+    function_list: t.List[t.Callable[[], bool]] = [
         test_function_1,
         test_function_2,
         # test_function_faulty,  # This will raise an exception
