@@ -11,8 +11,8 @@ import emission.storage.decorations.stats_queries as sdq
 import emission.core.timer as ec_timer
 
 # Import the database module for verification
-import emission.core.get_database as gdb
-
+import emission.storage.timeseries.builtin_timeseries as bits
+builtin_ts = bits.BuiltinTimeSeries(None)
 # Define test functions
 def test_function_1():
     logging.info("Executing test_function_1")
@@ -67,7 +67,7 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         logging.info(f"Function '{function_name}' executed successfully in {elapsed_ms:.2f} ms.")
 
         # Verification: Adjusted Query to Match Document Structure
-        timeseries_db = gdb.get_timeseries_db()
+        timeseries_db = builtin_ts.get_timeseries_db(key="stats/dashboard_time")
         
 
         query = {
@@ -115,7 +115,7 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         logging.error(f"Function '{function_name}' failed after {elapsed_ms:.2f} ms with error: {e}")
 
         # Verification: Adjusted Error Query to Match Document Structure
-        timeseries_db = gdb.get_timeseries_db()
+        timeseries_db = builtin_ts.get_timeseries_db(key="stats/dashboard_error")
 
         error_query = {
             "metadata.key": "stats/dashboard_error",
