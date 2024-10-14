@@ -46,7 +46,7 @@ def store_stats_entry(user_id, metadata_key, name, ts, reading):
     "reading": reading
   }
   new_entry = ecwe.Entry.create_entry(user_id, metadata_key, data)
-  return esta.TimeSeries.get_non_user_time_series().insert(new_entry)
+  return esta.TimeSeries.get_time_series(user_id).insert(new_entry)
 
 def store_dashboard_time(code_fragment_name: str, ts: float, reading: float):
     """

@@ -6,10 +6,11 @@ import pymongo
 import emission.core.get_database as edb
 import emission.storage.timeseries.builtin_timeseries as bits
 import emission.core.wrapper.entry as ecwe  # Added missing import
+import emission.storage.timeseries.aggregate_timeseries as esta
 
 class NonUserTimeSeries(bits.BuiltinTimeSeries):
     def __init__(self):
-        super(NonUserTimeSeries, self).__init__(None)  # Corrected superclass name
+        super(esta.AggregateTimeSeries, self).__init__(None)
         self.user_query = {}
         self.timeseries_db = edb.get_non_user_timeseries_db()
 
@@ -18,7 +19,7 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         return []
 
     def get_timeseries_db(self, key):
-        return self.timeseries_db  # Ensure this is intended to ignore 'key'
+        return self.non_user_timeseries_db
 
     # _get_query: not overridden
     # _get_sort_query: not overridden
@@ -32,7 +33,7 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         current_query = self._get_query(key_list, time_query, geo_query, extra_query_list)
         logging.debug(f"curr_query = {current_query}, sort_key = {sort_key}")
         ts_db_result = self._get_entries_for_timeseries(
-            self.timeseries_db,
+            self.non_user_timeseries_db,
             key_list,
             time_query,
             geo_query,
