@@ -85,7 +85,7 @@ class TestFunctionTiming(unittest.TestCase):
                 result = func()  # Execute the test function
 
             elapsed_seconds = timer.elapsed  # Accessing the float attribute directly
-            elapsed_ms = (elapsed_seconds * 1000)  # Convert to milliseconds and round to nearest integer
+            elapsed_ms = (elapsed_seconds * 1000)  # Convert to milliseconds
 
             # Store the execution time
             sdq.store_dashboard_time(
@@ -133,7 +133,7 @@ class TestFunctionTiming(unittest.TestCase):
         except Exception as e:
             # Even if the function fails, capture the elapsed time up to the exception
             elapsed_seconds = timer.elapsed if 'timer' in locals() else 0  # Accessing the float attribute directly
-            elapsed_ms = (elapsed_seconds * 1000)  # Convert to milliseconds and round to nearest integer
+            elapsed_ms = (elapsed_seconds * 1000)  # Convert to milliseconds
 
             # Store the error timing
             sdq.store_dashboard_error(
