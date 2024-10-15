@@ -177,7 +177,6 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                          list(overlap_keys))
                 else:
                     ret_query.update(extra_query)
-
         return ret_query
 
     def _get_sort_key(self, time_query = None):
