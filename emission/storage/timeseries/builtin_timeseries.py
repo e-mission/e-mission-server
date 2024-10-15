@@ -170,12 +170,13 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 eq_keys = set(extra_query.keys())
                 curr_keys = set(ret_query.keys())
                 overlap_keys = eq_keys.intersection(curr_keys)
-                if overlap_keys:
-                    logging.info(
-                        f"eq_keys = {eq_keys}, curr_keys = {curr_keys}, overlap_keys = {overlap_keys}"
-                    )
-                    raise AttributeError(f"extra query would overwrite keys {list(overlap_keys)}")
-                ret_query.update(extra_query)
+                if len(overlap_keys) != 0:
+                    logging.info("eq_keys = %s, curr_keys = %s, overlap_keys = %s" %
+                                 (eq_keys, curr_keys, overlap_keys))
+                    raise AttributeError("extra query would overwrite keys %s" %
+                                         list(overlap_keys))
+                else:
+                    ret_query.update(extra_query)
 
         return ret_query
 

@@ -70,19 +70,11 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         # Verification: Adjusted Query to Match Document Structure
         timeseries_db = esta.TimeSeries.get_time_series(None)
 
-        # Define the time range and additional filters
-        time_query = {
-            "data.ts": {"$gte": timestamp, "$lte": timestamp},
-            "data.name": function_name,
-            "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms}
-        }
-
-        # Retrieve the first matching entry using the get_first_entry method
-        stored_document = timeseries_db.get_first_entry(
+        # Retrieve the document
+        stored_document = timeseries_db.get_entry_at_ts(
             key="stats/dashboard_time",
-            field="data.ts",
-            sort_order=pymongo.DESCENDING,
-            time_query=time_query
+            ts_key="data.ts",
+            ts=timestamp
         )
 
         if stored_document:
@@ -120,19 +112,11 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         # Initialize the TimeSeries database connection
         timeseries_db = esta.TimeSeries.get_time_series(None)
 
-        # Define the time range and additional filters
-        time_query = {
-            "data.ts": {"$gte": timestamp, "$lte": timestamp},
-            "data.name": function_name,
-            "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms}
-        }
-
-        # Retrieve the first matching entry using the get_first_entry method
-        stored_error = timeseries_db.get_first_entry(
+        # Retrieve the document
+        stored_error = timeseries_db.get_entry_at_ts(
             key="stats/dashboard_error",
-            field="data.ts",
-            sort_order=pymongo.DESCENDING,
-            time_query=time_query
+            ts_key="data.ts",
+            ts=timestamp
         )
 
 
