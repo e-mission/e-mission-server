@@ -130,28 +130,53 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :return:
         """
         ret_query = {"invalid": {"$exists": False}}
-        ret_query.update(self.user_query)
-        if key_list is not None and len(key_list) > 0:
-            key_query_list = []
-            for key in key_list:
-                key_query_list.append(self.key_query(key))
-            ret_query.update({"$or": key_query_list})
-        if time_query is not None:
-            ret_query.update(time_query.get_query())
-        if geo_query is not None:
-            ret_query.update(geo_query.get_query())
-        if extra_query_list is not None:
+        
+        # Update with user-specific queries
+        if hasattr(self, 'user_query') and isinstance(self.user_query, dict):
+            ret_query.update(self.user_query)
+        elif hasattr(self, 'user_query'):
+            logging.warning("user_query is not a dict and will not be used.")
+
+        # Handle key_list
+        if key_list:
+            key_query_list = [self.key_query(key) for key in key_list]
+            ret_query["$or"] = key_query_list
+
+        # Handle time_query
+        if time_query:
+            if hasattr(time_query, 'get_query') and callable(time_query.get_query):
+                time_query_dict = time_query.get_query()
+                ret_query.update(time_query_dict)
+            elif isinstance(time_query, dict):
+                ret_query.update(time_query)
+            else:
+                raise TypeError("time_query must have a get_query method or be a dict")
+
+        # Handle geo_query
+        if geo_query:
+            if hasattr(geo_query, 'get_query') and callable(geo_query.get_query):
+                geo_query_dict = geo_query.get_query()
+                ret_query.update(geo_query_dict)
+            elif isinstance(geo_query, dict):
+                ret_query.update(geo_query)
+            else:
+                raise TypeError("geo_query must have a get_query method or be a dict")
+
+        # Handle extra_query_list
+        if extra_query_list:
             for extra_query in extra_query_list:
+                if not isinstance(extra_query, dict):
+                    raise TypeError("Each extra_query must be a dict")
                 eq_keys = set(extra_query.keys())
                 curr_keys = set(ret_query.keys())
                 overlap_keys = eq_keys.intersection(curr_keys)
-                if len(overlap_keys) != 0:
-                    logging.info("eq_keys = %s, curr_keys = %s, overlap_keys = %s" %
-                                 (eq_keys, curr_keys, overlap_keys))
-                    raise AttributeError("extra query would overwrite keys %s" %
-                                         list(overlap_keys))
-                else:
-                    ret_query.update(extra_query)
+                if overlap_keys:
+                    logging.info(
+                        f"eq_keys = {eq_keys}, curr_keys = {curr_keys}, overlap_keys = {overlap_keys}"
+                    )
+                    raise AttributeError(f"extra query would overwrite keys {list(overlap_keys)}")
+                ret_query.update(extra_query)
+
         return ret_query
 
     def _get_sort_key(self, time_query = None):

@@ -3,6 +3,7 @@
 import logging
 import time
 import typing as t
+import pymongo
 
 # Import the store_dashboard_time and store_dashboard_error functions
 import emission.storage.decorations.stats_queries as sdq
@@ -11,8 +12,8 @@ import emission.storage.decorations.stats_queries as sdq
 import emission.core.timer as ec_timer
 
 # Import the database module for verification
-import emission.storage.timeseries.builtin_timeseries as bits
-builtin_ts = bits.BuiltinTimeSeries(None)
+import emission.storage.timeseries.abstract_timeseries as esta
+
 # Define test functions
 def test_function_1():
     logging.info("Executing test_function_1")
@@ -67,20 +68,21 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         logging.info(f"Function '{function_name}' executed successfully in {elapsed_ms:.2f} ms.")
 
         # Verification: Adjusted Query to Match Document Structure
-        timeseries_db = builtin_ts.get_timeseries_db(key="stats/dashboard_time")
-        
+        timeseries_db = esta.TimeSeries.get_time_series(None)
 
-        query = {
-            "metadata.key": "stats/dashboard_time",
-            "data.name": function_name,
+        # Define the time range and additional filters
+        time_query = {
             "data.ts": {"$gte": timestamp, "$lte": timestamp},
-            "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms} 
+            "data.name": function_name,
+            "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms}
         }
-        
-        # Retrieve the most recent document for the function
-        stored_document = timeseries_db.find_one(
-            query,
-            sort=[("data.ts", -1)]
+
+        # Retrieve the first matching entry using the get_first_entry method
+        stored_document = timeseries_db.get_first_entry(
+            key="stats/dashboard_time",
+            field="data.ts",
+            sort_order=pymongo.DESCENDING,
+            time_query=time_query
         )
 
         if stored_document:
@@ -115,18 +117,24 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         logging.error(f"Function '{function_name}' failed after {elapsed_ms:.2f} ms with error: {e}")
 
         # Verification: Adjusted Error Query to Match Document Structure
-        timeseries_db = builtin_ts.get_timeseries_db(key="stats/dashboard_error")
+        # Initialize the TimeSeries database connection
+        timeseries_db = esta.TimeSeries.get_time_series(None)
 
-        error_query = {
-            "metadata.key": "stats/dashboard_error",
-            "data.name": function_name,
+        # Define the time range and additional filters
+        time_query = {
             "data.ts": {"$gte": timestamp, "$lte": timestamp},
+            "data.name": function_name,
             "data.reading": {"$gte": elapsed_ms, "$lte": elapsed_ms}
         }
-        stored_error = timeseries_db.find_one(
-            error_query,
-            sort=[("data.ts", -1)]
+
+        # Retrieve the first matching entry using the get_first_entry method
+        stored_error = timeseries_db.get_first_entry(
+            key="stats/dashboard_error",
+            field="data.ts",
+            sort_order=pymongo.DESCENDING,
+            time_query=time_query
         )
+
 
         if stored_error:
             stored_ts = stored_error.get("data", {}).get("ts", 0)
@@ -148,7 +156,7 @@ def main():
     function_list: t.List[t.Callable[[], bool]] = [
         test_function_1,
         test_function_2,
-        # test_function_faulty,  # This will raise an exception
+        test_function_faulty,  # This will raise an exception
         test_function_3  # This should execute normally after the faulty function
     ]
     # Execute and time each function
