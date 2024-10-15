@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+import time
 # Standard imports
 from future import standard_library
 standard_library.install_aliases()
@@ -10,6 +11,7 @@ from builtins import *
 # Our imports
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.entry as ecwe
+import emission.core.timer as ec_timer
 
 
 # metadata format is 
@@ -44,21 +46,47 @@ def store_stats_entry(user_id, metadata_key, name, ts, reading):
   new_entry = ecwe.Entry.create_entry(user_id, metadata_key, data)
   return esta.TimeSeries.get_time_series(user_id).insert(new_entry)
 
-def store_dashboard_time(code_fragment_name: str, ts: float, reading: float):
+def store_dashboard_time(code_fragment_name: str, timer: ec_timer.Timer):
     """
-    Stores statistics about execution times in dashboard code. Both of our current dashboards generate _aggregate_ metrics. I don't see that changing in the foreseeable future, since we don't really want to work at a per-user level in the python dashboards. So we don't pass in the user_id, only a string indicating the name of the step being instrumented, and the value.
-    
+    Stores statistics about execution times in dashboard code using a Timer object.
+    Both of our current dashboards generate _aggregate_ metrics. We do not work at a per-user level
+    in the Python dashboards, so we pass in only the name of the step being instrumented and the timing information.
+
     Parameters:
-    - code_fragment_name (str): The name of the function being timed.
-    - ts (float): The timestamp when the function execution started.
-    - reading (float): The duration of the function execution in milliseconds.
-    
-    Returns:
-    - InsertResult: The result of the insert operation.
+    - code_fragment_name (str): The name of the function or code fragment being timed.
+    - timer (ec_timer.Timer): The Timer object that records the execution duration.
     """
-    return store_stats_entry(None, "stats/dashboard_time", code_fragment_name, ts, reading)
+    # Extract the elapsed time in seconds and convert to milliseconds
+    elapsed_seconds = timer.elapsed  # Access the elapsed time in seconds
+    elapsed_ms = elapsed_seconds * 1000  # Convert to milliseconds
+
+    # Get the current timestamp in seconds since epoch
+    timestamp = time.time()
+
+    # Call the existing store_stats_entry function
+    store_stats_entry(
+        user_id=None,  # No user ID as per current dashboard design
+        metadata_key="stats/dashboard_time",
+        name=code_fragment_name,
+        ts=timestamp,
+        reading=elapsed_ms
+    )
 
 
-def store_dashboard_error(code_fragment_name: str, ts: float, reading: float):
-    store_stats_entry(None, "stats/dashboard_error", code_fragment_name, ts, reading)
+def store_dashboard_error(code_fragment_name: str, timer: ec_timer.Timer):
+    # Extract the elapsed time in seconds and convert to milliseconds
+    elapsed_seconds = timer.elapsed  # Access the elapsed time in seconds
+    elapsed_ms = elapsed_seconds * 1000  # Convert to milliseconds
+
+    # Get the current timestamp in seconds since epoch
+    timestamp = time.time()
+
+    # Call the existing store_stats_entry function
+    store_stats_entry(
+        user_id=None,  # No user ID as per current dashboard design
+        metadata_key="stats/dashboard_error",
+        name=code_fragment_name,
+        ts=timestamp,
+        reading=elapsed_ms
+    )
 

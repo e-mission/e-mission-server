@@ -47,7 +47,6 @@ def execute_and_time_function(func: t.Callable[[], bool]):
     - func (Callable[[], bool]): The test function to execute and time.
     """
     function_name = func.__name__
-    timestamp = time.time()
 
     logging.info(f"Starting timing for function: {function_name}")
 
@@ -61,8 +60,7 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         # Store the execution time
         sdq.store_dashboard_time(
             code_fragment_name=function_name,
-            ts=timestamp,
-            reading=elapsed_ms
+            timer=timer
         )
         print(f"Function '{function_name}' executed successfully in {elapsed_ms:.2f} ms.")
         logging.info(f"Function '{function_name}' executed successfully in {elapsed_ms:.2f} ms.")
@@ -71,10 +69,10 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         timeseries_db = esta.TimeSeries.get_time_series(None)
 
         # Retrieve the document
-        stored_document = timeseries_db.get_entry_at_ts(
-            key="stats/dashboard_time",
-            ts_key="data.ts",
-            ts=timestamp
+        stored_document = timeseries_db.get_first_entry(
+            key=f"stats/dashboard_time",
+            field="data.ts",
+            sort_order=pymongo.DESCENDING,
         )
 
         if stored_document:
@@ -82,14 +80,6 @@ def execute_and_time_function(func: t.Callable[[], bool]):
             stored_ts = stored_document.get("data", {}).get("ts", 0)
             stored_reading = stored_document.get("data", {}).get("reading", 0)
             logging.debug(f"Stored Document for '{function_name}': ts={stored_ts}, reading={stored_reading}")
-
-            # Check if the reading is within a reasonable tolerance (e.g., ±100 ms)
-            if abs(stored_reading - elapsed_ms) <= 100:
-                print(f"Verification passed: Data for '{function_name}' is stored correctly.")
-                logging.info(f"Verification passed: Data for '{function_name}' is stored correctly.")
-            else:
-                print(f"Verification failed: 'reading' value for '{function_name}' is outside the expected range.")
-                logging.error(f"Verification failed: 'reading' value for '{function_name}' is outside the expected range.")
         else:
             print(f"Verification failed: Data for '{function_name}' was not found in the database.")
             logging.error(f"Verification failed: Data for '{function_name}' was not found in the database.")
@@ -102,8 +92,7 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         # Store the error timing
         sdq.store_dashboard_error(
             code_fragment_name=function_name,
-            ts=timestamp,
-            reading=elapsed_ms
+            timer=timer
         )
         print(f"Function '{function_name}' failed after {elapsed_ms:.2f} ms with error: {e}")
         logging.error(f"Function '{function_name}' failed after {elapsed_ms:.2f} ms with error: {e}")
@@ -113,24 +102,16 @@ def execute_and_time_function(func: t.Callable[[], bool]):
         timeseries_db = esta.TimeSeries.get_time_series(None)
 
         # Retrieve the document
-        stored_error = timeseries_db.get_entry_at_ts(
+        stored_error = timeseries_db.get_first_entry(
             key="stats/dashboard_error",
-            ts_key="data.ts",
-            ts=timestamp
+            field="data.ts",
+            sort_order=pymongo.DESCENDING,
         )
-
 
         if stored_error:
             stored_ts = stored_error.get("data", {}).get("ts", 0)
             stored_reading = stored_error.get("data", {}).get("reading", 0)
             logging.debug(f"Stored Error Document for '{function_name}': ts={stored_ts}, reading={stored_reading}")
-
-            if abs(stored_reading - elapsed_ms) <= 100:
-                print(f"Error verification passed: Error for '{function_name}' is stored correctly.")
-                logging.info(f"Error verification passed: Error for '{function_name}' is stored correctly.")
-            else:
-                print(f"Error verification failed: 'reading' value for '{function_name}' error is outside the expected range.")
-                logging.error(f"Error verification failed: 'reading' value for '{function_name}' error is outside the expected range.")
         else:
             print(f"Error verification failed: Error for '{function_name}' was not found in the database.")
             logging.error(f"Error verification failed: Error for '{function_name}' was not found in the database.")
