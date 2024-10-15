@@ -18,12 +18,12 @@ import emission.core.get_database as edb
 
 class TestFunctionTiming(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(self):
         """
         Set up resources before any tests are run.
         """
         logging.basicConfig(level=logging.INFO)
-        cls.timeseries_db = esta.TimeSeries.get_time_series(None)
+        self.timeseries_db = esta.TimeSeries.get_time_series(None)
 
     def tearDown(self):
         """
