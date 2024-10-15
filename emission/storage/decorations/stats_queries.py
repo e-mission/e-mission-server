@@ -57,8 +57,7 @@ def store_dashboard_time(code_fragment_name: str, timer: ec_timer.Timer):
     - timer (ec_timer.Timer): The Timer object that records the execution duration.
     """
     # Extract the elapsed time in seconds and convert to milliseconds
-    elapsed_seconds = timer.elapsed  # Access the elapsed time in seconds
-    elapsed_ms = elapsed_seconds * 1000  # Convert to milliseconds
+    elapsed_ms = timer.elapsed * 1000  # Convert to milliseconds
 
     # Get the current timestamp in seconds since epoch
     timestamp = time.time()
