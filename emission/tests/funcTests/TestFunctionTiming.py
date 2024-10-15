@@ -83,9 +83,8 @@ class TestFunctionTiming(unittest.TestCase):
         try:
             with ec_timer.Timer() as timer:
                 result = func()  # Execute the test function
-
-            elapsed_seconds = timer.elapsed  # Accessing the float attribute directly
-            elapsed_ms = (elapsed_seconds * 1000)  # Convert to milliseconds
+                
+            elapsed_ms = (timer.elapsed * 1000)  # Convert to milliseconds
 
             # Store the execution time
             sdq.store_dashboard_time(
@@ -95,21 +94,31 @@ class TestFunctionTiming(unittest.TestCase):
             logging.info(f"Function '{function_name}' executed successfully in {elapsed_ms} ms.")
 
             # Verification: Adjusted Query to Match Document Structure
-            stored_document = self.timeseries_db.get_first_entry(
-                key="stats/dashboard_time",
-                field="data.ts",
-                sort_order=pymongo.DESCENDING,
+            stored_documents_chain = self.timeseries_db.find_entries(["stats/dashboard_time"], time_query=None)
+
+            # Convert the chain to a list to make it subscriptable and to allow multiple accesses
+            stored_documents = list(stored_documents_chain)
+
+            # Assert that at least one document was retrieved
+            self.assertTrue(
+                len(stored_documents) > 0,
+                f"Data for '{function_name}' was not found in the database."
             )
 
-            self.assertIsNotNone(stored_document, f"Data for '{function_name}' was not found in the database.")
-
-            # Inspect the stored document
-            stored_ts = stored_document['data']['ts']
-            stored_reading = stored_document['data']['reading']
-            stored_name = stored_document['data']['name']
-            logging.debug(f"Stored Document for '{function_name}': ts={stored_ts}, reading={stored_reading}")
-
-
+            # Iterate over each document and inspect its contents
+            for idx, stored_document in enumerate(stored_documents):
+                try:
+                    stored_ts = stored_document['data']['ts']
+                    stored_reading = stored_document['data']['reading']
+                    stored_name = stored_document['data']['name']
+                    logging.debug(
+                        f"Stored Document {idx} for '{function_name}': ts={stored_ts}, reading={stored_reading}, name={stored_name}"
+                    )
+                except KeyError as e:
+                    self.fail(
+                        f"Missing key {e} in stored document {idx} for '{function_name}'."
+                    )
+            
             # Assert that the stored_reading_error matches elapsed_ms exactly
             self.assertEqual(
                 stored_reading,
@@ -143,20 +152,30 @@ class TestFunctionTiming(unittest.TestCase):
             logging.error(f"Function '{function_name}' failed after {elapsed_ms} ms with error: {e}")
 
             # Verification: Adjusted Error Query to Match Document Structure
-            stored_error = self.timeseries_db.get_first_entry(
-                key="stats/dashboard_error",
-                field="data.ts",
-                sort_order=pymongo.DESCENDING,
+            stored_error_chain = self.timeseries_db.find_entries(["stats/dashboard_error"], time_query=None)
+
+            # Convert the chain to a list to make it subscriptable and to allow multiple accesses
+            stored_errors = list(stored_error_chain)
+
+            # Assert that at least one document was retrieved
+            self.assertTrue(
+                len(stored_errors) > 0,
+                f"Data for '{function_name}' was not found in the database."
             )
 
-            self.assertIsNotNone(stored_error, f"Error for '{function_name}' was not found in the database.")
-
-            # Inspect the stored error document
-            stored_ts_error = stored_error['data']['ts']
-            stored_reading_error = stored_error['data']['reading']
-            stored_name_error = stored_error['data']['name']
-            logging.debug(f"Stored Error Document for '{function_name}': ts={stored_ts_error}, reading={stored_reading_error}")
-
+            # Iterate over each document and inspect its contents
+            for idx, stored_error in enumerate(stored_errors):
+                try:
+                    stored_ts_error = stored_error['data']['ts']
+                    stored_reading_error = stored_error['data']['reading']
+                    stored_name_error = stored_error['data']['name']
+                    logging.debug(
+                        f"Stored Document {idx} for '{function_name}': ts={stored_ts_error}, reading={stored_reading_error}, name={stored_name_error}"
+                    )
+                except KeyError as e:
+                    self.fail(
+                        f"Missing key {e} in stored document {idx} for '{function_name}'."
+                    )
             # Assert that the stored_reading_error matches elapsed_ms exactly
             self.assertEqual(
                 stored_reading_error,
