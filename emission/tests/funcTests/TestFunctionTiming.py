@@ -430,6 +430,3 @@ def test_function_faulty():
     logging.info("Executing test_function_faulty")
     time.sleep(1)
     raise ValueError("Simulated error in test_function_faulty")
-
-if __name__ == "__main__":
-    unittest.main()
