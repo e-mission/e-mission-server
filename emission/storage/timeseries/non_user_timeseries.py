@@ -5,11 +5,10 @@ import pymongo
 
 import emission.core.get_database as edb
 import emission.storage.timeseries.builtin_timeseries as bits
-import emission.core.wrapper.entry as ecwe
 
 class NonUserTimeSeries(bits.BuiltinTimeSeries):
     def __init__(self):
-        super(ecwe.AggregateTimeSeries, self).__init__(None)
+        super(AggregateTimeSeries, self).__init__(None)
         self.user_query = {}
         self.timeseries_db = edb.get_non_user_timeseries_db()
 
