@@ -102,16 +102,6 @@ class TestFunctionTiming(unittest.TestCase):
         stored_documents = list(stored_documents_chain)
         logging.info(f"Number of 'stats/dashboard_time' entries retrieved: {len(stored_documents)}")
 
-        # Log details of each stored document
-        for doc in stored_documents:
-            try:
-                name = doc['data']['name']
-                reading = doc['data']['reading']
-                ts = doc['data']['ts']
-                logging.info(f"Stored Entry - Name: {name}, Reading: {reading} ms, Timestamp: {ts}")
-            except KeyError as e:
-                logging.error(f"Missing key {e} in stored document: {doc}")
-
         # Assert that the number of stored documents matches the number of functions tested
         expected_count = len(functions)
         actual_count = len(stored_documents)
