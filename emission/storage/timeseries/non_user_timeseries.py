@@ -5,12 +5,11 @@ import pymongo
 
 import emission.core.get_database as edb
 import emission.storage.timeseries.builtin_timeseries as bits
-import emission.core.wrapper.entry as ecwe  # Added missing import
-import emission.storage.timeseries.aggregate_timeseries as esta
+import emission.core.wrapper.entry as ecwe
 
 class NonUserTimeSeries(bits.BuiltinTimeSeries):
     def __init__(self):
-        super(esta.AggregateTimeSeries, self).__init__(None)
+        super(ecwe.AggregateTimeSeries, self).__init__(None)
         self.user_query = {}
         self.timeseries_db = edb.get_non_user_timeseries_db()
 
@@ -56,25 +55,13 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         if type(entry) == dict:
             entry = ecwe.Entry(entry)
         if entry["user_id"] is not None:
-            raise AttributeError(
-                f"Saving entry {entry} for {entry['user_id']} in non_user_timeseries is not allowed."
-            )
+            raise AttributeError("Saving entry %s for %s in non_user_timeseries" % 
+                (entry, entry["user_id"]))
         else:
             logging.debug("entry was fine, no need to fix it")
 
-        # Get the collection and log its full name
-        collection = self.get_timeseries_db(entry.metadata.key)
-        logging.debug(f"Collection used for insertion: {collection.full_name}")
-
-        logging.debug(f"Inserting entry {entry} into timeseries")
-        try:
-            result = collection.insert_one(entry)
-            logging.debug(f"Inserted entry with ID: {result.inserted_id}")
-            return result.inserted_id
-        except pymongo.errors.PyMongoError as e:
-            logging.error(f"Failed to insert entry: {e}")
-            raise
-
+        logging.debug("Inserting entry %s into timeseries" % entry)
+        return self.get_timeseries_db(entry.metadata.key).insert(entry)
 
     # insert_data is unchanged
     def insert_error(self, entry):
@@ -91,7 +78,6 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
         versioned objects
         """
         raise AttributeError("non_user_timeseries does not support updates")
-
 
     @staticmethod
     def update_data(user_id, key, obj_id, data):

@@ -97,27 +97,26 @@ class TestFunctionTiming(unittest.TestCase):
             stored_documents_chain = self.timeseries_db.find_entries(["stats/dashboard_time"], time_query=None)
 
             # Convert the chain to a list to make it subscriptable and to allow multiple accesses
-            stored_documents = list(stored_documents_chain)
+            stored_document = list(stored_documents_chain)
 
             # Assert that at least one document was retrieved
             self.assertTrue(
-                len(stored_documents) > 0,
+                len(stored_document) > 0,
                 f"Data for '{function_name}' was not found in the database."
             )
-
+            stored_document = stored_document[0]
             # Iterate over each document and inspect its contents
-            for idx, stored_document in enumerate(stored_documents):
-                try:
-                    stored_ts = stored_document['data']['ts']
-                    stored_reading = stored_document['data']['reading']
-                    stored_name = stored_document['data']['name']
-                    logging.debug(
-                        f"Stored Document {idx} for '{function_name}': ts={stored_ts}, reading={stored_reading}, name={stored_name}"
-                    )
-                except KeyError as e:
-                    self.fail(
-                        f"Missing key {e} in stored document {idx} for '{function_name}'."
-                    )
+            try:
+                stored_ts = stored_document['data']['ts']
+                stored_reading = stored_document['data']['reading']
+                stored_name = stored_document['data']['name']
+                logging.debug(
+                    f"Stored Document for '{function_name}': ts={stored_ts}, reading={stored_reading}, name={stored_name}"
+                )
+            except KeyError as e:
+                self.fail(
+                    f"Missing key {e} in stored document for '{function_name}'."
+                )
             
             # Assert that the stored_reading_error matches elapsed_ms exactly
             self.assertEqual(
@@ -155,27 +154,26 @@ class TestFunctionTiming(unittest.TestCase):
             stored_error_chain = self.timeseries_db.find_entries(["stats/dashboard_error"], time_query=None)
 
             # Convert the chain to a list to make it subscriptable and to allow multiple accesses
-            stored_errors = list(stored_error_chain)
+            stored_error = list(stored_error_chain)
 
             # Assert that at least one document was retrieved
             self.assertTrue(
-                len(stored_errors) > 0,
+                len(stored_error) > 0,
                 f"Data for '{function_name}' was not found in the database."
             )
-
+            stored_error = stored_error[0]
             # Iterate over each document and inspect its contents
-            for idx, stored_error in enumerate(stored_errors):
-                try:
-                    stored_ts_error = stored_error['data']['ts']
-                    stored_reading_error = stored_error['data']['reading']
-                    stored_name_error = stored_error['data']['name']
-                    logging.debug(
-                        f"Stored Document {idx} for '{function_name}': ts={stored_ts_error}, reading={stored_reading_error}, name={stored_name_error}"
-                    )
-                except KeyError as e:
-                    self.fail(
-                        f"Missing key {e} in stored document {idx} for '{function_name}'."
-                    )
+            try:
+                stored_ts_error = stored_error['data']['ts']
+                stored_reading_error = stored_error['data']['reading']
+                stored_name_error = stored_error['data']['name']
+                logging.debug(
+                    f"Stored Document for '{function_name}': ts={stored_ts_error}, reading={stored_reading_error}, name={stored_name_error}"
+                )
+            except KeyError as e:
+                self.fail(
+                    f"Missing key {e} in stored document for '{function_name}'."
+                )
             # Assert that the stored_reading_error matches elapsed_ms exactly
             self.assertEqual(
                 stored_reading_error,
