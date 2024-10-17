@@ -1,5 +1,3 @@
-# rename/move this to emission/tests/storageTests/TestStatsQueries.py
-
 import unittest
 import logging
 import time
