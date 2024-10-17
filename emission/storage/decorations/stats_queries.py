@@ -51,10 +51,9 @@ def store_dashboard_time(code_fragment_name: str, timer: ec_timer.Timer):
     Stores statistics about execution times in dashboard code using a Timer object.
     Both of our current dashboards generate _aggregate_ metrics. We do not work at a per-user level
     in the Python dashboards, so we pass in only the name of the step being instrumented and the timing information.
-
-    Parameters:
-    - code_fragment_name (str): The name of the function or code fragment being timed.
-    - timer (ec_timer.Timer): The Timer object that records the execution duration.
+    
+    :param code_fragment_name (str): The name of the function or code fragment being timed.
+    :param timer (ec_timer.Timer): The Timer object that records the execution duration.
     """
     # Get the current timestamp in seconds since epoch
     timestamp = time.time()
