@@ -108,5 +108,5 @@ class TimeSeries(object):
     def update_data(user_id, key, obj_id, data):
         pass
 
-    def invalidate_raw_entry(self, obj_id):
+    def invalidate_raw_entry(self, list_obj_id):
         pass
