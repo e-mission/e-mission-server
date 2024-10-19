@@ -41,24 +41,18 @@ jobs:
         uname -a
         uname -m
 
-    # Install Homebrew
-    - name: Install Homebrew
+    - name: Setup docker, docker-compose, and colima (missing on MacOS)
+      if: runner.os == 'macos'
       run: |
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew install docker docker-compose colima
+        
+        # Link the Docker Compose v2 plugin so it's understood by the docker CLI
+        mkdir -p ~/.docker/cli-plugins
+        ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+        
+        colima start
 
-    # Install Docker and Docker Compose
-    - name: Install Docker and Docker Compose
+    - name: try doing docker build
+      shell: bash -l {0}
       run: |
-        brew install --cask docker
-        brew install docker-compose
-
-    # Start Docker
-    - name: Start Docker Service
-      run: |
-        open /Applications/Docker.app
-        while ! docker system info > /dev/null 2>&1; do sleep 1; done
-
-    # Run Docker commands
-    - name: Run a Docker container
-      run: |
-        docker run hello-world
+        docker build -t emission-server .
