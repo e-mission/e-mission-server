@@ -15,7 +15,7 @@ on:
     # * is a special character in YAML so you have to quote this string
     - cron:  '5 4 * * 0'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -41,16 +41,16 @@ jobs:
         uname -a
         uname -m
 
-    - name: Setup docker and docker-compose (missing on MacOS)
+    - name: Setup docker, docker-compose, and colima (missing on MacOS)
       if: runner.os == 'macos'
       run: |
-        brew install docker docker-compose
+        brew install docker docker-compose colima
         
         # Link the Docker Compose v2 plugin so it's understood by the docker CLI
         mkdir -p ~/.docker/cli-plugins
         ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
         
-        
+        colima start
 
     - name: try doing docker build
       shell: bash -l {0}
