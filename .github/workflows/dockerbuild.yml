@@ -41,6 +41,11 @@ jobs:
         uname -a
         uname -m
 
+    # Install Homebrew
+    - name: Install Homebrew
+      run: |
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
     # Install Docker and Docker Compose
     - name: Install Docker and Docker Compose
       run: |
