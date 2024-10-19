@@ -50,7 +50,9 @@ jobs:
         mkdir -p ~/.docker/cli-plugins
         ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
         
-        colima start
+        LIMACTL_PATH=$(brew --prefix)/bin/limactl
+        sudo curl -L -o $LIMACTL_PATH https://github.com/mikekazakov/lima-nohvf/raw/master/limactl && sudo chmod +x $LIMACTL_PATH
+        colima start --network-address --arch arm64 --vm-type=qemu
 
     - name: try doing docker build
       shell: bash -l {0}
