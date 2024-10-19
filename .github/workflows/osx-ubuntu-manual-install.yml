@@ -23,34 +23,37 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-22.04-arm64, ubuntu-latest, macos-latest] # Use ubuntu-22.04-arm64 runner
         include:
         - os: macos-latest
           PLATFORM: MacOSX-x86_64
         - os: ubuntu-latest
           PLATFORM: Linux-x86_64
+        - os: ubuntu-22.04-arm64
+          PLATFORM: Linux-arm64
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: check my platform
+    - name: Check platform and architecture
       shell: bash -l {0}
       run: |
         uname -a
         uname -m
+        echo "Architecture: ${{ matrix.architecture }}"
 
     - name: Install miniconda
       shell: bash -l {0}
       run: |
         source setup/setup_conda.sh ${{ matrix.PLATFORM }}
 
-    - name: Check whether the environment is setup properly
+    - name: Check if the environment is set up properly
       shell: bash -l {0}
       run: |
         source setup/activate_conda.sh
-        if [ ${{ matrix.PLATFORM }} == "Linux-x86_64" ]; then
+        if [ ${{ matrix.PLATFORM }} == "Linux-x86_64" ] || [ ${{ matrix.PLATFORM }} == "Linux-arm64" ]; then
             echo "Linux install, going to check conda path"
             which conda
         else
