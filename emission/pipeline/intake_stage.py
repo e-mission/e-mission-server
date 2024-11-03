@@ -198,7 +198,13 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_COMPOSITE_OBJECTS.name,
                                  time.time(), crt.elapsed)
 
-        _get_and_store_range(uuid, "analysis/composite_trip")
+        with ect.Timer() as gsr:
+            logging.info("*" * 10 + "UUID %s: generating store and range " % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: generating store and range " % uuid + "*" * 10)
+            _get_and_store_range(uuid, "analysis/composite_trip")
+
+        esds.store_pipeline_time(uuid, 'GENERATE_STORE_AND_RANGE',
+                                 time.time(), gsr.elapsed)
 
 def _get_and_store_range(user_id, trip_key):
     ts = esta.TimeSeries.get_time_series(user_id)
