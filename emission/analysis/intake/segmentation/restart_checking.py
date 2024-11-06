@@ -9,7 +9,7 @@ import logging
 import emission.core.wrapper.transition as ecwt
 import emission.storage.timeseries.timequery as estt
 
-def is_tracking_restarted_in_range(start_ts, end_ts, timeseries):
+def is_tracking_restarted_in_range(start_ts, end_ts, transition_df):
     """
     Check to see if tracing was restarted between the times specified
     :param start_ts: the start of the time range to check
@@ -17,28 +17,32 @@ def is_tracking_restarted_in_range(start_ts, end_ts, timeseries):
     :param timeseries: the timeseries to use for checking
     :return:
     """
-    import emission.storage.timeseries.timequery as estt
+    transition_df_start_idx=transition_df.ts.searchsorted(start_ts,side='left')    
+    transition_df_end_idx=transition_df.ts.searchsorted(end_ts,side='right')
+    transition_df_for_current=transition_df.iloc[transition_df_start_idx:transition_df_end_idx]
 
-    tq = estt.TimeQuery(timeType="data.ts", startTs=start_ts,
-                        endTs=end_ts)
-    transition_df = timeseries.get_data_df("statemachine/transition", tq)
-    if len(transition_df) == 0:
+    if len(transition_df_for_current) == 0:
         logging.debug("In range %s -> %s found no transitions" %
-                      (tq.startTs, tq.endTs))
+                      (start_ts, end_ts))
         return False
     logging.debug("In range %s -> %s found transitions %s" %
-                  (tq.startTs, tq.endTs, transition_df[["fmt_time", "curr_state", "transition"]]))
-    return _is_tracking_restarted_android(transition_df) or \
-           _is_tracking_restarted_ios(transition_df)
+                  (start_ts, end_ts, transition_df_for_current[["fmt_time", "curr_state", "transition"]]))
+    return _is_tracking_restarted_android(transition_df_for_current) or \
+           _is_tracking_restarted_ios(transition_df_for_current)
 
-def get_ongoing_motion_in_range(start_ts, end_ts, timeseries):
-    tq = estt.TimeQuery(timeType = "data.ts", startTs = start_ts,
-                        endTs = end_ts)
-    motion_list = list(timeseries.find_entries(["background/motion_activity"], tq))
+def get_ongoing_motion_in_range(start_ts, end_ts, motion_df):
+    ## in case when we receive an empty dataframe, there's nothing to
+    ## process
+    if motion_df.shape == (0,0): 
+        return motion_df
+
+    motion_df_start_idx=motion_df.ts.searchsorted(start_ts,side='left')    
+    motion_df_end_idx=motion_df.ts.searchsorted(end_ts,side='right')
+    filtered_motion_df=motion_df.iloc[motion_df_start_idx:motion_df_end_idx]
     logging.debug("Found %s motion_activity entries in range %s -> %s" %
-                  (len(motion_list), tq.startTs, tq.endTs))
-    logging.debug("sample activities are %s" % motion_list[0:5])
-    return motion_list
+                 (len(filtered_motion_df),start_ts, end_ts))
+    #logging.debug("sample activities are %s" % filtered_motion_df.head())
+    return filtered_motion_df
 
 def _is_tracking_restarted_android(transition_df):
     """
