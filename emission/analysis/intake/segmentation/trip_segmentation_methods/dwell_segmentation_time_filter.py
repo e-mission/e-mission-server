@@ -70,7 +70,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             user_id = filtered_points_pre_ts_diff_df["user_id"].iloc[0]
         esds.store_pipeline_time(
             user_id,
-            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/get_filtered_points_pre_ts_diff_df",
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/get_filtered_points_pre_ts_diff_df",
             time.time(),
             t_get_filtered_points_pre.elapsed
         )
@@ -86,7 +86,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             filtered_points_df.reset_index(inplace=True)
         esds.store_pipeline_time(
             user_id,
-            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/filter_bogus_points",
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/filter_bogus_points",
             time.time(),
             t_filter_bogus_points.elapsed
         )
@@ -95,7 +95,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             transition_df = timeseries.get_data_df("statemachine/transition", time_query)
         esds.store_pipeline_time(
             user_id,
-            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/get_transition_df",
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/get_transition_df",
             time.time(),
             t_get_transition_df.elapsed
         )
@@ -172,7 +172,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
 
                 esds.store_pipeline_time(
                     user_id,
-                    ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/calculations_per_iteration",
+                    ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/calculations_per_iteration",
                     time.time(),
                     t_calculations.elapsed
                 )
@@ -204,14 +204,14 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                         prevPoint = currPoint
                 esds.store_pipeline_time(
                     user_id,
-                    ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/has_trip_ended",
+                    ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/has_trip_ended",
                     time.time(),
                     t_has_trip_ended.elapsed
                 )
 
         esds.store_pipeline_time(
             user_id,
-            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/loop",
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/loop",
             time.time(),
             t_loop.elapsed
         )
@@ -237,7 +237,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     self.last_ts_processed = currPoint.metadata_write_ts
         esds.store_pipeline_time(
             user_id,
-            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips/post_loop",
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/post_loop",
             time.time(),
             t_post_loop.elapsed
         )
