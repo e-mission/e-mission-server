@@ -40,6 +40,7 @@ import emission.net.ext_service.habitica.executor as autocheck
 import emission.storage.decorations.stats_queries as esds
 
 import emission.core.wrapper.user as ecwu
+import emission.analysis.result.user_stat as eaurs
 
 def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
     """
@@ -202,83 +203,7 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         with ect.Timer() as gsr:
             logging.info("*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
-            _get_and_store_range(uuid, "analysis/composite_trip")
+            eaurs.get_and_store_user_stats(uuid, "analysis/composite_trip")
 
         esds.store_pipeline_time(uuid, 'STORE_USER_STATS',
-                                 time.time(), gsr.elapsed)
-
-def _get_and_store_range(user_id, trip_key):
-    """
-    Extends the user profile with pipeline_range, total_trips, labeled_trips, and last_call.
-
-    Parameters:
-    - user_id (str): The UUID of the user.
-    - trip_key (str): The key representing the trip data in the time series.
-    """
-    time_format = 'YYYY-MM-DD HH:mm:ss'
-    try:
-        logging.info(f"Starting _get_and_store_range for user_id: {user_id}, trip_key: {trip_key}")
-        
-        # Fetch the time series for the user
-        ts = esta.TimeSeries.get_time_series(user_id)
-        logging.debug("Fetched time series data.")
-        
-        # Get start timestamp
-        start_ts = ts.get_first_value_for_field(trip_key, "data.start_ts", pymongo.ASCENDING)
-        start_ts = None if start_ts == -1 else start_ts
-        logging.debug(f"Start timestamp: {start_ts}")
-        
-        # Get end timestamp
-        end_ts = ts.get_first_value_for_field(trip_key, "data.end_ts", pymongo.DESCENDING)
-        end_ts = None if end_ts == -1 else end_ts
-        logging.debug(f"End timestamp: {end_ts}")
-
-        # Retrieve trip entries
-        total_trips = ts.find_entries_count(
-            key_list=["analysis/confirmed_trip"],
-        )
-
-        labeled_trips = ts.find_entries_count(
-            key_list=["analysis/confirmed_trip"],
-            extra_query_list=[{'data.user_input': {'$ne': {}}}]
-        )
-
-        logging.info(f"Total trips: {total_trips}, Labeled trips: {labeled_trips}")
-        logging.info(type(user_id))
-        logging.debug("Fetched API call statistics.")
-
-        last_call_ts = ts.get_first_value_for_field(
-                        key='stats/server_api_time',
-                        field='data.ts',
-                        sort_order=pymongo.DESCENDING
-                    )
-
-        logging.info(f"Last call timestamp: {last_call_ts}")
-
-        # Update the user profile with pipeline_range, total_trips, labeled_trips, and last_call
-        user = ecwu.User.fromUUID(user_id)
-        if last_call_ts != -1:
-            # Format the timestamp using arrow
-            formatted_last_call = arrow.get(last_call_ts).format(time_format)
-            # Assign using attribute access or the update method
-            # Option 1: Attribute Assignment (if supported)
-            # user.last_call = formatted_last_call
-
-            # Option 2: Using the update method
-            user.update({
-                "last_call": formatted_last_call
-            })
-        user.update({
-            "pipeline_range": {
-                "start_ts": start_ts,
-                "end_ts": end_ts
-            },
-            "total_trips": total_trips,
-            "labeled_trips": labeled_trips,
-            "last_call": last_call_ts
-        })
-        logging.debug("User profile updated successfully.")
-        logging.debug("After updating, new profile is %s", user.getProfile())
-
-    except Exception as e:
-        logging.error(f"Error in _get_and_store_range for user_id {user_id}: {e}")
+                                time.time(), gsr.elapsed)
