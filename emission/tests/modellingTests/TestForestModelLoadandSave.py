@@ -1,7 +1,7 @@
 from typing import ByteString
 import unittest
 import logging
-from unittest.mock import patch
+import unittest.mock as um
 import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.model_storage as eamums
@@ -220,7 +220,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
         # side_effect, which is set to mock_dump, is called instead of
         # real joblib.dump function when 'to_dict' is invoked
 
-        with patch('joblib.dump',side_effect=mock_dump):
+        with um.patch('joblib.dump',side_effect=mock_dump):
             with self.assertRaises(RuntimeError):
                 model.to_dict()
 
@@ -260,7 +260,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
         # side_effect, which is set to mock_load, is called instead of
         # real joblib.load function when 'to_dict' is invoked
 
-        with patch('joblib.load',side_effect=mock_load):
+        with um.patch('joblib.load',side_effect=mock_load):
             with self.assertRaises(RuntimeError):
                 deserialized_model.from_dict(model_data)
 

@@ -12,7 +12,7 @@ import emission.core.get_database as edb
 import emission.tests.common as etc
 import emission.pipeline.intake_stage as epi
 import logging
-from bson.objectid import ObjectId
+import bson.objectid as boi
 
 import emission.analysis.modelling.trip_model.config as eamtc
 
@@ -60,8 +60,8 @@ class TestForestModelIntegration(unittest.TestCase):
         for result_entry in train:
             result_entry['data']['start_local_dt']=result_entry['metadata']['write_local_dt']
             result_entry['data']['end_local_dt']=result_entry['metadata']['write_local_dt']
-            result_entry['data']['start_place']=ObjectId()
-            result_entry['data']['end_place']=ObjectId()
+            result_entry['data']['start_place']=boi.ObjectId()
+            result_entry['data']['end_place']=boi.ObjectId()
         ts.bulk_insert(train)
         # confirm data write did not fail
         check_data = esda.get_entries(key="analysis/confirmed_trip", user_id=self.testUUID, time_query=None)

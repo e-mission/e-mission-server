@@ -12,7 +12,7 @@ import emission.core.get_database as edb
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.pipelinestate as ecwp
 import emission.analysis.modelling.trip_model.forest_classifier as eamtf
-from sklearn.ensemble import RandomForestClassifier 
+import sklearn.ensemble as sklen
 
 class TestRunForestModel(unittest.TestCase):
     """
@@ -98,9 +98,9 @@ class TestRunForestModel(unittest.TestCase):
         """
 
         built_model = eamumt.ModelType.RANDOM_FOREST_CLASSIFIER.build()
-        attributes={'purpose_predictor': RandomForestClassifier ,
-                    'mode_predictor' :RandomForestClassifier,
-                    'replaced_predictor':RandomForestClassifier,
+        attributes={'purpose_predictor': sklen.RandomForestClassifier ,
+                    'mode_predictor' :sklen.RandomForestClassifier,
+                    'replaced_predictor':sklen.RandomForestClassifier,
                     'purpose_enc' : eamtm.OneHotWrapper,
                     'mode_enc':eamtm.OneHotWrapper
                     }
