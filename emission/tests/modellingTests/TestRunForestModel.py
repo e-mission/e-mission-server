@@ -155,7 +155,7 @@ class TestRunForestModel(unittest.TestCase):
             "pipeline should not have a current timestamp for the test user")
 
 
-    def test1RoundPredictForestModel(self):
+    def testRoundPredictForestModel(self):
         """
        forest model takes config arguments via the constructor for testing
        purposes but will load from a file in /conf/analysis/ which is tested here
@@ -204,11 +204,11 @@ class TestRunForestModel(unittest.TestCase):
         )
         for prediction, n in predictions_list:
             [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
-            self.assertNotEqual(len(prediction), 0, "should have a prediction")
+            self.assertNotEqual(len(prediction), 0, "Prediction list should not be empty - model failed to generate any predictions")
             self.assertIn('labels',prediction[0].keys())
             self.assertIn('p',prediction[0].keys())
-            self.assertIsInstance(prediction[0], dict, " should be an instance of the dictionary class")
-            self.assertIsInstance(prediction[0]['labels'], dict, " should be an instance of the dictionary class")
+            self.assertIsInstance(prediction[0], dict, "should be an instance of the dictionary class")
+            self.assertIsInstance(prediction[0]['labels'], dict, "should be an instance of the dictionary class")
             self.assertIn('mode_confirm',prediction[0]['labels'].keys())
             self.assertIn('replaced_mode',prediction[0]['labels'].keys())
             self.assertIn('purpose_confirm',prediction[0]['labels'].keys())

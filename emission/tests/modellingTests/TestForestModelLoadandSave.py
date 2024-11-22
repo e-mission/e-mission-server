@@ -17,27 +17,14 @@ import emission.tests.common as etc
 class TestForestModelLoadandSave(unittest.TestCase):
     """
     Tests to make sure the model load and save properly
+    The label_data dict and mock_trip_data are copied over from TestRunGreedyModel.py
     """
-    def setUp(self):
-        """
-        sets up the end-to-end run model test with Confirmedtrip data
-        """
-        # configuration for randomly-generated test data
-        self.user_id = user_id = 'TestForestModelLoadAndSave-TestData'
-        self.origin = (-105.1705977, 39.7402654,)
-        self.destination = (-105.1755606, 39.7673075)
-        self.min_trips = 14
-        self.total_trips = 100
-        self.clustered_trips = 33    # must have at least self.min_trips similar trips by default
-        self.has_label_percent = 0.9 # let's make a few that don't have a label, but invariant
-                                # $clustered_trips * $has_label_percent > self.min_trips
-                                # must be correct or else this test could fail under some random test cases.
-
+    def setUp(self): 
+        self.user_id = 'TestForestModelLoadAndSave-TestData'
         self.unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
+        ts = esta.TimeSeries.get_time_series(self.user_id)
 
-        ts = esta.TimeSeries.get_time_series(user_id)
-
-        # generate labels with a known sample weight that we can rely on in the test
+        # Generate labels with a known sample weight that we can rely on in the test
         label_data = {
             "mode_confirm": ['ebike', 'bike'],
             "purpose_confirm": ['happy-hour', 'dog-park'],
@@ -46,24 +33,29 @@ class TestForestModelLoadandSave(unittest.TestCase):
             "purpose_weights": [0.1, 0.9]
         }
 
-        # generate test data for the database
-        test_data = etmm.generate_mock_trips(
-            user_id=user_id,
-            trips=self.total_trips,
-            origin=self.origin,
-            destination=self.destination,
+        # Configuration values for randomly-generated test data copied over from TestRunGreedyModel.py
+        mock_trip_data = etmm.generate_mock_trips(
+            user_id=self.user_id,
+            trips=100,
+            origin=(-105.1705977, 39.7402654,),
+            destination=(-105.1755606, 39.7673075),
             trip_part='od',
             label_data=label_data,
-            within_threshold=self.clustered_trips,  
+            within_threshold=33,  
             threshold=0.004, # ~400m
-            has_label_p=self.has_label_percent
+            has_label_p=0.9
         )
 
-        for result_entry in test_data:
+        # Required for Forest model inference
+        for result_entry in mock_trip_data:
             result_entry['data']['start_local_dt']=result_entry['metadata']['write_local_dt']
             result_entry['data']['end_local_dt']=result_entry['metadata']['write_local_dt']
 
-        ts.bulk_insert(test_data)
+        split = int(len(mock_trip_data)*0.7)  
+        mock_train_data = mock_trip_data[:split]
+        self.mock_test_data = mock_trip_data[split:]
+
+        ts.bulk_insert(mock_train_data)
 
         self.forest_model_config= eamtc.get_config_value_or_raise('model_parameters.forest')
 
@@ -73,7 +65,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
             user_id=self.user_id,
             model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
             model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            min_trips=self.min_trips,
+            min_trips=14,
             model_config=self.forest_model_config
         )
 
@@ -98,10 +90,8 @@ class TestForestModelLoadandSave(unittest.TestCase):
         The type of deserialized model attributes and the predictions of this must match 
         those of initial model.
         """
-        test_trip_data = esda.get_entries(key=esda.CONFIRMED_TRIP_KEY, user_id=self.user_id, time_query=None)
-
         predictions_list = eamur.predict_labels_with_n(
-            trip_list = test_trip_data,
+            trip_list = self.mock_test_data,
             model=self.model
         )
 
@@ -111,7 +101,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
         deserialized_model.from_dict(model_data)
 
         predictions_deserialized_model_list = eamur.predict_labels_with_n(
-                trip_list = test_trip_data,
+                trip_list = self.mock_test_data,
                 model=deserialized_model
         )
 
@@ -130,10 +120,8 @@ class TestForestModelLoadandSave(unittest.TestCase):
         ConsistencyTest : To Verify that the serialization and deserialization process
         is consistent across multiple executions
         """
-        test_trip_data = esda.get_entries(key=esda.CONFIRMED_TRIP_KEY, user_id=self.user_id, time_query=None)    
-
         predictions_list_model1 = eamur.predict_labels_with_n(
-            trip_list = test_trip_data,
+            trip_list = self.mock_test_data,
             model=self.model           
         )
 
@@ -145,7 +133,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
         )
 
         predictions_list_model2 = eamur.predict_labels_with_n(
-            trip_list = test_trip_data,
+            trip_list = self.mock_test_data,
             model=model_iter2           
         )
 
