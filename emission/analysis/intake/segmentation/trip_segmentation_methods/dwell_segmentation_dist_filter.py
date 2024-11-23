@@ -89,14 +89,8 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                     # segmentation_points.append(currPoint)
 
                 if just_ended:
-                    with ect.Timer() as t_continue_just_ended:
-                        continue_flag = self.continue_just_ended(idx, currPoint, self.filtered_points_df)
-                    esds.store_pipeline_time(
-                        user_id,
-                        ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_dist/continue_just_ended",
-                        time.time(),
-                        t_continue_just_ended.elapsed
-                    )
+
+                    continue_flag = self.continue_just_ended(idx, currPoint, self.filtered_points_df)
 
                     if continue_flag:
                         # We have "processed" the currPoint by deciding to glom it
@@ -126,38 +120,28 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                         )
 
                         if trip_ended:
-                            with ect.Timer() as t_get_last_trip_end_point:
-                                last_trip_end_point = lastPoint
-                                logging.debug("Appending last_trip_end_point %s with index %s " %
-                                            (last_trip_end_point, idx - 1))
-                                segmentation_points.append((curr_trip_start_point, last_trip_end_point))
-                                logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
-                                # We have processed everything up to the trip end by marking it as a completed trip
-                                self.last_ts_processed = currPoint.metadata_write_ts
-                            esds.store_pipeline_time(
-                                user_id,
-                                ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_dist/get_last_trip_end_point",
-                                time.time(),
-                                t_get_last_trip_end_point.elapsed
-                            )
 
-                            with ect.Timer() as t_handle_trip_end:
-                                just_ended = True
-                                # Now, we have finished processing the previous point as a trip
-                                # end or not. But we still need to process this point by seeing
-                                # whether it should represent a new trip start, or a glom to the
-                                # previous trip
-                                if not self.continue_just_ended(idx, currPoint, self.filtered_points_df):
-                                    sel_point = currPoint
-                                    logging.debug("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
-                                    curr_trip_start_point = sel_point
-                                    just_ended = False
-                            esds.store_pipeline_time(
-                                user_id,
-                                ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_dist/handle_trip_end",
-                                time.time(),
-                                t_handle_trip_end.elapsed
-                            )
+                            last_trip_end_point = lastPoint
+                            logging.debug("Appending last_trip_end_point %s with index %s " %
+                                        (last_trip_end_point, idx - 1))
+                            segmentation_points.append((curr_trip_start_point, last_trip_end_point))
+                            logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
+                            # We have processed everything up to the trip end by marking it as a completed trip
+                            self.last_ts_processed = currPoint.metadata_write_ts
+
+
+
+                            just_ended = True
+                            # Now, we have finished processing the previous point as a trip
+                            # end or not. But we still need to process this point by seeing
+                            # whether it should represent a new trip start, or a glom to the
+                            # previous trip
+                            if not self.continue_just_ended(idx, currPoint, self.filtered_points_df):
+                                sel_point = currPoint
+                                logging.debug("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
+                                curr_trip_start_point = sel_point
+                                just_ended = False
+
         esds.store_pipeline_time(
             user_id,
             ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_dist/loop",
