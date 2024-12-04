@@ -13,6 +13,7 @@ import arrow
 from uuid import UUID
 import time
 import pymongo
+from datetime import datetime
 
 import emission.core.get_database as edb
 import emission.core.timer as ect
@@ -39,6 +40,7 @@ import emission.net.ext_service.habitica.executor as autocheck
 import emission.storage.decorations.stats_queries as esds
 
 import emission.core.wrapper.user as ecwu
+import emission.analysis.result.user_stat as eaurs
 
 def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
     """
@@ -201,20 +203,7 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         with ect.Timer() as gsr:
             logging.info("*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
-            _get_and_store_range(uuid, "analysis/composite_trip")
+            eaurs.get_and_store_user_stats(uuid, "analysis/composite_trip")
 
         esds.store_pipeline_time(uuid, 'STORE_USER_STATS',
-                                 time.time(), gsr.elapsed)
-
-def _get_and_store_range(user_id, trip_key):
-    ts = esta.TimeSeries.get_time_series(user_id)
-    start_ts = ts.get_first_value_for_field(trip_key, "data.start_ts", pymongo.ASCENDING)
-    if start_ts == -1:
-        start_ts = None
-    end_ts = ts.get_first_value_for_field(trip_key, "data.end_ts", pymongo.DESCENDING)
-    if end_ts == -1:
-        end_ts = None
-
-    user = ecwu.User(user_id)
-    user.update({"pipeline_range": {"start_ts": start_ts, "end_ts": end_ts}})
-    logging.debug("After updating, new profiles is %s" % user.getProfile())
+                                time.time(), gsr.elapsed)
