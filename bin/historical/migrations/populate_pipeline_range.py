@@ -13,6 +13,7 @@ import emission.storage.decorations.user_queries as esdu
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.analysis.plotting.composite_trip_creation as eapc
 import emission.analysis.userinput.matcher as eaum
+import emission.analysis.result.user_stat as eaurs
 
 def add_pipeline_range(process_number, uuid_list, skip_if_no_new_data):
     import logging
@@ -25,7 +26,7 @@ def add_pipeline_range(process_number, uuid_list, skip_if_no_new_data):
             continue
 
         try:
-            epi._get_and_store_range(uuid, "analysis/composite_trip")
+            eaurs.get_and_store_user_stats(uuid, "analysis/composite_trip")
         except Exception as e:
             print("Found error %s while processing pipeline for user %s, check log files for details"
                 % (e, uuid))

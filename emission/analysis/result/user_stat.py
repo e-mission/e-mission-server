@@ -7,26 +7,6 @@ from typing import Optional, Dict, Any
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.user as ecwu
 
-TIME_FORMAT = 'YYYY-MM-DD HH:mm:ss'
-
-def count_trips(ts: esta.TimeSeries, key_list: list, extra_query_list: Optional[list] = None) -> int:
-    """
-    Counts the number of trips based on the provided query.
-
-    :param ts: The time series object.
-    :type ts: esta.TimeSeries
-    :param key_list: List of keys to filter trips.
-    :type key_list: list
-    :param extra_query_list: Additional queries, defaults to None.
-    :type extra_query_list: Optional[list], optional
-    :return: The count of trips.
-    :rtype: int
-    """
-    count = ts.find_entries_count(key_list=key_list, extra_query_list=extra_query_list)
-    logging.debug(f"Counted {len(key_list)} trips with additional queries {extra_query_list}: {count}")
-    return count
-
-
 def get_last_call_timestamp(ts: esta.TimeSeries) -> Optional[int]:
     """
     Retrieves the last API call timestamp.
@@ -81,9 +61,8 @@ def get_and_store_user_stats(user_id: str, trip_key: str) -> None:
         end_ts_result = ts.get_first_value_for_field(trip_key, "data.end_ts", pymongo.DESCENDING)
         end_ts = None if end_ts_result == -1 else end_ts_result
 
-        total_trips = count_trips(ts, key_list=["analysis/confirmed_trip"])
-        labeled_trips = count_trips(
-            ts,
+        total_trips = ts.find_entries_count(key_list=["analysis/confirmed_trip"])
+        labeled_trips = ts.find_entries_count(
             key_list=["analysis/confirmed_trip"],
             extra_query_list=[{'data.user_input': {'$ne': {}}}]
         )
