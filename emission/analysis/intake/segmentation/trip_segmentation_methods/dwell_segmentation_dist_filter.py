@@ -62,14 +62,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
 
         self.filtered_points_df.loc[:, "valid"] = True
 
-        with ect.Timer() as t_get_transition_df:
-            self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-        esds.store_pipeline_time(
-            user_id,
-            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_dist/get_transition_df",
-            time.time(),
-            t_get_transition_df.elapsed
-        )
+        self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
 
         if len(self.transition_df) > 0:
             logging.debug("self.transition_df = %s" % self.transition_df[["fmt_time", "transition"]])
