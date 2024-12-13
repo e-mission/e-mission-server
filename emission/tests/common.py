@@ -193,6 +193,7 @@ def runIntakePipeline(uuid):
     import emission.analysis.userinput.expectations as eaue
     import emission.analysis.classification.inference.labels.pipeline as eacilp
     import emission.analysis.plotting.composite_trip_creation as eapcc
+    import emission.analysis.result.user_stat as eaurs
 
     eaum.match_incoming_user_inputs(uuid)
     eaicf.filter_accuracy(uuid)
@@ -205,6 +206,8 @@ def runIntakePipeline(uuid):
     eaue.populate_expectations(uuid)
     eaum.create_confirmed_objects(uuid)
     eapcc.create_composite_objects(uuid)
+    eaurs.get_and_store_user_stats(uuid, "analysis/composite_trip")
+    
 
 def configLogging():
     """
