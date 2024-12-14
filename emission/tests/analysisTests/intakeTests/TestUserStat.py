@@ -31,53 +31,28 @@ class TestUserStats(unittest.TestCase):
         """
         Set up the test environment by loading real example data for both Android and  users.
         """
-        # Configure logging for the test
-        etc.configLogging()
-
-        # Retrieve a test user UUID from the database
-        get_example = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
-        if get_example.empty:
-            self.fail("No users found in the database to perform tests.")
-        test_user_id = get_example.iloc[0].uuid
-        self.testUUID = test_user_id
-        self.UUID = test_user_id
-        # Load example entries from a JSON file
-        with open("emission/tests/data/real_examples/shankari_2015-aug-27") as fp:
-            self.entries = json.load(fp, object_hook=esj.wrapped_object_hook)
-
         # Set up the real example data with entries
-        etc.setupRealExampleWithEntries(self)
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
         # Retrieve the user profile
-        profile = edb.get_profile_db().find_one({"user_id": self.UUID})
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
         if profile is None:
             # Initialize the profile if it does not exist
-            edb.get_profile_db().insert_one({"user_id": self.UUID})
+            edb.get_profile_db().insert_one({"user_id": self.testUUID})
 
-        etc.runIntakePipeline(self.UUID)
+        etc.runIntakePipeline(self.testUUID)
 
-        logging.debug("UUID = %s" % (self.UUID))
+        logging.debug("UUID = %s" % (self.testUUID))
 
     def tearDown(self):
         """
         Clean up the test environment by removing analysis configuration and deleting test data from databases.
         """
 
-        # Delete all time series entries for users
-        tsdb = edb.get_timeseries_db()
-        tsdb.delete_many({"user_id": self.UUID})
-
-        # Delete all pipeline state entries for users
-        pipeline_db = edb.get_pipeline_state_db()
-        pipeline_db.delete_many({"user_id": self.UUID})
-
-        # Delete all analysis time series entries for  users
-        analysis_ts_db = edb.get_analysis_timeseries_db()
-        analysis_ts_db.delete_many({"user_id": self.UUID})
-
-        # Delete user profiles
-        profile_db = edb.get_profile_db()
-        profile_db.delete_one({"user_id": self.UUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_profile_db().delete_one({"user_id": self.testUUID})
 
     def testGetAndStoreUserStats(self):
         """
@@ -86,7 +61,7 @@ class TestUserStats(unittest.TestCase):
         """
 
         # Retrieve the updated user profile from the database
-        profile = edb.get_profile_db().find_one({"user_id": self.UUID})
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
 
         # Ensure that the profile exists
         self.assertIsNotNone(profile, "User profile should exist after storing stats.")
@@ -120,15 +95,15 @@ class TestUserStats(unittest.TestCase):
 
     def testLastCall(self):
         # Call the function with all required arguments
-        enac.store_server_api_time(self.UUID, "test_call", 1440729142.709, 69)
-
-        etc.runIntakePipeline(self.UUID)
+        test_call_ts = time.time()
+        enac.store_server_api_time(self.testUUID, "test_call_ts", test_call_ts, 69420)
+        etc.runIntakePipeline(self.testUUID)
 
         # Retrieve the profile from the database
-        profile = edb.get_profile_db().find_one({"user_id": self.UUID})
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
 
         # Verify that last_call_ts is updated correctly
-        expected_last_call_ts = 1440729142.709
+        expected_last_call_ts = test_call_ts
         actual_last_call_ts = profile.get("last_call_ts")
 
         self.assertEqual(
@@ -138,4 +113,6 @@ class TestUserStats(unittest.TestCase):
         )
 
 if __name__ == '__main__':
+    # Configure logging for the test
+    etc.configLogging()
     unittest.main()
