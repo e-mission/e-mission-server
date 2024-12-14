@@ -207,3 +207,4 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
 
         esds.store_pipeline_time(uuid, 'STORE_USER_STATS',
                                 time.time(), gsr.elapsed)
+
