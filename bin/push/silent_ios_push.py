@@ -7,6 +7,7 @@ standard_library.install_aliases()
 from builtins import *
 import json
 import logging
+logging.basicConfig(level=logging.DEBUG)
 import argparse
 
 import emission.net.ext_service.push.notify_usage as pnu
