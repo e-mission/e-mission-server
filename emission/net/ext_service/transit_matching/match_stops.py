@@ -15,12 +15,12 @@ except:
     url = "https://lz4.overpass-api.de/"
 
 try:
-    query_file = open('conf/net/ext_service/overpass_transit_stops_query_template')
-except:
+    with open('conf/net/ext_service/overpass_transit_stops_query_template', 'r', encoding='UTF-8') as query_file:
+        query_string = "".join(query_file.readlines())
+except FileNotFoundError:
     print("transit stops query not configured, falling back to default")
-    query_file = open('conf/net/ext_service/overpass_transit_stops_query_template.sample')
-
-query_string = "".join(query_file.readlines())
+    with open('conf/net/ext_service/overpass_transit_stops_query_template.sample', 'r', encoding='UTF-8') as query_file:
+        query_string = "".join(query_file.readlines())
 
 RETRY = -1
 
