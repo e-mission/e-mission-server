@@ -91,12 +91,17 @@ class FirebasePush(pni.NotifyInterface):
                 unmapped_token_list.append(token)
         return (mapped_token_map, unmapped_token_list)
 
-    def retrieve_fcm_tokens(self, token_list, dev):
+    def retrieve_fcm_tokens(self, push_service, token_list, dev):
         if len(token_list) == 0:
             logging.debug("len(token_list) == 0, skipping fcm token mapping to save API call")
             return []
         importedResultList = []
-        importHeaders = {"Authorization": "key=%s" % self.server_auth_token,
+        existing_headers = push_service.requests_session.headers
+        logging.debug(f"Reading existing headers from current session {existing_headers}")
+        # Copying over the authorization from existing headers since, as of Dec
+        # 2024, we cannot use the server API key and must use an OAuth2 token instead
+        importHeaders = {"Authorization": existing_headers['Authorization'],
+                         "access_token_auth": "true",
                          "Content-Type": "application/json"}
         for curr_first in range(0, len(token_list), 100):
             curr_batch = token_list[curr_first:curr_first + 100]
@@ -115,7 +120,7 @@ class FirebasePush(pni.NotifyInterface):
                 print("After appending result of size %s, total size = %s" %
                         (len(importedResult), len(importedResultList)))
             else:
-                print(f"Received invalid result for batch starting at = {curr_first}")
+                print(f"Received invalid response {importResponse} for batch starting at = {curr_first}")
         return importedResultList
 
     def process_fcm_token_result(self, importedResultList):
@@ -133,9 +138,9 @@ class FirebasePush(pni.NotifyInterface):
                     (result, i));
         return ret_list
 
-    def convert_to_fcm_if_necessary(self, token_map, dev):
+    def convert_to_fcm_if_necessary(self, push_service, token_map, dev):
         (mapped_token_map, unmapped_token_list) = self.map_existing_fcm_tokens(token_map)
-        importedResultList = self.retrieve_fcm_tokens(unmapped_token_list, dev)
+        importedResultList = self.retrieve_fcm_tokens(push_service, unmapped_token_list, dev)
         newly_mapped_token_list = self.process_fcm_token_result(importedResultList)
         print("after mapping iOS tokens, imported %s -> processed %s" %
             (len(importedResultList), len(newly_mapped_token_list)))
@@ -152,15 +157,15 @@ class FirebasePush(pni.NotifyInterface):
             logging.info("len(token_map) == 0, early return to save api calls")
             return
 
-        # convert tokens if necessary
-        fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
-
         push_service = FCMNotification(
             service_account_file=self.service_account_file,
             project_id=self.project_id)
         # Send android and iOS messages separately because they have slightly
         # different formats
         # https://github.com/e-mission/e-mission-server/issues/564#issuecomment-360720598
+        # convert tokens if necessary
+        fcm_token_map = self.convert_to_fcm_if_necessary(push_service, token_map, dev)
+
         android_response = self.notify_multiple_devices(push_service,
                                                fcm_token_map["android"],
                                                notification_body = message,
@@ -192,7 +197,7 @@ class FirebasePush(pni.NotifyInterface):
             project_id=self.project_id)
 
         # convert tokens if necessary
-        fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
+        fcm_token_map = self.convert_to_fcm_if_necessary(push_service, token_map, dev)
 
         response = {}
         response["ios"] = self.notify_multiple_devices(push_service,
