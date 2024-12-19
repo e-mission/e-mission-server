@@ -263,25 +263,29 @@ def createDummyRequestEnviron(self, addl_headers, request_body):
     return test_environ
 
 def set_analysis_config(key, value):
+    """
+    Tests that call this in their setUp must call clear_analysis_config in their tearDown
+    """
     import emission.analysis.config as eac
     import shutil
 
-    analysis_conf_path = "conf/analysis/debug.conf.json"
-    shutil.copyfile("conf/analysis/debug.conf.dev.json",
-                    analysis_conf_path)
-    with open(analysis_conf_path) as fd:
+    shutil.copyfile(eac.ANALYSIS_CONF_DEV_PATH, eac.ANALYSIS_CONF_PATH)
+    with open(eac.ANALYSIS_CONF_PATH) as fd:
         curr_config = json.load(fd)
     curr_config[key] = value
-    with open(analysis_conf_path, "w") as fd:
+    with open(eac.ANALYSIS_CONF_PATH, "w") as fd:
         json.dump(curr_config, fd, indent=4)
-    logging.debug("Finished setting up %s" % analysis_conf_path)
-    with open(analysis_conf_path) as fd:
+    logging.debug("Finished setting up %s" % eac.ANALYSIS_CONF_PATH)
+    with open(eac.ANALYSIS_CONF_PATH) as fd:
         logging.debug("Current values are %s" % json.load(fd))
 
     eac.reload_config()
-    
-    # Return this so that we can delete it in the teardown
-    return analysis_conf_path
+
+def clear_analysis_config():
+    import emission.analysis.config as eac
+    if os.path.exists(eac.ANALYSIS_CONF_PATH):
+        os.remove(eac.ANALYSIS_CONF_PATH)
+    eac.reload_config()
 
 def copy_dummy_seed_for_inference():
     import shutil

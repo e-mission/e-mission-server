@@ -36,8 +36,7 @@ import emission.tests.common as etc
 
 class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
-        self.analysis_conf_path = \
-            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
+        etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
 
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
@@ -51,7 +50,7 @@ class TestTripSegmentation(unittest.TestCase):
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
-        os.remove(self.analysis_conf_path)
+        etc.clear_analysis_config()
         edb.get_timeseries_db().delete_many({"user_id": self.androidUUID}) 
         edb.get_timeseries_db().delete_many({"user_id": self.iosUUID})
         edb.get_pipeline_state_db().delete_many({"user_id": self.androidUUID})
