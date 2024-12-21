@@ -70,4 +70,6 @@ jobs:
 
     - name: Teardown the test environment
       shell: bash -l {0}
-      run: source setup/teardown_tests.sh
+      run: |
+        source setup/activate_conda.sh
+        source setup/teardown_tests.sh
