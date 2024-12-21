@@ -60,8 +60,7 @@ class TestPipelineRealData(unittest.TestCase):
     def setUp(self):
         # Thanks to M&J for the number!
         np.random.seed(61297777)
-        self.analysis_conf_path = \
-            etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
+        etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
         logging.info("setUp complete")
 
     def tearDown(self):
@@ -76,8 +75,7 @@ class TestPipelineRealData(unittest.TestCase):
             # to determine whether to switch to a new implementation
             if not hasattr(self, "evaluation") or not self.evaluation:
                 self.clearRelatedDb()
-            if hasattr(self, "analysis_conf_path"):
-                os.remove(self.analysis_conf_path)
+            etc.clear_analysis_config()
             if hasattr(self, "seed_mode_path"):
                 os.remove(self.seed_mode_path)
             logging.info("tearDown complete")
@@ -744,8 +742,7 @@ class TestPipelineRealData(unittest.TestCase):
 
     def testJackUntrackedTimeMar12InferredSections(self):
         # Setup to use the inferred sections
-        self.analysis_conf_path = \
-            etc.set_analysis_config("analysis.result.section.key", "analysis/inferred_section")
+        etc.set_analysis_config("analysis.result.section.key", "analysis/inferred_section")
         # along with the proper random seed
         self.seed_mode_path = etc.copy_dummy_seed_for_inference()
         dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
