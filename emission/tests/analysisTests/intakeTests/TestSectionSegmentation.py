@@ -41,8 +41,7 @@ import emission.tests.common as etc
 
 class TestSectionSegmentation(unittest.TestCase):
     def setUp(self):
-        self.analysis_conf_path = \
-            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
+        etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
 
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
@@ -58,8 +57,7 @@ class TestSectionSegmentation(unittest.TestCase):
     def tearDown(self):
         if not hasattr(self, "evaluation") or not self.evaluation:
             self.clearRelatedDb()
-        if hasattr(self, "analysis_conf_path"):
-            os.remove(self.analysis_conf_path)
+        etc.clear_analysis_config()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.androidUUID})
