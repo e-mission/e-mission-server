@@ -23,7 +23,10 @@ for key in ["DB_HOST", "DB_RESULT_LIMIT"]:
         db_config[key] = None
 print("Retrieved config: %s" % db_config)
 url = config.get("DB_HOST", "localhost")
-result_limit = config.get("DB_RESULT_LIMIT", 250000)
+try:
+    result_limit = int(config.get("DB_RESULT_LIMIT", 250000))
+except ValueError:
+    result_limit = 250000
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
