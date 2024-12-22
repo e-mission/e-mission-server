@@ -34,15 +34,14 @@ class TestFilterAccuracy(unittest.TestCase):
         import emission.core.get_database as edb
         import uuid
 
-        self.analysis_conf_path = \
-            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
+        etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
         self.testUUID = None
 
     def tearDown(self):
         import emission.core.get_database as edb
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
-        os.remove(self.analysis_conf_path)
+        etc.clear_analysis_config()
 
     def checkSuccessfulRun(self):
         pipelineState = edb.get_pipeline_state_db().find_one({"user_id": self.testUUID,

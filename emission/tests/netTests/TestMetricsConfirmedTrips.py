@@ -17,8 +17,7 @@ from emission.net.api import metrics
 
 class TestMetrics(unittest.TestCase):
     def setUp(self):
-        self.analysis_conf_path = \
-            etc.set_analysis_config("analysis.result.section.key", "analysis/confirmed_trip")
+        etc.set_analysis_config("analysis.result.section.key", "analysis/confirmed_trip")
         self._loadDataFileAndInputs("emission/tests/data/real_examples/shankari_2016-06-20")
         self.testUUID1 = self.testUUID
         self._loadDataFileAndInputs("emission/tests/data/real_examples/shankari_2016-06-21")
@@ -39,7 +38,7 @@ class TestMetrics(unittest.TestCase):
 
     def tearDown(self):
         self.clearRelatedDb()
-        os.remove(self.analysis_conf_path)
+        etc.clear_analysis_config()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID1})
