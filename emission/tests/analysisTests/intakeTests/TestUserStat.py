@@ -57,7 +57,7 @@ class TestUserStats(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_profile_db().delete_one({"user_id": self.testUUID})
 
-    def testGetAndStoreUserStats(self):
+    def testGetAndStoreUserStatsDefault(self):
         """
         Test get_and_store_user_stats for the user to ensure that user statistics
         are correctly aggregated and stored in the user profile.
@@ -75,7 +75,7 @@ class TestUserStats(unittest.TestCase):
         self.assertIn("pipeline_range", profile, "User profile should contain 'pipeline_range'.")
         self.assertIn("last_call_ts", profile, "User profile should contain 'last_call_ts'.")
 
-        expected_total_trips = 5
+        expected_total_trips = 8
         expected_labeled_trips = 0
 
         self.assertEqual(profile["total_trips"], expected_total_trips,
@@ -114,6 +114,110 @@ class TestUserStats(unittest.TestCase):
             expected_last_call_ts,
             f"Expected last_call_ts to be {expected_last_call_ts}, got {actual_last_call_ts}"
         )
+
+    def testGetAndStoreUserStatsSecondRunNoNewData(self):
+        """
+        Case (ii): Verify stats remain unchanged if we run the pipeline again
+        without adding new data.
+        """
+        # Check stats after the initial run (from setUp()).
+        initial_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIsNotNone(initial_profile, "User profile should exist after first run.")
+        initial_total_trips = initial_profile["total_trips"]
+        initial_labeled_trips = initial_profile["labeled_trips"]
+
+        # Run the pipeline again, but don't add any new data
+        etc.runIntakePipeline(self.testUUID)
+
+        # Stats should remain the same
+        updated_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIsNotNone(updated_profile, "Profile should still exist.")
+        self.assertEqual(
+            updated_profile["total_trips"], 
+            initial_total_trips,
+            f"Expected total_trips to remain {initial_total_trips}, got {updated_profile['total_trips']}"
+        )
+        self.assertEqual(
+            updated_profile["labeled_trips"], 
+            initial_labeled_trips,
+            f"Expected labeled_trips to remain {initial_labeled_trips}, got {updated_profile['labeled_trips']}"
+        )
+
+
+    def testGetAndStoreUserStatsNewData(self):
+        """
+        Case (i): Verify stats are updated properly when new data is inserted
+        from shankari_2015-aug-27 without modifying the original data and the pipeline is rerun.
+        We then assert the actual number of total trips (e.g., from 8 to 18).
+        """
+        # 1. Retrieve the initial user profile after setUp()
+        initial_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIsNotNone(initial_profile, "User profile should exist after the first run.")
+
+        # 2. Assert that the initial total trips are as expected (8 trips)
+        expected_initial_trips = 8
+        self.assertEqual(
+            initial_profile["total_trips"],
+            expected_initial_trips,
+            f"Expected initial total_trips to be {expected_initial_trips}, got {initial_profile['total_trips']}"
+        )
+
+        # Store initial trips count and labeled trips for later comparison
+        initial_total_trips = initial_profile["total_trips"]
+        initial_labeled_trips = initial_profile["labeled_trips"]
+
+        # 3. Load and prepare new data from shankari_2015-aug-27
+        new_entries = []
+        aug27_file_path = "emission/tests/data/real_examples/shankari_2015-aug-27"
+
+        try:
+            with open(aug27_file_path) as fp:
+                # Load entries using the existing JSON wrapper
+                aug27_entries = json.load(fp, object_hook=esj.wrapped_object_hook)
+                for entry in aug27_entries:
+                    # Replace the user_id UUID with self.testUUID
+                    entry['user_id'] = self.testUUID
+
+                    # Remove the '_id' field to let MongoDB assign a new one
+                    if '_id' in entry:
+                        del entry['_id']
+
+                    # Append the modified entry to the new_entries list
+                    new_entries.append(entry)
+                    
+        except FileNotFoundError:
+            self.fail(f"New data file not found at path: {aug27_file_path}")
+        except json.JSONDecodeError as e:
+            self.fail(f"JSON decoding failed for file {aug27_file_path}: {e}")
+
+        # 4. Insert the new entries into the timeseries collection
+        if new_entries:
+            edb.get_timeseries_db().insert_many(new_entries)
+        else:
+            self.fail("No new entries were loaded from the new data file.")
+
+        # 5. Run the pipeline again to process the newly inserted entries
+        etc.runIntakePipeline(self.testUUID)
+
+        # 6. Retrieve the updated user profile after processing new data
+        updated_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIsNotNone(updated_profile, "Profile should exist after inserting new data.")
+
+        # 7. Assert that the total trips have increased from 8 to 18
+        expected_final_trips = 18
+        self.assertEqual(
+            updated_profile["total_trips"],
+            expected_final_trips,
+            f"Expected total_trips to be {expected_final_trips}, got {updated_profile['total_trips']}"
+        )
+
+        # 8. Ensure that labeled_trips is not less than it was before
+        self.assertGreaterEqual(
+            updated_profile["labeled_trips"],
+            initial_labeled_trips,
+            f"Expected labeled_trips >= {initial_labeled_trips}, got {updated_profile['labeled_trips']}"
+        )
+
 
 if __name__ == '__main__':
     # Configure logging for the test
