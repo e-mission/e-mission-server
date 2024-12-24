@@ -1,6 +1,15 @@
 set -e
 echo "About to start conda update, this may take some time..."
-source setup/setup_conda.sh Linux-x86_64
+ARCH=$(uname -m)
+if [ "$ARCH" == "x86_64" ]; then
+    source setup/setup_conda.sh Linux-x86_64
+elif [ "$ARCH" == "aarch64" ]; then
+    source setup/setup_conda.sh Linux-aarch64
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
+
 # now install the emission environment
 source setup/setup.sh
 
