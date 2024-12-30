@@ -148,7 +148,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
 
 
                 with ect.Timer() as t_has_trip_ended:
-                    if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
+                    if self.has_trip_ended(user_id, prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
                         (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(
                             filtered_points_df,
                             last10Points_df,
@@ -238,69 +238,101 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 return False
 
-    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
+    def has_trip_ended(self, user_id, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
         # Another mismatch between phone and server. Phone stops tracking too soon,
         # so the distance is still greater than the threshold at the end of the trip.
         # But then the next point is a long time away, so we can split again (similar to a distance filter)
-        if prev_point is None:
-            logging.debug("prev_point is None, continuing trip")
-        else:
-            timeDelta = curr_point.ts - prev_point.ts
-            distDelta = pf.calDistance(prev_point, curr_point)
-            if timeDelta > 0:
-                speedDelta = old_div(distDelta, timeDelta)
+        
+        with ect.Timer() as t_initial_checks:
+            if prev_point is None:
+                logging.debug("prev_point is None, continuing trip")
             else:
-                speedDelta = np.nan
-            speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
+                timeDelta = curr_point.ts - prev_point.ts
+                distDelta = pf.calDistance(prev_point, curr_point)
+                if timeDelta > 0:
+                    speedDelta = old_div(distDelta, timeDelta)
+                else:
+                    speedDelta = np.nan
+                speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
+        esds.store_pipeline_time(
+            user_id,
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/has_trip_ended/initial_checks",
+            time.time(),
+            t_initial_checks.elapsed
+        )
+        
+        with ect.Timer() as t_tracking_restart_check:
+            if prev_point is not None:
+                if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
+                    logging.debug("tracking was restarted, ending trip")
+                    return True
+        esds.store_pipeline_time(
+            user_id,
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/has_trip_ended/tracking_restart_check",
+            time.time(),
+            t_tracking_restart_check.elapsed
+        )
+        
+        with ect.Timer() as t_motion_and_gap_checks:
+            if prev_point is not None:
+                ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries)) > 0
+                if timeDelta > 2 * self.time_threshold and not ongoing_motion_check:
+                    logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
+                                (prev_point.ts, curr_point.ts, self.time_threshold, curr_point.ts - prev_point.ts, ongoing_motion_check))
+                    return True
 
-            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
-                logging.debug("tracking was restarted, ending trip")
-                return True
+                # http://www.huffingtonpost.com/hoppercom/the-worlds-20-longest-non-stop-flights_b_5994268.html
+                # Longest flight is 17 hours, which is the longest you can go without cell reception
+                # And even if you split an air flight that long into two, you will get some untracked time in the
+                # middle, so that's good.
+                TWELVE_HOURS = 12 * 60 * 60
+                if timeDelta > TWELVE_HOURS:
+                    logging.debug("prev_point.ts = %s, curr_point.ts = %s, TWELVE_HOURS = %s, large gap = %s, ending trip" %
+                                (prev_point.ts, curr_point.ts, TWELVE_HOURS, curr_point.ts - prev_point.ts))
+                    return True
 
-            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries)) > 0
-            if timeDelta > 2 * self.time_threshold and not ongoing_motion_check:
-                logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
-                              (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts, ongoing_motion_check))
-                return True
+                if (timeDelta > 2 * self.time_threshold and # We have been here for a while
+                    speedDelta < speedThreshold): # we haven't moved very much
+                    logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, large gap = %s, ending trip" %
+                                (prev_point.ts, curr_point.ts, self.time_threshold, curr_point.ts - prev_point.ts))
+                    return True
+                else:
+                    logging.debug("prev_point.ts = %s, curr_point.ts = %s, time gap = %s (vs %s), distance_gap = %s (vs %s), speed_gap = %s (vs %s) continuing trip" %
+                                (prev_point.ts, curr_point.ts,
+                                timeDelta, self.time_threshold,
+                                distDelta, self.distance_threshold,
+                                speedDelta, speedThreshold))
+        esds.store_pipeline_time(
+            user_id,
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/has_trip_ended/motion_and_gap_checks",
+            time.time(),
+            t_motion_and_gap_checks.elapsed
+        )
+        
+        with ect.Timer() as t_final_distance_checks:
+            # The -30 is a fuzz factor intended to compensate for older clients
+            # where data collection stopped after 5 mins, so that we never actually
+            # see 5 mins of data
 
-            # http://www.huffingtonpost.com/hoppercom/the-worlds-20-longest-non-stop-flights_b_5994268.html
-            # Longest flight is 17 hours, which is the longest you can go without cell reception
-            # And even if you split an air flight that long into two, you will get some untracked time in the
-            # middle, so that's good.
-            TWELVE_HOURS = 12 * 60 * 60
-            if timeDelta > TWELVE_HOURS:
-                logging.debug("prev_point.ts = %s, curr_point.ts = %s, TWELVE_HOURS = %s, large gap = %s, ending trip" %
-                              (prev_point.ts, curr_point.ts, TWELVE_HOURS, curr_point.ts - prev_point.ts))
-                return True
+            if (len(last10PointsDistances) < self.point_threshold - 1 or
+                        len(last5MinsDistances) == 0 or
+                        last5MinTimes.max() < self.time_threshold - 30):
+                logging.debug("Too few points to make a decision, continuing")
+                return False
 
-            if (timeDelta > 2 * self.time_threshold and # We have been here for a while
-                 speedDelta < speedThreshold): # we haven't moved very much
-                logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, large gap = %s, ending trip" %
-                              (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts))
-                return True
-            else:
-                logging.debug("prev_point.ts = %s, curr_point.ts = %s, time gap = %s (vs %s), distance_gap = %s (vs %s), speed_gap = %s (vs %s) continuing trip" %
-                              (prev_point.ts, curr_point.ts,
-                               timeDelta, self.time_threshold,
-                               distDelta, self.distance_threshold,
-                               speedDelta, speedThreshold))
+            # Normal end-of-trip case
+            logging.debug("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
+                        (last5MinsDistances.max(), last10PointsDistances.max()))
+            if (last5MinsDistances.max() < self.distance_threshold and
+                last10PointsDistances.max() < self.distance_threshold):
+                    return True
+        esds.store_pipeline_time(
+            user_id,
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_time/has_trip_ended/final_distance_checks",
+            time.time(),
+            t_final_distance_checks.elapsed
+        )
 
-        # The -30 is a fuzz factor intended to compensate for older clients
-        # where data collection stopped after 5 mins, so that we never actually
-        # see 5 mins of data
-
-        if (len(last10PointsDistances) < self.point_threshold - 1 or
-                    len(last5MinsDistances) == 0 or
-                    last5MinTimes.max() < self.time_threshold - 30):
-            logging.debug("Too few points to make a decision, continuing")
-            return False
-
-        # Normal end-of-trip case
-        logging.debug("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
-                      (last5MinsDistances.max(), last10PointsDistances.max()))
-        if (last5MinsDistances.max() < self.distance_threshold and
-            last10PointsDistances.max() < self.distance_threshold):
-                return True
 
 
     def get_last_trip_end_point(self, filtered_points_df, last10Points_df, last5MinsPoints_df):
