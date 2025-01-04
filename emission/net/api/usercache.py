@@ -51,14 +51,19 @@ def sync_phone_to_server(uuid, data_from_phone):
                         'metadata.type': data["metadata"]["type"],
                         'metadata.write_ts': data["metadata"]["write_ts"],
                         'metadata.key': data["metadata"]["key"]}
-        result = usercache_db.update_one(update_query,
-                                           document,
-                                           upsert=True)
-        logging.debug("Updated result for user = %s, key = %s, write_ts = %s = %s" % 
-            (uuid, data["metadata"]["key"], data["metadata"]["write_ts"], result.raw_result))
+        try:
+            result = usercache_db.update_one(update_query,
+                                               document,
+                                               upsert=True)
+            logging.debug("Updated result for user = %s, key = %s, write_ts = %s = %s" %
+                (uuid, data["metadata"]["key"], data["metadata"]["write_ts"], result.raw_result))
 
-        # I am not sure how to trigger a writer error to test this
-        # and whether this is the format expected from the server in the rawResult
-        if 'ok' in result.raw_result and result.raw_result['ok'] != 1.0:
-            logging.error("In sync_phone_to_server, err = %s" % result.raw_result['writeError'])
-            raise Exception()
+            # I am not sure how to trigger a writer error to test this
+            # and whether this is the format expected from the server in the rawResult
+            if 'ok' in result.raw_result and result.raw_result['ok'] != 1.0:
+                logging.error("In sync_phone_to_server, err = %s" % result.raw_result['writeError'])
+                raise Exception()
+        except pymongo.errors.PyMongoError as e:
+            logging.error(f"In sync_phone_to_server, while executing {update_query=} on {document=}")
+            logging.exception(e)
+            raise
