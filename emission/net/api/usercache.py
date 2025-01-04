@@ -29,6 +29,19 @@ def sync_server_to_phone(uuid):
     # logging.debug("retrievedData = %s" % retrievedData)
     return retrievedData
 
+def _remove_dots(entry_doc):
+    for key in entry_doc:
+        # print(f"Checking {key=}")
+        if isinstance(entry_doc[key], dict):
+            # print(f"Found dict for {key=}, recursing")
+            _remove_dots(entry_doc[key])
+        if '.' in key:
+            munged_key = key.replace(".", "_")
+            logging.info(f"Found {key=} with dot, munged to {munged_key=}")
+            # Get and delete in one swoop
+            # https://stackoverflow.com/a/11277439
+            entry_doc[munged_key] = entry_doc.pop(key, None)
+
 def sync_phone_to_server(uuid, data_from_phone):
     """
         Puts the blob from the phone into the cache
@@ -44,6 +57,10 @@ def sync_phone_to_server(uuid, data_from_phone):
 
         if "ts" in data["data"] and ecc.isMillisecs(data["data"]["ts"]):
             data["data"]["ts"] = old_div(float(data["data"]["ts"]), 1000)
+
+        # mongodb/documentDB don't support field names with `.`
+        # let's convert them all to `_`
+        _remove_dots(data)
             
         # logging.debug("After updating with UUId, we get %s" % data)
         document = {'$set': data}
