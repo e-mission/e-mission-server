@@ -51,28 +51,20 @@ class TripSegmentationMethod(object):
         pass
     
 def segment_current_trips(user_id):
-    with ect.Timer() as t_get_time_series:
-        ts = esta.TimeSeries.get_time_series(user_id)
-    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/get_time_series", time.time(), t_get_time_series.elapsed)
-
-    with ect.Timer() as t_get_time_range:
-        time_query = epq.get_time_range_for_segmentation(user_id)
-    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/get_time_range_for_segmentation", time.time(), t_get_time_range.elapsed)
+    ts = esta.TimeSeries.get_time_series(user_id)
+    time_query = epq.get_time_range_for_segmentation(user_id)
 
     import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_time_filter as dstf
     import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_dist_filter as dsdf
 
-    with ect.Timer() as t_create_time_filter:
-        dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold=5 * 60,  # 5 mins
-                                                 point_threshold=9,
-                                                 distance_threshold=100)  # 100 m
-    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/create_time_filter", time.time(), t_create_time_filter.elapsed)
 
-    with ect.Timer() as t_create_dist_filter:
-        dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold=10 * 60,  # 10 mins
-                                                 point_threshold=9,
-                                                 distance_threshold=50)  # 50 m
-    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/create_dist_filter", time.time(), t_create_dist_filter.elapsed)
+    dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold=5 * 60,  # 5 mins
+                                                point_threshold=9,
+                                                distance_threshold=100)  # 100 m
+
+    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold=10 * 60,  # 10 mins
+                                                point_threshold=9,
+                                                distance_threshold=50)  # 50 m
 
     filter_methods = {"time": dstfsm, "distance": dsdfsm}
     filter_method_names = {"time": "DwellSegmentationTimeFilter", "distance": "DwellSegmentationDistFilter"}
@@ -89,24 +81,20 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_done(user_id, None)
         return
 
-    with ect.Timer() as t_handle_out_of_order:
-        out_of_order_points = loc_df[loc_df.ts.diff() < 0]
-        if len(out_of_order_points) > 0:
-            logging.info("Found out of order points!")
-            logging.info("%s" % out_of_order_points)
-            # drop from the table
-            loc_df = loc_df.drop(out_of_order_points.index.tolist())
-            loc_df.reset_index(inplace=True)
-            # invalidate in the database.
-            out_of_order_id_list = out_of_order_points["_id"].tolist()
-            logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
-            for ooid in out_of_order_id_list:
-                ts.invalidate_raw_entry(ooid)
-    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/handle_out_of_order_points", time.time(), t_handle_out_of_order.elapsed)
+    out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    if len(out_of_order_points) > 0:
+        logging.info("Found out of order points!")
+        logging.info("%s" % out_of_order_points)
+        # drop from the table
+        loc_df = loc_df.drop(out_of_order_points.index.tolist())
+        loc_df.reset_index(inplace=True)
+        # invalidate in the database.
+        out_of_order_id_list = out_of_order_points["_id"].tolist()
+        logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
+        for ooid in out_of_order_id_list:
+            ts.invalidate_raw_entry(ooid)
 
-    with ect.Timer() as t_get_filters:
-        filters_in_df = loc_df["filter"].dropna().unique()
-    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/get_filters_in_df", time.time(), t_get_filters.elapsed)
+    filters_in_df = loc_df["filter"].dropna().unique()
 
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
     if len(filters_in_df) == 1:

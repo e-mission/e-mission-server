@@ -14,6 +14,7 @@ import json
 import uuid
 import attrdict as ad
 import time
+import copy
 import geojson as gj
 # This change should be removed in the next server update, by which time hopefully the new geojson version will incorporate the long-term fix for their default precision
 # See - jazzband/geojson#177
@@ -272,6 +273,77 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # 60 entries from android + 60 entries from ios = 120
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 120)
         self.assertEqual(edb.get_timeseries_error_db().estimated_document_count(), 0)
+
+    def testRemoteDots(self):
+        test_template = {"ts":1735934360.256,
+                  "client_app_version":"1.9.6",
+                  "name":"open_notification",
+                  "client_os_version":"15.5",
+                  "reading":{
+                      "additionalData":{
+                        "google.c.sender.id":"FAKE_SENDER_ID",
+                        "coldstart":False,
+                        "notId":"1122334455667788",
+                        "payload":1122334455667788,
+                        "content-available":1,
+                        "foreground":False,
+                        "google.c.fid":"FAKE_FID",
+                        "gcm.message_id":"FAKE_MESSAGE_ID"}}}
+        test_1 = copy.copy(test_template)
+        self.assertEqual(len(test_1["reading"]["additionalData"]), 8)
+        self.assertIn("google.c.sender.id",
+            test_1["reading"]["additionalData"])
+        self.assertIn("google.c.fid",
+            test_1["reading"]["additionalData"])
+        self.assertIn("gcm.message_id",
+            test_1["reading"]["additionalData"])
+        mauc._remove_dots(test_1)
+        self.assertEqual(len(test_1["reading"]["additionalData"]), 8)
+        self.assertIn("google_c_sender_id",
+            test_1["reading"]["additionalData"])
+        self.assertIn("google_c_fid",
+            test_1["reading"]["additionalData"])
+        self.assertIn("gcm_message_id",
+            test_1["reading"]["additionalData"])
+        self.assertNotIn("google.c.sender.id",
+            test_1["reading"]["additionalData"])
+        self.assertNotIn("google.c.fid",
+            test_1["reading"]["additionalData"])
+        self.assertNotIn("gcm.message_id",
+            test_1["reading"]["additionalData"])
+
+        metadata_template = {'plugin': 'none',
+                         'write_ts': self.curr_ts - 25,
+                         'time_zone': u'America/Los_Angeles',
+                         'platform': u'ios',
+                         'key': u'stats/client_time',
+                         'read_ts': self.curr_ts - 27,
+                         'type': u'message'}
+
+        # there are 30 entries in the setup function
+        self.assertEqual(len(self.uc1.getMessage()), 30)
+
+        three_entries_with_dots = []
+        for i in range(3):
+            curr_md = copy.copy(metadata_template)
+            curr_md['write_ts'] = self.curr_ts - 25 + i
+            three_entries_with_dots.append({
+                'user_id': self.testUserUUID1,
+                'data': copy.copy(test_template),
+                'metadata': curr_md})
+
+        print(f"AFTER {[e.get('metadata', None) for e in three_entries_with_dots]}")
+
+        mauc.sync_phone_to_server(self.testUserUUID1, three_entries_with_dots)
+        # we have munged, so these new entries should also be saved
+        # and we should have 33 entries in the usercache
+        self.assertEqual(len(self.uc1.getMessage()), 33)
+        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
+        # since they were munged before saving into the usercache,
+        # there should be no errors while copying to the timeseries
+        self.assertEqual(len(self.uc1.getMessage()), 0)
+        self.assertEqual(len(list(self.ts1.find_entries())), 33)
 
 if __name__ == '__main__':
     import emission.tests.common as etc

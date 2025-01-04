@@ -7,6 +7,7 @@ import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
 import emission.tests.common as etc
 import emission.pipeline.intake_stage as epi
+import emission.analysis.result.user_stat as eaurs
 
 from emission.net.api import pipeline
 
@@ -38,6 +39,7 @@ class TestPipeline(unittest.TestCase):
     def testAnalysisResults(self):
         self.assertEqual(pipeline.get_range(self.testUUID), (None, None))
         epi.run_intake_pipeline_for_user(self.testUUID, skip_if_no_new_data = False)
+        eaurs.get_and_store_user_stats(self.testUUID, "analysis/composite_trip")
         pr = pipeline.get_range(self.testUUID)
         self.assertAlmostEqual(pr[0], 1440688739.672)
         self.assertAlmostEqual(pr[1], 1440729142.709)
