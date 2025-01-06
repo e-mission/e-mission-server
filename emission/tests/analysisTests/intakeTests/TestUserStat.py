@@ -57,11 +57,20 @@ class TestUserStats(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_profile_db().delete_one({"user_id": self.testUUID})
 
-    def testGetAndStoreUserStats(self):
+    def testGetAndStoreUserStatsDefault(self):
         """
-        Test get_and_store_user_stats for the user to ensure that user statistics
+        Case (i): Test get_and_store_user_stats for the user to ensure that user statistics
         are correctly aggregated and stored in the user profile.
         """
+        # Load in new data
+        
+        with open("emission/tests/data/real_examples/shankari_2015-aug-27") as fp:
+            self.entries = json.load(fp, object_hook=esj.wrapped_object_hook)
+            
+        etc.setupRealExampleWithEntries(self)
+
+        # Rerun Pipeline
+        etc.runIntakePipeline(self.testUUID)
 
         # Retrieve the updated user profile from the database
         profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
@@ -75,7 +84,7 @@ class TestUserStats(unittest.TestCase):
         self.assertIn("pipeline_range", profile, "User profile should contain 'pipeline_range'.")
         self.assertIn("last_call_ts", profile, "User profile should contain 'last_call_ts'.")
 
-        expected_total_trips = 5
+        expected_total_trips = 13
         expected_labeled_trips = 0
 
         self.assertEqual(profile["total_trips"], expected_total_trips,
@@ -89,15 +98,58 @@ class TestUserStats(unittest.TestCase):
         self.assertIn("end_ts", pipeline_range, "Pipeline range should contain 'end_ts'.")
 
         expected_start_ts = 1440168891.095
-        expected_end_ts = 1440209488.817
+        expected_end_ts = 1440729142.709
 
         self.assertEqual(pipeline_range["start_ts"], expected_start_ts,
                          f"Expected start_ts to be {expected_start_ts}, got {pipeline_range['start_ts']}")
         self.assertEqual(pipeline_range["end_ts"], expected_end_ts,
                          f"Expected end_ts to be {expected_end_ts}, got {pipeline_range['end_ts']}")
+        
+        test_call_ts = time.time()
+        enac.store_server_api_time(self.testUUID, "test_call_ts", test_call_ts, 69420)
+        etc.runIntakePipeline(self.testUUID)
 
-    def testLastCall(self):
-        # Call the function with all required arguments
+        # Retrieve the profile from the database
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+
+        # Verify that last_call_ts is updated correctly
+        expected_last_call_ts = test_call_ts
+        actual_last_call_ts = profile.get("last_call_ts")
+
+        self.assertEqual(
+            actual_last_call_ts,
+            expected_last_call_ts,
+            f"Expected last_call_ts to be {expected_last_call_ts}, got {actual_last_call_ts}"
+        )
+
+    def testGetAndStoreUserStatsSecondRunNoNewData(self):
+        """
+        Case (ii): Verify stats remain unchanged if we run the pipeline again
+        without adding new data.
+        """
+        # Check stats after the initial run (from setUp()).
+        initial_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIsNotNone(initial_profile, "User profile should exist after first run.")
+        initial_total_trips = initial_profile["total_trips"]
+        initial_labeled_trips = initial_profile["labeled_trips"]
+
+        # Run the pipeline again, but don't add any new data
+        etc.runIntakePipeline(self.testUUID)
+
+        # Stats should remain the same
+        updated_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIsNotNone(updated_profile, "Profile should still exist.")
+        self.assertEqual(
+            updated_profile["total_trips"], 
+            initial_total_trips,
+            f"Expected total_trips to remain {initial_total_trips}, got {updated_profile['total_trips']}"
+        )
+        self.assertEqual(
+            updated_profile["labeled_trips"], 
+            initial_labeled_trips,
+            f"Expected labeled_trips to remain {initial_labeled_trips}, got {updated_profile['labeled_trips']}"
+        )
+
         test_call_ts = time.time()
         enac.store_server_api_time(self.testUUID, "test_call_ts", test_call_ts, 69420)
         etc.runIntakePipeline(self.testUUID)
