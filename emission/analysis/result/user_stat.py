@@ -61,9 +61,9 @@ def get_and_store_user_stats(user_id: str, trip_key: str) -> None:
         end_ts_result = ts.get_first_value_for_field(trip_key, "data.end_ts", pymongo.DESCENDING)
         end_ts = None if end_ts_result == -1 else end_ts_result
 
-        total_trips = ts.find_entries_count(key_list=[trip_key])
+        total_trips = ts.find_entries_count(key_list=["analysis/confirmed_trip"])
         labeled_trips = ts.find_entries_count(
-            key_list=[trip_key],
+            key_list=["analysis/confirmed_trip"],
             extra_query_list=[{'data.user_input': {'$ne': {}}}]
         )
 
