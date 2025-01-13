@@ -28,7 +28,9 @@ class PipelineStages(enum.Enum):
     USER_MODEL = 7
     RECOMMENDATION = 8
     OUTPUT_GEN = 9
-    EXPORT_DATA = 15
+    EXPORT_DATA = 18
+    PURGE_TIMESERIES_DATA = 19
+    RESTORE_TIMESERIES_DATA = 20
 
 class PipelineState(ecwb.WrapperBase):
     props = {"pipeline_stage": ecwb.WrapperBase.Access.RW,  # the value of the stage from the enum above
