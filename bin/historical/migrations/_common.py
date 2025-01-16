@@ -2,28 +2,29 @@ import os
 import subprocess
 import importlib
 import logging
+import tempfile
+import time
 
 import emission.core.get_database as edb
 
-DB_HOST_TEMPLATE = "mongodb://localhost:27017/openpath_prod_REPLACEME"
+DB_HOST_TEMPLATE = os.environ.get('DB_HOST_TEMPLATE', "mongodb://localhost:27017/openpath_prod_REPLACEME")
 
-proc = subprocess.run(
-      'rm -rf nrel-openpath-deploy-configs && ' +
-      'git clone --no-checkout https://github.com/e-mission/nrel-openpath-deploy-configs.git && ' +
-      'cd nrel-openpath-deploy-configs && ' +
-      'git ls-tree -r --name-only HEAD | grep configs/',
-      shell=True,
-      capture_output=True,
-      text=True)
-filenames = proc.stdout.replace("configs/", "").split("\n")
+if 'PROD_LIST' in os.environ:
+    PROD_LIST=os.environ['PROD_LIST'].split(",")
+else:
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        print(f"created {tmpdirname=} to find list of configs")
+        os.chdir(tmpdirname)
+        proc = subprocess.run(
+              f"git clone https://github.com/e-mission/nrel-openpath-deploy-configs.git", shell=True)
+        filenames = os.listdir(f"nrel-openpath-deploy-configs/configs/")
 
-PROD_LIST = [
-    fname.split(".")[0]
-    for fname in filenames
-      if fname and 'dev-' not in fname and 'stage-' not in fname
-]
+    PROD_LIST = [
+        fname.split(".")[0]
+        for fname in filenames
+          if fname and 'dev-' not in fname and 'stage-' not in fname
+    ]
 print(f"PROD_LIST: {PROD_LIST}")
-
 
 def run_on_all_deployments(fn_to_run):
     """
