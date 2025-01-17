@@ -56,9 +56,7 @@ def update_trip_model(
         time_query = time_query_from_pipeline if model.is_incremental else None
         logging.debug(f'model type {model_type.name} is incremental? {model.is_incremental}')
         logging.debug(f'time query for training data collection: {time_query}')
-
         trips = _get_training_data(user_id, time_query)
-        
         # don't start training for a user that doesn't have at least $trips many trips
         # (assume if a stored model exists for the user, that they met this requirement previously)
         if len(trips) == 0:
@@ -74,7 +72,8 @@ def update_trip_model(
             epq.mark_trip_model_failed(user_id)
         else:
             
-            # train and store the model
+            # train and store the model. pass only List of event and only convert 
+            # to dataframe type data whereever required.
             model.fit(trips)
             model_data_next = model.to_dict()
 
