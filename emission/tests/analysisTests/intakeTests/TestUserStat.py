@@ -44,7 +44,7 @@ class TestUserStats(unittest.TestCase):
             edb.get_profile_db().insert_one({"user_id": self.testUUID})
 
         #etc.runIntakePipeline(self.testUUID)
-        etc.runIntakePipeline(self.testUUID)
+        epi.run_intake_pipeline_for_user(self.testUUID, skip_if_no_new_data = False)
         logging.debug("UUID = %s" % (self.testUUID))
 
     def tearDown(self):
