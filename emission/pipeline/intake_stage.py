@@ -76,6 +76,12 @@ def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
 
         try:
             run_intake_pipeline_for_user(uuid, skip_if_no_new_data)
+            with ect.Timer() as gsr:
+                logging.info("*" * 10 + "UUID %s: storing pipeline independent user stats " % uuid + "*" * 10)
+                print(str(arrow.now()) + "*" * 10 + "UUID %s: storing pipeline independent user stats " % uuid + "*" * 10)
+                eaurs.get_and_store_pipeline_independent_user_stats(uuid)
+            esds.store_pipeline_time(uuid, 'STORE_PIPELINE_INDEPENDENT_USER_STATS',
+                                time.time(), gsr.elapsed)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
@@ -203,7 +209,7 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         with ect.Timer() as gsr:
             logging.info("*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
-            eaurs.get_and_store_user_stats(uuid, "analysis/composite_trip")
+            eaurs.get_and_store_pipeline_dependent_user_stats(uuid, "analysis/composite_trip")
 
-        esds.store_pipeline_time(uuid, 'STORE_USER_STATS',
+        esds.store_pipeline_time(uuid, 'STORE_PIPELINE_DEPENDENT_USER_STATS',
                                 time.time(), gsr.elapsed)
