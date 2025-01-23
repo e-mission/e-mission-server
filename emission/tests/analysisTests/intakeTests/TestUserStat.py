@@ -43,7 +43,6 @@ class TestUserStats(unittest.TestCase):
             # Initialize the profile if it does not exist
             edb.get_profile_db().insert_one({"user_id": self.testUUID})
 
-        #etc.runIntakePipeline(self.testUUID)
         etc.runIntakePipeline(self.testUUID)
         logging.debug("UUID = %s" % (self.testUUID))
 

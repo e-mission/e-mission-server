@@ -41,9 +41,10 @@ def update_user_profile(user_id: str, data: Dict[str, Any]) -> None:
     logging.debug(f"New profile: {user.getProfile()}")
 
 
-def get_and_store_user_stats(user_id: str, trip_key: str) -> None:
+def get_and_store_pipeline_dependent_user_stats(user_id: str, trip_key: str) -> None:
     """
-    Aggregates and stores user statistics into the user profile.
+    Aggregates and stores pipeline dependent into the user profile.
+    These are statistics based on analysed data such as trips or labels.
 
     :param user_id: The UUID of the user.
     :type user_id: str
@@ -52,7 +53,7 @@ def get_and_store_user_stats(user_id: str, trip_key: str) -> None:
     :return: None
     """
     try:
-        logging.info(f"Starting get_and_store_user_stats for user_id: {user_id}, trip_key: {trip_key}")
+        logging.info(f"Starting get_and_store_pipeline_dependent_user_stats for user_id: {user_id}, trip_key: {trip_key}")
 
         ts = esta.TimeSeries.get_time_series(user_id)
         start_ts_result = ts.get_first_value_for_field(trip_key, "data.start_ts", pymongo.ASCENDING)
@@ -68,11 +69,6 @@ def get_and_store_user_stats(user_id: str, trip_key: str) -> None:
         )
 
         logging.info(f"Total trips: {total_trips}, Labeled trips: {labeled_trips}")
-        logging.info(f"user_id type: {type(user_id)}")
-
-        last_call_ts = get_last_call_timestamp(ts)
-        logging.info(f"Last call timestamp: {last_call_ts}")
-
         update_data = {
             "pipeline_range": {
                 "start_ts": start_ts,
@@ -80,12 +76,37 @@ def get_and_store_user_stats(user_id: str, trip_key: str) -> None:
             },
             "total_trips": total_trips,
             "labeled_trips": labeled_trips,
-            "last_call_ts": last_call_ts
         }
 
+        logging.info(f"user_id type: {type(user_id)}")
         update_user_profile(user_id, update_data)
 
         logging.debug("User profile updated successfully.")
 
     except Exception as e:
-        logging.error(f"Error in get_and_store_user_stats for user_id {user_id}: {e}")
+        logging.error(f"Error in get_and_store_dependent_user_stats for user_id {user_id}: {e}")
+
+def get_and_store_pipeline_independent_user_stats(user_id: str) -> None:
+    """
+    Aggregates and stores pipeline indepedent statistics into the user profile.
+    These are statistics based on raw data, such as the last call, last push
+    or last location received.
+
+    :param user_id: The UUID of the user.
+    :type user_id: str
+    :return: None
+    """
+
+    try:
+        logging.info(f"Starting get_and_store_pipeline_independent_user_stats for user_id: {user_id}")
+        ts = esta.TimeSeries.get_time_series(user_id)
+        last_call_ts = get_last_call_timestamp(ts)
+        logging.info(f"Last call timestamp: {last_call_ts}")
+
+        update_data = {
+            "last_call_ts": last_call_ts
+        }
+        update_user_profile(user_id, update_data)
+
+    except Exception as e:
+        logging.error(f"Error in get_and_store_independent_user_stats for user_id {user_id}: {e}")
