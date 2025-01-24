@@ -34,6 +34,10 @@ def run_on_all_deployments(fn_to_run):
       nrel-openpath-deploy-configs repo upon initialization of this module.
     """
     for prod in PROD_LIST:
+        # e-bikes-for-essentials has a typo; treat as special case
+        if prod == 'e-bikes-for-essentials':
+            prod = 'ebikes-for-essentials'
+            
         prod_db_name = prod.replace("-", "_")
         print(f"Running {fn_to_run.__name__} for {prod} on DB {prod_db_name}")
         os.environ['DB_HOST'] = DB_HOST_TEMPLATE.replace(
