@@ -74,10 +74,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             (filtered_points_df.metadata_write_ts - filtered_points_df.ts) < 1000
         ]
         filtered_points_df.reset_index(inplace=True)
-        transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+        self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+        self.motion_list = list(timeseries.find_entries(["background/motion_activity"], time_query))
 
-        if len(transition_df) > 0:
-            logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
+        if len(self.transition_df) > 0:
+            logging.debug("self.transition_df = %s" % self.transition_df[["fmt_time", "transition"]])
         else:
             logging.debug("no transitions found. This can happen for continuous sensing")
 
@@ -185,11 +186,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             t_loop.elapsed
         )
 
-        logging.debug("Iterated over all points, just_ended = %s, len(transition_df) = %s" %
-                    (just_ended, len(transition_df)))
-        if not just_ended and len(transition_df) > 0:
-            stopped_moving_after_last = transition_df[
-                (transition_df.ts > currPoint.ts) & (transition_df.transition == 2)
+        logging.debug("Iterated over all points, just_ended = %s, len(self.transition_df) = %s" %
+                    (just_ended, len(self.transition_df)))
+        if not just_ended and len(self.transition_df) > 0:
+            stopped_moving_after_last = self.transition_df[
+                (self.transition_df.ts > currPoint.ts) & (self.transition_df.transition == 2)
             ]
             logging.debug("looking after %s, found transitions %s" %
                         (currPoint.ts, stopped_moving_after_last))
@@ -252,11 +253,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 speedDelta = np.nan
             speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
 
-            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
+            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries, self.transition_df):
                 logging.debug("tracking was restarted, ending trip")
                 return True
 
-            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries)) > 0
+            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries, self.motion_list)) > 0
             if timeDelta > 2 * self.time_threshold and not ongoing_motion_check:
                 logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
                               (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts, ongoing_motion_check))
