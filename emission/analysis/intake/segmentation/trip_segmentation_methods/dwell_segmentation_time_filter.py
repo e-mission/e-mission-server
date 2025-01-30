@@ -57,7 +57,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self, timeseries, time_query, filtered_points_df):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -65,14 +65,13 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         data that they want from the sensor streams in order to determine the
         segmentation points.
         """
-        filtered_points_pre_ts_diff_df = timeseries.get_data_df("background/filtered_location", time_query)
-        user_id = filtered_points_pre_ts_diff_df["user_id"].iloc[0]
+        user_id = filtered_points_df["user_id"].iloc[0]
         # Sometimes, we can get bogus points because data.ts and
         # metadata.write_ts are off by a lot. If we don't do this, we end up
         # appearing to travel back in time
         # https://github.com/e-mission/e-mission-server/issues/457
-        filtered_points_df = filtered_points_pre_ts_diff_df[
-            (filtered_points_pre_ts_diff_df.metadata_write_ts - filtered_points_pre_ts_diff_df.ts) < 1000
+        filtered_points_df = filtered_points_df[
+            (filtered_points_df.metadata_write_ts - filtered_points_df.ts) < 1000
         ]
         filtered_points_df.reset_index(inplace=True)
         transition_df = timeseries.get_data_df("statemachine/transition", time_query)

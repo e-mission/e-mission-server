@@ -42,7 +42,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self, timeseries, time_query, filtered_points_df):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -51,7 +51,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         segmentation points.
         """
         with ect.Timer() as t_get_filtered_points:
-            self.filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
+            self.filtered_points_df = filtered_points_df
             user_id = self.filtered_points_df["user_id"].iloc[0]
         esds.store_pipeline_time(
             user_id,
