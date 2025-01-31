@@ -100,7 +100,7 @@ def segment_current_trips(user_id):
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
         with ect.Timer() as t_segment_trips:
-            segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(ts, time_query)
+            segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(ts, time_query, loc_df)
         esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips", time.time(), t_segment_trips.elapsed)
     else:
         with ect.Timer() as t_get_combined_segmentation:
@@ -165,7 +165,9 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
             time_query.endTs = loc_df.iloc[endIndex+1].ts
         logging.debug("for filter %s, startTs = %d and endTs = %d" %
             (curr_filter, time_query.startTs, time_query.endTs))
-        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)
+        curr_filter_loc_df = loc_df.loc[startIndex:endIndex]
+        curr_filter_loc_df.reset_index(drop=True, inplace=True)
+        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query, curr_filter_loc_df)
     logging.debug("After filtering, segmentation_map has keys %s" % list(segmentation_map.keys()))
     sortedStartTsList = sorted(segmentation_map.keys())
     segmentation_points = []

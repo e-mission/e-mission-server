@@ -9,34 +9,46 @@ import logging
 import emission.core.wrapper.transition as ecwt
 import emission.storage.timeseries.timequery as estt
 
-def is_tracking_restarted_in_range(start_ts, end_ts, timeseries):
+def is_tracking_restarted_in_range(start_ts, end_ts, timeseries, transition_df=None):
     """
     Check to see if tracing was restarted between the times specified
     :param start_ts: the start of the time range to check
     :param end_ts: the end of the time range to check
     :param timeseries: the timeseries to use for checking
+    :param transition_df: dataframe of transitions to use (if None, will be fetched from timeseries)
     :return:
     """
-    import emission.storage.timeseries.timequery as estt
+    if transition_df is not None:
+        transition_df = transition_df[
+            (transition_df['ts'] >= start_ts) & (transition_df['ts'] <= end_ts)
+        ]
+    else:
+        import emission.storage.timeseries.timequery as estt
+        tq = estt.TimeQuery(timeType="data.ts", startTs=start_ts,
+                            endTs=end_ts)
+        transition_df = timeseries.get_data_df("statemachine/transition", tq)
 
-    tq = estt.TimeQuery(timeType="data.ts", startTs=start_ts,
-                        endTs=end_ts)
-    transition_df = timeseries.get_data_df("statemachine/transition", tq)
     if len(transition_df) == 0:
         logging.debug("In range %s -> %s found no transitions" %
-                      (tq.startTs, tq.endTs))
+                      (start_ts, end_ts))
         return False
     logging.debug("In range %s -> %s found transitions %s" %
-                  (tq.startTs, tq.endTs, transition_df[["fmt_time", "curr_state", "transition"]]))
+                  (start_ts, end_ts, transition_df[["fmt_time", "curr_state", "transition"]]))
     return _is_tracking_restarted_android(transition_df) or \
            _is_tracking_restarted_ios(transition_df)
 
-def get_ongoing_motion_in_range(start_ts, end_ts, timeseries):
-    tq = estt.TimeQuery(timeType = "data.ts", startTs = start_ts,
-                        endTs = end_ts)
-    motion_list = list(timeseries.find_entries(["background/motion_activity"], tq))
+def get_ongoing_motion_in_range(start_ts, end_ts, timeseries, motion_list=None):
+    if motion_list is not None:
+        motion_list = [
+            m for m in motion_list if m['data']['ts'] >= start_ts and m['data']['ts'] <= end_ts
+        ]
+    else:
+        tq = estt.TimeQuery(timeType = "data.ts", startTs = start_ts,
+                            endTs = end_ts)
+        motion_list = list(timeseries.find_entries(["background/motion_activity"], tq))
+
     logging.debug("Found %s motion_activity entries in range %s -> %s" %
-                  (len(motion_list), tq.startTs, tq.endTs))
+                  (len(motion_list), start_ts, end_ts))
     logging.debug("sample activities are %s" % motion_list[0:5])
     return motion_list
 

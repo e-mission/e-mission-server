@@ -42,7 +42,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self, timeseries, time_query, filtered_points_df):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -51,7 +51,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         segmentation points.
         """
         with ect.Timer() as t_get_filtered_points:
-            self.filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
+            self.filtered_points_df = filtered_points_df
             user_id = self.filtered_points_df["user_id"].iloc[0]
         esds.store_pipeline_time(
             user_id,
@@ -63,6 +63,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         self.filtered_points_df.loc[:, "valid"] = True
 
         self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+        self.motion_list = list(timeseries.find_entries(["background/motion_activity"], time_query))
 
         if len(self.transition_df) > 0:
             logging.debug("self.transition_df = %s" % self.transition_df[["fmt_time", "transition"]])
@@ -207,14 +208,14 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             # for this kind of test
             speedThreshold = old_div(float(self.distance_threshold * 2), (old_div(self.time_threshold, 2)))
 
-            if eaisr.is_tracking_restarted_in_range(lastPoint.ts, currPoint.ts, timeseries):
+            if eaisr.is_tracking_restarted_in_range(lastPoint.ts, currPoint.ts, timeseries, self.transition_df):
                 logging.debug("tracking was restarted, ending trip")
                 return True
 
             # In general, we get multiple locations between each motion activity. If we see a bunch of motion activities
             # between two location points, and there is a large gap between the last location and the first
             # motion activity as well, let us just assume that there was a restart
-            ongoing_motion_in_range = eaisr.get_ongoing_motion_in_range(lastPoint.ts, currPoint.ts, timeseries)
+            ongoing_motion_in_range = eaisr.get_ongoing_motion_in_range(lastPoint.ts, currPoint.ts, timeseries, self.motion_list)
             ongoing_motion_check = len(ongoing_motion_in_range) > 0
             if timeDelta > self.time_threshold and not ongoing_motion_check:
                 logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
