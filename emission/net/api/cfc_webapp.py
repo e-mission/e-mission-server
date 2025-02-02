@@ -68,6 +68,7 @@ socket_timeout = config.get("WEBSERVER_TIMEOUT", 3600)
 auth_method = config.get("WEBSERVER_AUTH", "skip")
 aggregate_call_auth = config.get("WEBSERVER_AGGREGATE_CALL_AUTH", "no_auth")
 not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nrel.gov/openpath")
+dynamic_config = None
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -483,6 +484,25 @@ def after_request():
   stats.store_server_api_time(request.params.user_uuid, "%s_%s_cputime" % (request.method, request.path),
         msTimeNow, new_duration)
 
+# Dynamic config BEGIN
+
+def get_dynamic_config():
+    logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
+    download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
+    logging.debug("About to download config from %s" % download_url)
+    r = requests.get(download_url)
+    if r.status_code != 200:
+        logging.debug(f"Unable to download study config for {STUDY_CONFIG=}, status code: {r.status_code}")
+        return None
+    else:
+        dynamic_config = json.loads(r.text)
+        logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
+            f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
+            f"and data collection URL {dynamic_config['server']['connectUrl']}")
+        return dynamic_config
+
+# Dynamic config END
+
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
 # yet. All others should use the UUID.
@@ -524,20 +544,10 @@ def getUUID(request, inHeader=False):
 
 def resolve_auth(auth_method):
     if auth_method == "dynamic":
-        logging.debug("auth_method is dynamic")
-        logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
-        download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
-        logging.debug("About to download config from %s" % download_url)
-        r = requests.get(download_url)
-        if r.status_code != 200:
-            logging.debug(f"Unable to download study config, status code: {r.status_code}")
+        logging.debug("auth_method is dynamic, using dynamic config to find the actual auth method")
+        if dynamic_config is None:
             sys.exit(1)
         else:
-            dynamic_config = json.loads(r.text)
-            logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
-                f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
-                f"and data collection URL {dynamic_config['server']['connectUrl']}")
-
             if "opcode" in dynamic_config:
                 # New style config
                 if dynamic_config["opcode"]["autogen"] == True:
@@ -567,6 +577,7 @@ if __name__ == '__main__':
 
     logging.config.dictConfig(webserver_log_config)
     logging.debug("attempting to resolve auth_method")
+    dynamic_config = get_dynamic_config()
     auth_method = resolve_auth(auth_method)
 
     logging.debug(f"Using auth method {auth_method}")
