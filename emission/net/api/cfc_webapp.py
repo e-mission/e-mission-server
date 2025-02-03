@@ -498,7 +498,7 @@ def get_dynamic_config():
         dynamic_config = json.loads(r.text)
         logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
             f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
-            f"and data collection URL {dynamic_config['server']['connectUrl']}")
+            f"and data collection URL {dynamic_config.get('server', {}).get('connectUrl', 'OS DEFAULT')}")
         return dynamic_config
 
 # Dynamic config END
@@ -533,7 +533,7 @@ def get_user_or_aggregate_auth(request):
 
 def getUUID(request, inHeader=False):
     try:
-        retUUID = enaa.getUUID(request, auth_method, inHeader)
+        retUUID = enaa.getUUID(dynamic_config, request, auth_method, inHeader)
         logging.debug("retUUID = %s" % retUUID)
         if retUUID is None:
            raise HTTPError(403, "token is valid, but no account found for user")

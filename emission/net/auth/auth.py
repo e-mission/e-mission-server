@@ -53,9 +53,45 @@ def __getToken__(request, inHeader):
 
     return userToken
 
-def getUUID(request, authMethod, inHeader=False):
+def getSubgroupFromToken(token, config):
+  if "opcode" in config:
+    # new style study, expects token with sub-group
+    tokenParts = token.split('_');
+    if len(tokenParts) <= 3:
+      # no subpart defined
+      raise ValueError(f"Not enough parts in {token=}, expected 3, found {tokenParts.length=}")
+    if "subgroups" in config.get("opcode", {}):
+      if tokenParts[2] not in config['opcode']['subgroups']:
+        # subpart not in config list
+        raise ValueError(f"Invalid subgroup {tokenParts[2]} not in {config.opcode.subgroups}")
+      else:
+        logging.debug('subgroup ' + tokenParts[2] + ' found in list ' + str(config['opcode']['subgroups']))
+        return tokenParts[2];
+    else:
+      if tokenParts[2] != 'default':
+        # subpart not in config list
+        raise ValueError(f"No subgroups found in config, but subgroup {tokenParts[2]} is not 'default'")
+      else:
+        logging.debug("no subgroups in config, 'default' subgroup found in token ");
+        return tokenParts[2];
+  else:
+    # old style study, expect token without subgroup
+    # nothing further to validate at this point
+    # only validation required is `nrelop_` and valid study name
+    # first is already handled in getStudyNameFromToken, second is handled
+    # by default since download will fail if it is invalid
+    logging.debug('Old-style study, expecting token without a subgroup...');
+    return None;
+
+def getUUID(dynamicConfig, request, authMethod, inHeader=False):
   retUUID = None
   userToken = __getToken__(request, inHeader)
+  curr_subgroup = getSubgroupFromToken(userToken, dynamicConfig)
+  suspended_subgroups = dynamicConfig.get("opcode", {}).get("suspended_subgroups", [])
+  if request.path == "/usercache/put":
+    if curr_subgroup in suspended_subgroups:
+        logging.info(f"Received put message for subgroup {curr_subgroup} in {suspended_subgroups=}, returning uuid = None")
+        return None
   retUUID = getUUIDFromToken(authMethod, userToken)
   request.params.user_uuid = retUUID
   return retUUID
