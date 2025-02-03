@@ -143,7 +143,7 @@ class TestAuthSelection(unittest.TestCase):
         logging.debug("Found request body = %s" % request.body.getvalue())
         logging.debug("Found request headers = %s" % list(request.headers.keys()))
         user = ecwu.User.register(self.test_email)
-        self.assertEqual(enaa.getUUID(request, "skip", inHeader=False), user.uuid)
+        self.assertEqual(enaa.getUUID({}, request, "skip", inHeader=False), user.uuid)
         ecwu.User.unregister(self.test_email)
 
     def testGetUUIDTokenAuthSuccess(self):
@@ -161,7 +161,7 @@ class TestAuthSelection(unittest.TestCase):
         logging.debug("Found request body = %s" % request.body.getvalue())
         logging.debug("Found request headers = %s" % list(request.headers.keys()))
         user = ecwu.User.register(self.test_email)
-        self.assertEqual(enaa.getUUID(request, "token_list", inHeader=False), user.uuid)
+        self.assertEqual(enaa.getUUID({}, request, "token_list", inHeader=False), user.uuid)
         ecwu.User.unregister(self.test_email)
 
     def testGetUUIDTokenAuthFailure(self):
@@ -180,7 +180,7 @@ class TestAuthSelection(unittest.TestCase):
         user = ecwu.User.register(self.test_email)
         ecwu.User.unregister(self.test_email)
         with self.assertRaises(ValueError):
-            self.assertEqual(enaa.getUUID(request, "token_list", inHeader=False), user.uuid)
+            self.assertEqual(enaa.getUUID({}, request, "token_list", inHeader=False), user.uuid)
 
 if __name__ == '__main__':
     import emission.tests.common as etc

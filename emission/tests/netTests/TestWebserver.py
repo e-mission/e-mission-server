@@ -60,20 +60,24 @@ class TestWebserver(unittest.TestCase):
     @mock.patch.dict(os.environ, {"STUDY_CONFIG":"nrel-commute"}, clear=True)
     def test_ResolveAuthWithEnvVar(self):
         importlib.reload(enacw)
+        enacw.dynamic_config = enacw.get_dynamic_config()
         self.assertEqual(enacw.resolve_auth("dynamic"),"skip")
 
     @mock.patch.dict(os.environ, {"STUDY_CONFIG":"denver-casr"}, clear=True)
     def test_ResolveAuthWithEnvVar(self):
         importlib.reload(enacw)
+        enacw.dynamic_config = enacw.get_dynamic_config()
         self.assertEqual(enacw.resolve_auth("dynamic"),"skip")
 
     @mock.patch.dict(os.environ, {"STUDY_CONFIG":"stage-program"}, clear=True)
     def test_ResolveAuthWithEnvVar(self):
         importlib.reload(enacw)
+        enacw.dynamic_config = enacw.get_dynamic_config()
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
 
     def testResolveAuthNoEnvVar(self):
         importlib.reload(enacw)
+        enacw.dynamic_config = enacw.get_dynamic_config()
         self.assertEqual(enacw.resolve_auth("skip"),"skip")
         self.assertEqual(enacw.resolve_auth("token_list"),"token_list")
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
