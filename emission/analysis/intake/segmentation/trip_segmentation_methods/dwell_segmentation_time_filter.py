@@ -109,7 +109,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         last_segmented_idx = 0
         with ect.Timer() as t_loop:
             while last_segmented_idx < len(loc_df):
-                logging.info("last_segmented_idx = %s" % last_segmented_idx)
+                print("last_segmented_idx = %s" % last_segmented_idx)
                 # trim off dists of points that were before the last_segmented_idx
                 last_10_dists_filtered = [
                     dists if row_idx - last_segmented_idx > len(dists)
@@ -125,7 +125,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 last_10_max_dists = np.array(
                     [dists.max()
                         # if we don't have enough points, we can't make a decision
-                        if len(dists) >= self.point_threshold - 1
+                        if len(dists) >= self.point_threshold - 2 # TODO weird but necessary to match the current behavior
                         else np.inf
                      for dists in last_10_dists_filtered]
                 )
@@ -170,7 +170,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                         logging.info("looking after %s, found transitions %s" %
                                     (last_point_ts, stopped_moving_after_last))
                         if len(stopped_moving_after_last) > 0:
-                            (unused, last_trip_end_idx) = self.get_last_trip_end_point_idx(
+                            (_, last_trip_end_idx) = self.get_last_trip_end_point_idx(
                                 len(loc_df) - 1,
                                 last_10_dists_filtered[len(loc_df) - 1],
                                 last_5min_dists_filtered[len(loc_df) - 1],
@@ -178,17 +178,18 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                             segmentation_idxs.append((last_segmented_idx, last_trip_end_idx))
                             logging.info(f'Found trip end at {last_trip_end_idx}')
 
-                    self.last_ts_processed = loc_df.iloc[-1]['metadata_write_ts']
+                            self.last_ts_processed = float(loc_df.iloc[-1]['metadata_write_ts'])
                     last_segmented_idx = len(loc_df)
                     break
 
                 trip_end_idx = idxs[0]
+                logging.info(f'***** SEGMENTING AT {trip_end_idx} / {len(loc_df)-1} *****')
 
-                logging.info(f'***** SEGMENTING AT {trip_end_idx}')
-                logging.info(f'last_10_dists_filtered[{trip_end_idx}] = {last_10_dists_filtered[trip_end_idx]}')
-                logging.info(f'last_10_max_dists[{trip_end_idx}] = {last_10_max_dists[trip_end_idx]}')
-                logging.info(f'last_5min_dists_filtered[{trip_end_idx}] = {last_5min_dists_filtered[trip_end_idx]}')
-                logging.info(f'last_5min_max_dists[{trip_end_idx}] = {last_5min_max_dists[trip_end_idx]}')
+                index_to_print = trip_end_idx
+                logging.info(f'last_10_dists_filtered[{index_to_print}] = {last_10_dists_filtered[index_to_print]}')
+                logging.info(f'last_10_max_dists[{index_to_print}] = {last_10_max_dists[index_to_print]}')
+                logging.info(f'last_5min_dists_filtered[{index_to_print}] = {last_5min_dists_filtered[index_to_print]}')
+                logging.info(f'last_5min_max_dists[{index_to_print}] = {last_5min_max_dists[index_to_print]}')
 
                 ended_before_this, last_trip_end_idx = self.get_last_trip_end_point_idx(
                     trip_end_idx,
@@ -201,7 +202,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     # there was a big gap before trip_end_idx,
                     # which means it is actually the start of the next trip
                     last_segmented_idx = trip_end_idx
-                    self.last_ts_processed = loc_df.iloc[last_segmented_idx]['metadata_write_ts']
+                    self.last_ts_processed = float(loc_df.iloc[last_segmented_idx]['metadata_write_ts'])
+                    logging.info(f'set last_segmented_idx {self.last_ts_processed}')
                 else:
                     # look for the next point that is outside the filter
                     next_start_idx = loc_df[
@@ -213,13 +215,16 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
 
                     if len(next_start_idx) > 0:
                         last_segmented_idx = next_start_idx[0]
-                        self.last_ts_processed = loc_df.iloc[last_segmented_idx]['metadata_write_ts']
+                        logging.info(f'setting last_ts_processed to {last_segmented_idx-1} {loc_df.iloc[last_segmented_idx-1]["metadata_write_ts"]}')
+                        self.last_ts_processed = float(loc_df.iloc[last_segmented_idx-1]['metadata_write_ts'])
                     elif trip_end_idx + 1 < len(loc_df):
                         last_segmented_idx = trip_end_idx + 1
-                        self.last_ts_processed = loc_df.iloc[last_segmented_idx]['metadata_write_ts']
+                        logging.info(f'setting last_ts_processed to {last_segmented_idx} {loc_df.iloc[last_segmented_idx]["metadata_write_ts"]}')
+                        self.last_ts_processed = float(loc_df.iloc[last_segmented_idx]['metadata_write_ts'])
                     else:
                         last_segmented_idx = len(loc_df)
-                        self.last_ts_processed = loc_df.iloc[-1]['metadata_write_ts']
+                        logging.info(f'setting last_ts_processed to {len(loc_df) - 1} {loc_df.iloc[-1]["metadata_write_ts"]}')
+                        self.last_ts_processed = float(loc_df.iloc[-1]['metadata_write_ts'])
 
         esds.store_pipeline_time(
             user_id,
@@ -268,7 +273,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         last_5min_dists_non_nan = last_5min_dists[~np.isnan(last_5min_dists)]
         ended_before_this = len(last_5min_dists_non_nan) == 0
         logging.info("ended_before_this = %s, curr_idx = %s, last_5min_dists_non_nan = %s " % (ended_before_this, curr_idx, last_5min_dists_non_nan))
-        last_10_median_idx = np.median(np.arange(curr_idx - len(last_10_dists), curr_idx + 1))
+        last_10_median_idx = np.median(np.arange(curr_idx - len(last_10_dists), curr_idx + 1)) # TODO weird but necessary to matche the current behavior
         if ended_before_this:
             last_trip_end_index = int(last_10_median_idx)
             logging.debug("last5MinsPoints not found, last_trip_end_index = %s" % last_trip_end_index)
