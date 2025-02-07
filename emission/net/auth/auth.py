@@ -54,7 +54,7 @@ def __getToken__(request, inHeader):
     return userToken
 
 def getSubgroupFromToken(token, config):
-  if "opcode" in config:
+  if config is not None and "opcode" in config:
     # new style study, expects token with sub-group
     tokenParts = token.split('_');
     if len(tokenParts) <= 3:
@@ -83,18 +83,20 @@ def getSubgroupFromToken(token, config):
     logging.debug('Old-style study, expecting token without a subgroup...');
     return None;
 
-def getUUID(dynamicConfig, request, authMethod, inHeader=False):
+def getUUID(request, authMethod, inHeader=False, dynamicConfig = None):
   retUUID = None
   userToken = __getToken__(request, inHeader)
   curr_subgroup = getSubgroupFromToken(userToken, dynamicConfig)
-  suspended_subgroups = dynamicConfig.get("opcode", {}).get("suspended_subgroups", [])
-  if request.path == "/usercache/put":
-    if curr_subgroup in suspended_subgroups:
-        logging.info(f"Received put message for subgroup {curr_subgroup} in {suspended_subgroups=}, returning uuid = None")
-        return None
   retUUID = getUUIDFromToken(authMethod, userToken)
   request.params.user_uuid = retUUID
-  return retUUID
+  # TODO: We should really think about how long we want to continue supporting
+  # non-dynamic config. Check with community on who's using it and what they need.
+  if dynamicConfig is not None:
+    subgroup = getSubgroupFromToken(userToken, dynamicConfig)
+    return {"subgroup": subgroup, "user_id": retUUID}
+  else:
+    # if the authmethod is "skip" or "token_list", the token can be in any format
+    return retUUID
 
 # Should only be used by the profile creation code, since we may not have a
 # UUID yet. All others should only use the UUID.

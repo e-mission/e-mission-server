@@ -244,10 +244,16 @@ def getFromCache():
 @post('/usercache/put')
 def putIntoCache():
   logging.debug("Called userCache.put")
-  user_uuid=getUUID(request)
-  logging.debug("user_uuid %s" % user_uuid)
-  from_phone = request.json['phone_to_server']
-  return usercache.sync_phone_to_server(user_uuid, from_phone)
+  user_context=getUUID(request, return_context=True)
+  logging.debug("user_uuid %s" % user_context)
+  suspended_subgroups = dynamic_config.get("opcode", {}).get("suspended_subgroups", [])
+  logging.debug(f"{suspended_subgroups=}")
+  curr_subgroup = user_context.get('subgroup', None)
+  if curr_subgroup in suspended_subgroups:
+      logging.info(f"Received put message for subgroup {curr_subgroup} in {suspended_subgroups=}, ignoring")
+  else:
+      from_phone = request.json['phone_to_server']
+      usercache.sync_phone_to_server(user_context['user_id'], from_phone)
 
 @post('/usercache/putone')
 def putIntoOneEntry():
@@ -531,13 +537,17 @@ def get_user_or_aggregate_auth(request):
     logging.debug(f"Aggregate call, checking {aggregate_call_auth} policy")
     return aggregate_call_map[aggregate_call_auth](request)
 
-def getUUID(request, inHeader=False):
+def getUUID(request, inHeader=False, return_context=False):
     try:
-        retUUID = enaa.getUUID(dynamic_config, request, auth_method, inHeader)
-        logging.debug("retUUID = %s" % retUUID)
-        if retUUID is None:
+        retContext = enaa.getUUID(request, auth_method, inHeader, dynamic_config)
+        logging.debug("retUUID = %s" % retContext)
+        if retContext is None:
            raise HTTPError(403, "token is valid, but no account found for user")
-        return retUUID
+
+        if return_context:
+            return retContext
+        else:
+            return retContext['user_id']
     except ValueError as e:
         traceback.print_exc()
         abort(403, e)
