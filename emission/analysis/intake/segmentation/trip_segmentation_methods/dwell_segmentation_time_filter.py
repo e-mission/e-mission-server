@@ -139,7 +139,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
 
                 idxs = np.where(
                     # check points that haven't already been segmented
-                    (loc_df.index > last_segmented_idx + 1)
+                    (loc_df.index > last_segmented_idx)
                     & (
                         # i) there was a statemachine/transition indicating a restart before this point
                         (loc_df['tracking_restarted'])
