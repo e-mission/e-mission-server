@@ -105,20 +105,20 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         loc_df['ongoing_motion'] = eaisr.ongoing_motion_in_loc_df(loc_df, self.motion_df)
         loc_df['tracking_restarted'] = eaisr.tracking_restarted_in_loc_df(loc_df, self.transition_df)
         
-        segmentation_idxs = []
-        last_segmented_idx = 0
+        segmentation_idx_pairs = []
+        trip_start_idx = 0
         with ect.Timer() as t_loop:
-            while last_segmented_idx < len(loc_df):
-                print("last_segmented_idx = %s" % last_segmented_idx)
-                # trim off dists of points that were before the last_segmented_idx
+            while trip_start_idx < len(loc_df):
+                logging.info("trip_start_idx = %s" % trip_start_idx)
+                # trim off dists of points that were before the trip_start_idx
                 last_10_dists_filtered = [
-                    dists if row_idx - last_segmented_idx > len(dists)
-                    else dists[last_segmented_idx - row_idx:]
+                    dists if row_idx - trip_start_idx > len(dists)
+                    else dists[trip_start_idx - row_idx:]
                     for row_idx, dists in loc_df['last_10_dists'].items()
                 ]
                 last_5min_dists_filtered = [
-                    dists if row_idx - last_segmented_idx > len(dists)
-                    else dists[last_segmented_idx - row_idx:]
+                    dists if row_idx - trip_start_idx > len(dists)
+                    else dists[trip_start_idx - row_idx:]
                     for row_idx, dists in loc_df['last_5min_dists'].items()
                 ]
 
@@ -137,9 +137,9 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                      for row_idx, dists in enumerate(last_5min_dists_filtered)]
                 )
 
-                idxs = np.where(
+                potential_trip_end_idxs = np.where(
                     # check points that haven't already been segmented
-                    (loc_df.index > last_segmented_idx)
+                    (loc_df.index > trip_start_idx)
                     & (
                         # i) there was a statemachine/transition indicating a restart before this point
                         (loc_df['tracking_restarted'])
@@ -157,12 +157,12 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     )
                 )[0]
 
-                logging.info(f'idxs = {idxs}')
+                logging.info(f'potential_trip_end_idxs = {potential_trip_end_idxs}')
 
-                if len(idxs) == 0:
-                    logging.info(f'No more segments, last_segmented_idx = {last_segmented_idx} / {len(loc_df)-1}')
+                if len(potential_trip_end_idxs) == 0:
+                    logging.info(f'No more segments, trip_start_idx = {trip_start_idx} / {len(loc_df)-1}')
 
-                    if last_segmented_idx < len(loc_df) -1 and len(self.transition_df) > 0:
+                    if trip_start_idx < len(loc_df) -1 and len(self.transition_df) > 0:
                         last_point_ts = loc_df.iloc[-1]['ts']
                         stopped_moving_after_last = self.transition_df[
                             (self.transition_df['ts'] > last_point_ts) & (self.transition_df['transition'] == 2)
@@ -170,59 +170,59 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                         logging.info("looking after %s, found transitions %s" %
                                     (last_point_ts, stopped_moving_after_last))
                         if len(stopped_moving_after_last) > 0:
-                            (_, last_trip_end_idx) = self.get_last_trip_end_point_idx(
+                            (_, trip_end_idx) = self.get_last_trip_end_point_idx(
                                 len(loc_df) - 1,
                                 last_10_dists_filtered[len(loc_df) - 1],
                                 last_5min_dists_filtered[len(loc_df) - 1],
                             )
-                            segmentation_idxs.append((last_segmented_idx, last_trip_end_idx))
-                            logging.info(f'Found trip end at {last_trip_end_idx}')
+                            segmentation_idx_pairs.append((trip_start_idx, trip_end_idx))
+                            logging.info(f'Found trip end at {trip_end_idx}')
 
                             self.last_ts_processed = float(loc_df.iloc[-1]['metadata_write_ts'])
-                    last_segmented_idx = len(loc_df)
+                    trip_start_idx = len(loc_df)
                     break
 
-                trip_end_idx = idxs[0]
-                logging.info(f'***** SEGMENTING AT {trip_end_idx} / {len(loc_df)-1} *****')
+                trip_end_detected_idx = potential_trip_end_idxs[0]
+                logging.info(f'***** TRIP END DETECTED AT {trip_end_detected_idx} / {len(loc_df)-1} *****')
 
-                index_to_print = trip_end_idx
+                index_to_print = trip_end_detected_idx
                 logging.info(f'last_10_dists_filtered[{index_to_print}] = {last_10_dists_filtered[index_to_print]}')
                 logging.info(f'last_10_max_dists[{index_to_print}] = {last_10_max_dists[index_to_print]}')
                 logging.info(f'last_5min_dists_filtered[{index_to_print}] = {last_5min_dists_filtered[index_to_print]}')
                 logging.info(f'last_5min_max_dists[{index_to_print}] = {last_5min_max_dists[index_to_print]}')
 
-                ended_before_this, last_trip_end_idx = self.get_last_trip_end_point_idx(
-                    trip_end_idx,
-                    last_10_dists_filtered[trip_end_idx],
-                    last_5min_dists_filtered[trip_end_idx],
+                ended_before_this, trip_end_idx = self.get_last_trip_end_point_idx(
+                    trip_end_detected_idx,
+                    last_10_dists_filtered[trip_end_detected_idx],
+                    last_5min_dists_filtered[trip_end_detected_idx],
                 )
-                segmentation_idxs.append((last_segmented_idx, last_trip_end_idx))
+                segmentation_idx_pairs.append((trip_start_idx, trip_end_idx))
 
                 if ended_before_this:
-                    # there was a big gap before trip_end_idx,
+                    # there was a big gap before trip_end_detected_idx,
                     # which means it is actually the start of the next trip
-                    last_segmented_idx = trip_end_idx
-                    self.last_ts_processed = float(loc_df.iloc[last_segmented_idx]['metadata_write_ts'])
-                    logging.info(f'set last_segmented_idx {self.last_ts_processed}')
+                    trip_start_idx = trip_end_detected_idx
+                    self.last_ts_processed = float(loc_df.iloc[trip_start_idx]['metadata_write_ts'])
+                    logging.info(f'set last_ts_processed to {self.last_ts_processed}')
                 else:
                     # look for the next point that is outside the filter
                     next_start_idx = loc_df[
-                        (loc_df.index > trip_end_idx) & (
+                        (loc_df.index > trip_end_detected_idx) & (
                             (loc_df['ts_diff'] > 60)
                             | (loc_df['dist_diff'] >= self.distance_threshold)
                         )
                     ].index
 
                     if len(next_start_idx) > 0:
-                        last_segmented_idx = next_start_idx[0]
-                        logging.info(f'setting last_ts_processed to {last_segmented_idx-1} {loc_df.iloc[last_segmented_idx-1]["metadata_write_ts"]}')
-                        self.last_ts_processed = float(loc_df.iloc[last_segmented_idx-1]['metadata_write_ts'])
-                    elif trip_end_idx + 1 < len(loc_df):
-                        last_segmented_idx = trip_end_idx + 1
-                        logging.info(f'setting last_ts_processed to {last_segmented_idx} {loc_df.iloc[last_segmented_idx]["metadata_write_ts"]}')
-                        self.last_ts_processed = float(loc_df.iloc[last_segmented_idx]['metadata_write_ts'])
+                        trip_start_idx = next_start_idx[0]
+                        logging.info(f'setting last_ts_processed to {trip_start_idx-1} {loc_df.iloc[trip_start_idx-1]["metadata_write_ts"]}')
+                        self.last_ts_processed = float(loc_df.iloc[trip_start_idx-1]['metadata_write_ts'])
+                    elif trip_end_detected_idx + 1 < len(loc_df):
+                        trip_start_idx = trip_end_detected_idx + 1
+                        logging.info(f'setting last_ts_processed to {trip_start_idx} {loc_df.iloc[trip_start_idx]["metadata_write_ts"]}')
+                        self.last_ts_processed = float(loc_df.iloc[trip_start_idx]['metadata_write_ts'])
                     else:
-                        last_segmented_idx = len(loc_df)
+                        trip_start_idx = len(loc_df)
                         logging.info(f'setting last_ts_processed to {len(loc_df) - 1} {loc_df.iloc[-1]["metadata_write_ts"]}')
                         self.last_ts_processed = float(loc_df.iloc[-1]['metadata_write_ts'])
 
@@ -234,9 +234,9 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         )
 
         segmentation_points = [
-            (ad.AttrDict(loc_df.iloc[last_segmented_idx]),
-             ad.AttrDict(loc_df.iloc[last_trip_end_idx]))
-            for (last_segmented_idx, last_trip_end_idx) in segmentation_idxs
+            (ad.AttrDict(loc_df.iloc[start_idx]),
+             ad.AttrDict(loc_df.iloc[end_idx]))
+            for (start_idx, end_idx) in segmentation_idx_pairs
         ]
 
         logging.info(f'self.last_ts_processed = {self.last_ts_processed}')
