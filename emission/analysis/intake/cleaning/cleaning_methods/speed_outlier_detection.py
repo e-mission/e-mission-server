@@ -24,7 +24,7 @@ class BoxplotOutlier(object):
             df_to_use = with_speeds_df[with_speeds_df.speed > 0]
         else:
             df_to_use = with_speeds_df
-        quartile_vals = df_to_use.quantile([0.25, 0.75]).speed
+        quartile_vals = df_to_use["speed"].quantile([0.25, 0.75])
         logging.debug("quartile values are %s" % quartile_vals)
         iqr = quartile_vals.iloc[1] - quartile_vals.iloc[0]
         logging.debug("iqr %s" % iqr)
