@@ -98,9 +98,9 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.last_ts_processed = None
         logging.info("Last ts processed = %s" % self.last_ts_processed)
 
-        loc_df['ts_diff'] = loc_df['ts'].diff()
-        loc_df['last_10_dists'], loc_df['last_5min_dists'] = self.compute_distances(loc_df)
-        loc_df['dist_diff'] = loc_df['last_10_dists'].apply(lambda x: x[-1])
+        loc_df['recent_points_diffs'] = self.compute_recent_point_diffs(loc_df)
+        loc_df['dist_diff'] = loc_df['recent_points_diffs'].apply(lambda x: x[0, -1])
+        loc_df['ts_diff'] = loc_df['recent_points_diffs'].apply(lambda x: x[1, -1])
         loc_df['speed_diff'] = loc_df['dist_diff'] / loc_df['ts_diff']
         loc_df['ongoing_motion'] = eaisr.ongoing_motion_in_loc_df(loc_df, self.motion_df)
         loc_df['tracking_restarted'] = eaisr.tracking_restarted_in_loc_df(loc_df, self.transition_df)
@@ -111,30 +111,24 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             while trip_start_idx < len(loc_df):
                 logging.info("trip_start_idx = %s" % trip_start_idx)
                 # trim off dists of points that were before the trip_start_idx
-                last_10_dists_filtered = [
-                    dists if row_idx - trip_start_idx > len(dists)
-                    else dists[trip_start_idx - row_idx:]
-                    for row_idx, dists in loc_df['last_10_dists'].items()
-                ]
-                last_5min_dists_filtered = [
-                    dists if row_idx - trip_start_idx > len(dists)
-                    else dists[trip_start_idx - row_idx:]
-                    for row_idx, dists in loc_df['last_5min_dists'].items()
+                recent_diffs_filtered = [
+                    diffs if row_idx - trip_start_idx > diffs.shape[1]
+                    else diffs[:, trip_start_idx - row_idx:]
+                    for row_idx, diffs in loc_df['recent_points_diffs'].items()
                 ]
 
-                last_10_max_dists = np.array(
-                    [dists.max()
-                        # if we don't have enough points, we can't make a decision
-                        if len(dists) >= self.point_threshold - 2 # TODO weird but necessary to match the current behavior
-                        else np.inf
-                     for dists in last_10_dists_filtered]
-                )
-                last_5min_max_dists = np.array(
-                    [dists.max()
-                        # if we don't have points going back far enough, we can't make a decision
-                        if loc_df.iloc[row_idx - len(dists)]['ts'] < loc_df.iloc[row_idx]['ts'] - (self.time_threshold - 30)
-                        else np.inf
-                     for row_idx, dists in enumerate(last_5min_dists_filtered)]
+                max_recent_dist_diffs = np.array(
+                    [np.inf
+                        # 'inf' means we can't make a decision because:
+                        # we don't have enough recent points (TODO the -2 weird, but necessary to match the current behavior)
+                        if diffs.shape[1] < self.point_threshold - 2
+                        # or the oldest point within the time filter is not old enough
+                        or np.sum(
+                            (diffs[1, :] < self.time_threshold) &
+                            (diffs[1, :] > self.time_threshold - 30)
+                        ) == 0
+                     else diffs[0, :].max()
+                     for diffs in recent_diffs_filtered]
                 )
 
                 potential_trip_end_idxs = np.where(
@@ -152,8 +146,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                         | ((loc_df['ts_diff'] > 2 * self.time_threshold)
                            & (loc_df['speed_diff'] < (self.distance_threshold / self.time_threshold)))
                         # v) common case: sufficient recent points and all are within distance_threshold
-                        | ((last_10_max_dists < self.distance_threshold)
-                           & (last_5min_max_dists < self.distance_threshold))
+                        | (max_recent_dist_diffs < self.distance_threshold)
                     )
                 )[0]
 
@@ -172,8 +165,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                         if len(stopped_moving_after_last) > 0:
                             (_, trip_end_idx) = self.get_last_trip_end_point_idx(
                                 len(loc_df) - 1,
-                                last_10_dists_filtered[len(loc_df) - 1],
-                                last_5min_dists_filtered[len(loc_df) - 1],
+                                recent_diffs_filtered[len(loc_df) - 1],
                             )
                             segmentation_idx_pairs.append((trip_start_idx, trip_end_idx))
                             logging.info(f'Found trip end at {trip_end_idx}')
@@ -184,17 +176,12 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
 
                 trip_end_detected_idx = potential_trip_end_idxs[0]
                 logging.info(f'***** TRIP END DETECTED AT {trip_end_detected_idx} / {len(loc_df)-1} *****')
-
-                index_to_print = trip_end_detected_idx
-                logging.info(f'last_10_dists_filtered[{index_to_print}] = {last_10_dists_filtered[index_to_print]}')
-                logging.info(f'last_10_max_dists[{index_to_print}] = {last_10_max_dists[index_to_print]}')
-                logging.info(f'last_5min_dists_filtered[{index_to_print}] = {last_5min_dists_filtered[index_to_print]}')
-                logging.info(f'last_5min_max_dists[{index_to_print}] = {last_5min_max_dists[index_to_print]}')
+                logging.info(f'recent_diffs_filtered[{trip_end_detected_idx}] = {recent_diffs_filtered[trip_end_detected_idx]}')
+                logging.info(f'max_recent_dist_diffs[{trip_end_detected_idx}] = {max_recent_dist_diffs[trip_end_detected_idx]}')
 
                 ended_before_this, trip_end_idx = self.get_last_trip_end_point_idx(
                     trip_end_detected_idx,
-                    last_10_dists_filtered[trip_end_detected_idx],
-                    last_5min_dists_filtered[trip_end_detected_idx],
+                    recent_diffs_filtered[trip_end_detected_idx],
                 )
                 segmentation_idx_pairs.append((trip_start_idx, trip_end_idx))
 
@@ -247,33 +234,36 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         return segmentation_points
 
 
-    def compute_distances(self, loc_df):
-        lat, lon = loc_df["latitude"].to_numpy(), loc_df["longitude"].to_numpy()
-        timestamps = loc_df["ts"].to_numpy()
-        indices = np.arange(len(loc_df))
-
+    def compute_recent_point_diffs(self, loc_df):
+        indices = loc_df.index
         last_10_start_indices = np.searchsorted(indices, indices - self.point_threshold)
-        last_10_distances = pd.Series([
-            haversine(lon[last_10_start_indices[i]:i], lat[last_10_start_indices[i]:i], lon[i], lat[i])
-            if last_10_start_indices[i] < i else np.empty(self.point_threshold)
-            for i in range(len(loc_df))
-        ])
-
+        timestamps = loc_df["ts"].to_numpy()
         last_5min_start_indices = np.searchsorted(timestamps, timestamps - self.time_threshold, side='right')
-        last_5min_distances = pd.Series([
-            haversine(lon[last_5min_start_indices[i]:i], lat[last_5min_start_indices[i]:i], lon[i], lat[i])
-            if last_5min_start_indices[i] < i else np.full(self.point_threshold, np.nan)
+
+        start_indices = [min(a, b) for a, b in zip(last_10_start_indices, last_5min_start_indices)]
+        lat, lon = loc_df["latitude"].to_numpy(), loc_df["longitude"].to_numpy()
+
+        recent_dists_and_times = pd.Series([
+            np.array([
+                haversine(lon[start_indices[i]:i], lat[start_indices[i]:i], lon[i], lat[i]),
+                timestamps[i] - timestamps[start_indices[i]:i],
+            ])
+            if start_indices[i] < i else np.empty((2, self.point_threshold))
             for i in range(len(loc_df))
         ])
 
-        return last_10_distances, last_5min_distances
+        return recent_dists_and_times
 
 
-    def get_last_trip_end_point_idx(self, curr_idx, last_10_dists, last_5min_dists):
-        last_5min_dists_non_nan = last_5min_dists[~np.isnan(last_5min_dists)]
-        ended_before_this = len(last_5min_dists_non_nan) == 0
-        logging.info("ended_before_this = %s, curr_idx = %s, last_5min_dists_non_nan = %s " % (ended_before_this, curr_idx, last_5min_dists_non_nan))
-        last_10_median_idx = np.median(np.arange(curr_idx - len(last_10_dists), curr_idx + 1)) # TODO weird but necessary to matche the current behavior
+    def get_last_trip_end_point_idx(self, curr_idx, recent_diffs: np.ndarray):
+        recent_diffs_non_na = recent_diffs[:, ~np.isnan(recent_diffs[0, :])]
+        num_recent_diffs_in_point_threshold = min(len(recent_diffs_non_na[0, :]), self.point_threshold)
+        num_recent_diffs_in_time_threshold = sum(recent_diffs_non_na[1, :] < self.time_threshold)
+        ended_before_this = num_recent_diffs_in_time_threshold == 0
+        logging.debug(f"curr_idx = {curr_idx}, " +
+              f"recent_diffs_in_point_threshold = {num_recent_diffs_in_point_threshold}, " +
+              f"recent_diffs_in_time_threshold = {num_recent_diffs_in_time_threshold}")
+        last_10_median_idx = np.median(np.arange(curr_idx - num_recent_diffs_in_point_threshold, curr_idx + 1)) # TODO weird but necessary to match the current behavior
         if ended_before_this:
             last_trip_end_index = int(last_10_median_idx)
             logging.debug("last5MinsPoints not found, last_trip_end_index = %s" % last_trip_end_index)
