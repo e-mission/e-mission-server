@@ -30,17 +30,26 @@ def sync_server_to_phone(uuid):
     return retrievedData
 
 def _remove_dots(entry_doc):
+    keys_to_munge = []
     for key in entry_doc:
         # print(f"Checking {key=}")
         if isinstance(entry_doc[key], dict):
             # print(f"Found dict for {key=}, recursing")
             _remove_dots(entry_doc[key])
         if '.' in key:
-            munged_key = key.replace(".", "_")
-            logging.info(f"Found {key=} with dot, munged to {munged_key=}")
-            # Get and delete in one swoop
-            # https://stackoverflow.com/a/11277439
-            entry_doc[munged_key] = entry_doc.pop(key, None)
+            logging.info(f"Found {key=} with dot, adding to {keys_to_munge=}")
+            keys_to_munge.append(key)
+
+    logging.info(f"Before modifying, {keys_to_munge=}")
+
+    for ktm in keys_to_munge:
+        munged_key = ktm.replace(".", "_")
+        # Get and delete in one swoop
+        # https://stackoverflow.com/a/11277439
+        logging.info(f"Replacing original dotted key {ktm} with {munged_key=}")
+        entry_doc[munged_key] = entry_doc.pop(ktm, None)
+
+    logging.info(f"(After modifying, {entry_doc.keys()=}")
 
 def sync_phone_to_server(uuid, data_from_phone):
     """

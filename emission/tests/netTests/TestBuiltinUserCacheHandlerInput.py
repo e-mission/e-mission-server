@@ -345,6 +345,122 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(self.uc1.getMessage()), 0)
         self.assertEqual(len(list(self.ts1.find_entries())), 33)
 
+    def testRemoteDotsIterateWhileModifyingSingleKey(self):
+        test_with_single_key = {'ts': 1734661726.167,
+            'client_app_version': '1.9.4',
+            'name': 'open_notification',
+            'client_os_version': '18.1.1',
+            'reading': {'message': 'Please label your recent trips',
+            'title': 'Trip labels requested',
+            'additionalData': {
+                'coldstart': True, 'title': 'Trip labels requested',
+                'message': 'Please label your recent trips',
+                'foreground': False,
+                'google.c.fid': 'TEST_FID',
+                'gcm_message_id': 'TEST_MESSAGE',
+                'google_c_sender_id': 'TEST_SENDER',
+                'google_c_a_e': '1'}}}
+        self.assertEqual(len(test_with_single_key["reading"]["additionalData"]), 8)
+        self.assertIn("google.c.fid",
+            test_with_single_key["reading"]["additionalData"])
+        mauc._remove_dots(test_with_single_key)
+        self.assertEqual(len(test_with_single_key["reading"]["additionalData"]), 8)
+        self.assertIn("google_c_fid",
+            test_with_single_key["reading"]["additionalData"])
+        self.assertNotIn("google.c.fid",
+            test_with_single_key["reading"]["additionalData"])
+
+    def testRemoteDotsIterateWhileModifyingMultiKey(self):
+        test_with_multiple_keys = {'ts': 1734661726.167,
+            'client_app_version': '1.9.4',
+            'name': 'open_notification',
+            'client_os_version': '18.1.1',
+            'reading': {'message': 'Please label your recent trips',
+            'title': 'Trip labels requested',
+            'additionalData': {'coldstart': True,
+                'title': 'Trip labels requested',
+                'message': 'Please label your recent trips',
+                'foreground': False,
+                'gcm.message_id': 'TEST_MESSAGE',
+                'google.c.sender.id': 'TEST_SENDER',
+                'google.c.a.e': '1',
+                'google.c.fid': 'TEST_FID'}}}
+
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        mauc._remove_dots(test_with_multiple_keys)
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm_message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_sender_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_a_e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+        self.assertNotIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+    def testRemoteDotsIterateWhileModifyingMultiKey2(self):
+        test_with_multiple_keys = {'ts': 1738001143.67,
+            'client_app_version': '1.9.6',
+            'name': 'open_notification',
+            'client_os_version': '18.1.1',
+            'reading': {'message': 'Please label your recent trips',
+            'title': 'Trip labels requested',
+            'additionalData': {'coldstart': True,
+                'title': 'Trip labels requested',
+                'message': 'Please label your recent trips',
+                'foreground': False,
+                'gcm.message_id': 'TEST_MESSAGE',
+                'google.c.sender.id': 'TEST_SENDER',
+                'google.c.a.e': '1',
+                'google.c.fid': 'TEST_FID'}}}
+
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        mauc._remove_dots(test_with_multiple_keys)
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm_message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_sender_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_a_e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+        self.assertNotIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+
 if __name__ == '__main__':
     import emission.tests.common as etc
 
