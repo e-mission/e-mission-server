@@ -91,12 +91,12 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.motion_df = timeseries.get_data_df("background/motion_activity", time_query)
 
         if len(self.transition_df) > 0:
-            logging.debug("self.transition_df = %s" % self.transition_df[["fmt_time", "transition"]])
+            logging.debug(f"self.transition_df = {self.transition_df[['fmt_time', 'transition']]}")
         else:
             logging.debug("self.transition_df is empty")
 
         self.last_ts_processed = None
-        logging.info("Last ts processed = %s" % self.last_ts_processed)
+        logging.info(f"Last ts processed = {self.last_ts_processed}")
 
         loc_df['recent_points_diffs'] = self.compute_recent_point_diffs(loc_df)
         loc_df['dist_diff'] = loc_df['recent_points_diffs'].apply(lambda x: x[0, -1])
@@ -109,7 +109,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         trip_start_idx = 0
         with ect.Timer() as t_loop:
             while trip_start_idx < len(loc_df):
-                logging.info("trip_start_idx = %s" % trip_start_idx)
+                logging.info(f"trip_start_idx = {trip_start_idx}")
                 # trim off dists of points that were before the trip_start_idx
                 recent_diffs_filtered = [
                     diffs if row_idx - trip_start_idx > diffs.shape[1]
@@ -160,8 +160,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                         stopped_moving_after_last = self.transition_df[
                             (self.transition_df['ts'] > last_point_ts) & (self.transition_df['transition'] == 2)
                         ]
-                        logging.info("looking after %s, found transitions %s" %
-                                    (last_point_ts, stopped_moving_after_last))
+                        logging.info(f"looking after {last_point_ts}, " +
+                              f"found transitions {stopped_moving_after_last}")
                         if len(stopped_moving_after_last) > 0:
                             (_, trip_end_idx) = self.get_last_trip_end_point_idx(
                                 len(loc_df) - 1,
@@ -227,10 +227,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         ]
 
         logging.info(f'self.last_ts_processed = {self.last_ts_processed}')
-        logging.info("Returning segmentation_points:\n %s" % '\n'.join([
-            f'{p1["index"]}, {p1["ts"]} -> {p2["index"]}, {p2["ts"]}'
-            for (p1, p2) in segmentation_points]))
-        
+        for (p1, p2) in segmentation_points:
+            logging.info(f"{p1['index']}, {p1['ts']} -> {p2['index']}, {p2['ts']}")        
         return segmentation_points
 
 
@@ -266,12 +264,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         last_10_median_idx = np.median(np.arange(curr_idx - num_recent_diffs_in_point_threshold, curr_idx + 1)) # TODO weird but necessary to match the current behavior
         if ended_before_this:
             last_trip_end_index = int(last_10_median_idx)
-            logging.debug("last5MinsPoints not found, last_trip_end_index = %s" % last_trip_end_index)
+            logging.debug(f"last_10_median_idx = {last_10_median_idx}, last_trip_end_index = {last_trip_end_index}")
         else:
-            last_5min_median_idx = np.median(np.arange(curr_idx - len(last_5min_dists_non_nan), curr_idx))
+            last_5min_median_idx = np.median(np.arange(curr_idx - num_recent_diffs_in_time_threshold, curr_idx))
             last_trip_end_index = int(min(last_5min_median_idx, last_10_median_idx))
-            logging.debug("last5MinsPoints and last10PointsMedian found, last_trip_end_index = %s" % last_trip_end_index)
+            logging.debug(f"last_5min_median_idx = {last_5min_median_idx}, last_10_median_idx = {last_10_median_idx}, last_trip_end_index = {last_trip_end_index}")
 
-        logging.debug("ended_before_this = %s, last_trip_end_index = %s" % (ended_before_this, last_trip_end_index))
+        logging.info(f"ended_before_this = {ended_before_this}, last_trip_end_index = {last_trip_end_index}")
         return (ended_before_this, last_trip_end_index)
-
