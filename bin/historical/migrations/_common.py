@@ -33,6 +33,10 @@ def run_on_all_deployments(fn_to_run):
     The list of deployments (PROD_LIST) is retrieved from the
       nrel-openpath-deploy-configs repo upon initialization of this module.
     """
+    print(f'About to run {fn_to_run.__name__} on {len(PROD_LIST)} deployments. Proceed? [y/n]')
+    if input() != 'y':
+        print("Aborting")
+        return
     for prod in PROD_LIST:
         prod_db_name = prod.replace("-", "_")
         print(f"Running {fn_to_run.__name__} for {prod} on DB {prod_db_name}")
