@@ -6,6 +6,7 @@ import json
 import os
 import time
 import pandas as pd
+import arrow
 
 from builtins import *
 from future import standard_library
@@ -72,7 +73,6 @@ class TestUserStats(unittest.TestCase):
         self.assertIn("total_trips", profile, "User profile should contain 'total_trips'.")
         self.assertIn("labeled_trips", profile, "User profile should contain 'labeled_trips'.")
         self.assertIn("pipeline_range", profile, "User profile should contain 'pipeline_range'.")
-        self.assertIn("last_call_ts", profile, "User profile should contain 'last_call_ts'.")
 
         expected_total_trips = 5
         expected_labeled_trips = 0
@@ -96,23 +96,29 @@ class TestUserStats(unittest.TestCase):
                          f"Expected end_ts to be {expected_end_ts}, got {pipeline_range['end_ts']}")
 
     def testLastCall(self):
-        # Call the function with all required arguments
-        test_call_ts = time.time()
-        enac.store_server_api_time(self.testUUID, "test_call_ts", test_call_ts, 69420)
-        etc.runIntakePipeline(self.testUUID)
+        # TODO: should this be here or in TestWebserver?
+        import emission.net.api.cfc_webapp as enacw
 
-        # Retrieve the profile from the database
+        # Retrieve the initial user profile from the database
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertNotIn("last_call_ts", profile)
+
+        enacw.request.params.user_uuid = self.testUUID
+        enacw.request.path = "TEST_PATH_CURRENTLY_IGNORED"
+        enacw.before_request()
+        enacw.after_request()
+
+        # Retrieve the updated profile from the database
         profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
 
-        # Verify that last_call_ts is updated correctly
-        expected_last_call_ts = test_call_ts
+        self.assertIn("last_call_ts", profile)
+
+        # We don't know exactly when the profile was updated, but we do know
+        # that it must have been after the start
         actual_last_call_ts = profile.get("last_call_ts")
 
-        self.assertEqual(
-            actual_last_call_ts,
-            expected_last_call_ts,
-            f"Expected last_call_ts to be {expected_last_call_ts}, got {actual_last_call_ts}"
-        )
+        self.assertGreater(actual_last_call_ts, enacw.request.params.start_ts)
+        self.assertLess(actual_last_call_ts, arrow.now().timestamp())
 
 if __name__ == '__main__':
     # Configure logging for the test

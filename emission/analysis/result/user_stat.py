@@ -7,23 +7,21 @@ from typing import Optional, Dict, Any
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.user as ecwu
 
-def get_last_call_timestamp(ts: esta.TimeSeries) -> Optional[int]:
+def update_last_call_timestamp(user_id: str, call_path: str) -> Optional[int]:
     """
-    Retrieves the last API call timestamp.
+    Updates the user profile with server call starts
 
-    :param ts: The time series object.
-    :type ts: esta.TimeSeries
-    :return: The last call timestamp or None if not found.
-    :rtype: Optional[int]
+    :param user_id: The user's UUID
+    :type ts: str
+    :param call_path: Can be used to store different call stats (e.g. last call
+        versus last push, currently a NOP)
+    :type ts: str
+    :return: None
     """
-    last_call_ts = ts.get_first_value_for_field(
-        key='stats/server_api_time',
-        field='data.ts',
-        sort_order=pymongo.DESCENDING
-    )
-    logging.debug(f"Last call timestamp: {last_call_ts}")
-    return None if last_call_ts == -1 else last_call_ts
-
+    update_data = {
+        "last_call_ts": arrow.now().timestamp()
+    }
+    update_user_profile(user_id, update_data)
 
 def update_user_profile(user_id: str, data: Dict[str, Any]) -> None:
     """
@@ -86,27 +84,3 @@ def get_and_store_pipeline_dependent_user_stats(user_id: str, trip_key: str) -> 
     except Exception as e:
         logging.error(f"Error in get_and_store_dependent_user_stats for user_id {user_id}: {e}")
 
-def get_and_store_pipeline_independent_user_stats(user_id: str) -> None:
-    """
-    Aggregates and stores pipeline indepedent statistics into the user profile.
-    These are statistics based on raw data, such as the last call, last push
-    or last location received.
-
-    :param user_id: The UUID of the user.
-    :type user_id: str
-    :return: None
-    """
-
-    try:
-        logging.info(f"Starting get_and_store_pipeline_independent_user_stats for user_id: {user_id}")
-        ts = esta.TimeSeries.get_time_series(user_id)
-        last_call_ts = get_last_call_timestamp(ts)
-        logging.info(f"Last call timestamp: {last_call_ts}")
-
-        update_data = {
-            "last_call_ts": last_call_ts
-        }
-        update_user_profile(user_id, update_data)
-
-    except Exception as e:
-        logging.error(f"Error in get_and_store_independent_user_stats for user_id {user_id}: {e}")
