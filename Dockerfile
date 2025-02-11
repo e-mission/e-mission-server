@@ -18,6 +18,12 @@ RUN apt-get install -y -qq git
 # install jq to parse json within bash scripts
 RUN apt-get install -y jq
 
+# Upgrade to resolve KEVs
+# TODO: Switch to more recent LTS
+# we are currently on jammy (22.04)
+# most recent LTS is numbat (24.04)
+RUN apt-get -y upgrade
+
 # cleanup
 RUN apt-get -y remove --purge build-essential
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
