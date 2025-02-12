@@ -17,6 +17,7 @@ import pymongo
 # Our imports
 from emission.core.get_database import get_usercache_db
 import emission.core.common as ecc
+import emission.analysis.result.user_stat as earus
 
 def sync_server_to_phone(uuid):
     """
@@ -57,6 +58,7 @@ def sync_phone_to_server(uuid, data_from_phone):
     """
     usercache_db = get_usercache_db()
 
+    last_location_entry = {"data": {"ts": -1}}
     for data in data_from_phone:
         # logging.debug("About to insert %s into the database" % data)
         data.update({"user_id": uuid})
@@ -89,7 +91,14 @@ def sync_phone_to_server(uuid, data_from_phone):
             if 'ok' in result.raw_result and result.raw_result['ok'] != 1.0:
                 logging.error("In sync_phone_to_server, err = %s" % result.raw_result['writeError'])
                 raise Exception()
+
+            if data["metadata"]["key"] == "background/location":
+                last_location_entry = data
+
         except pymongo.errors.PyMongoError as e:
             logging.error(f"In sync_phone_to_server, while executing {update_query=} on {document=}")
             logging.exception(e)
             raise
+
+    earus.update_upload_timestamp(uuid, "last_location_ts", last_location_entry["data"].get("ts", -1))
+    earus.update_upload_timestamp(uuid, "last_phone_data_ts", data["metadata"]["write_ts"])

@@ -33,6 +33,10 @@ class TestBuiltinUserCache(unittest.TestCase):
   def setUp(self):
     self.testUserUUID = uuid.uuid4()
     emission.tests.common.dropAllCollections(edb._get_current_db())
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    if profile is None:
+        # Initialize the profile if it does not exist
+        edb.get_profile_db().insert_one({"user_id": self.testUserUUID})
 
   def tearDown(self):
     emission.tests.common.dropAllCollections(edb._get_current_db())
@@ -98,6 +102,10 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertEqual(len(retrievedData), 0)
 
   def testGetTwoSetsOfUserDataFromPhone(self):
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertNotIn("last_location_ts", profile)
+    self.assertNotIn("last_phone_data_ts", profile)
+
     user_data_from_phone = [
       {
         "metadata": {
@@ -124,6 +132,10 @@ class TestBuiltinUserCache(unittest.TestCase):
     ]
 
     mauc.sync_phone_to_server(self.testUserUUID, user_data_from_phone)
+
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertEqual(profile["last_location_ts"], -1)
+    self.assertEqual(profile["last_phone_data_ts"], 1435856337)
 
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
     msgs = uc.getMessage(key_list = ["diary/mode-confirmation"])
@@ -170,6 +182,10 @@ class TestBuiltinUserCache(unittest.TestCase):
             self.assertLessEqual(rd["metadata"]["write_ts"], end_ts)
 
   def testGetTwoSetsOfBackgroundDataFromPhone(self):
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertNotIn("last_location_ts", profile)
+    self.assertNotIn("last_phone_data_ts", profile)
+
     background_data_from_phone = [
       {
         "metadata": {
@@ -177,7 +193,7 @@ class TestBuiltinUserCache(unittest.TestCase):
           "type": "message",
           "key": "background/location",
         },
-        "data" : { "mLat": 45.64, "mLng": 21.35, "mElapsedTime": 112233, }
+        "data" : { "mLat": 45.64, "mLng": 21.35, "mElapsedTime": 112233, "ts": 1435856234}
       },
       {
         "metadata": {
@@ -185,7 +201,7 @@ class TestBuiltinUserCache(unittest.TestCase):
           "type": "message",
           "key": "background/location",
         },
-        "data" : { "mLat": 49.64, "mLng": 25.35, "mElapsedTime": 142233, }
+        "data" : { "mLat": 49.64, "mLng": 25.35, "mElapsedTime": 142233, "ts": 1435886336}
       },
       {
         "metadata": {
@@ -223,6 +239,10 @@ class TestBuiltinUserCache(unittest.TestCase):
 
     mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone)
 
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertEqual(profile["last_location_ts"], 1435886336)
+    self.assertEqual(profile["last_phone_data_ts"], 1435886337)
+
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
     self.assertEqual(len(uc.getMessage(["background/location"])), 2)
     self.assertEqual(len(uc.getMessage(["background/activity"])), 2)
@@ -233,18 +253,20 @@ class TestBuiltinUserCache(unittest.TestCase):
 
   def testClearBackgroundData(self):
     start_ts = time.time()
+
+    first_ts = time.time()
     background_data_from_phone = [
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": first_ts,
           "type": "message",
           "key": "background/location",
         },
-        "data" : { "mLat": 45.64, "mLng": 21.35, "mElapsedTime": 112233, }
+        "data" : { "mLat": 45.64, "mLng": 21.35, "mElapsedTime": 112233, "ts": first_ts}
       },
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": first_ts,
           "type": "message",
           "key": "background/activity",
         },
@@ -252,7 +274,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": first_ts,
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -263,18 +285,19 @@ class TestBuiltinUserCache(unittest.TestCase):
     # sleep() expects an argument in seconds. We want to sleep for 5 ms.
     time.sleep(old_div(float(5),1000))
 
+    second_ts = time.time()
     background_data_from_phone_2 = [
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": second_ts,
           "type": "message",
           "key": "background/location",
         },
-        "data" : { "mLat": 49.64, "mLng": 25.35, "mElapsedTime": 142233, }
+        "data" : { "mLat": 49.64, "mLng": 25.35, "mElapsedTime": 142233, "ts": second_ts}
       },
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": second_ts,
           "type": "message",
           "key": "background/activity",
         },
@@ -282,7 +305,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": second_ts,
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -301,26 +324,27 @@ class TestBuiltinUserCache(unittest.TestCase):
 
     time.sleep(old_div(float(5), 1000))
 
+    third_ts = time.time()
     background_data_from_phone_3 = [
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": third_ts,
           "type": "message",
           "key": "background/location",
         },
-        "data" : { "mLat": 45.64, "mLng": 21.35, "mElapsedTime": 112233, }
+        "data" : { "mLat": 45.64, "mLng": 21.35, "mElapsedTime": 112233, "ts": third_ts}
       },
       {
         "metadata": {
-          "write_ts": time.time() + 30,
+          "write_ts": third_ts + 30,
           "type": "message",
           "key": "background/location",
         },
-        "data" : { "mLat": 49.64, "mLng": 25.35, "mElapsedTime": 142233, }
+        "data" : { "mLat": 49.64, "mLng": 25.35, "mElapsedTime": 142233, "ts": third_ts + 30}
       },
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": third_ts,
           "type": "message",
           "key": "background/activity",
         },
@@ -328,7 +352,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": time.time() + 30,
+          "write_ts": third_ts + 30,
           "type": "message",
           "key": "background/activity",
         },
@@ -336,7 +360,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": time.time(),
+          "write_ts": third_ts,
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -344,7 +368,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": time.time() + 30,
+          "write_ts": third_ts + 30,
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -352,9 +376,27 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
     ]
 
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertNotIn("last_location_ts", profile)
+    self.assertNotIn("last_phone_data_ts", profile)
+
     mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone)
+
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertEqual(profile["last_location_ts"], first_ts)
+    self.assertEqual(profile["last_phone_data_ts"], first_ts)
+
     mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone_2)
+
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertEqual(profile["last_location_ts"], second_ts)
+    self.assertEqual(profile["last_phone_data_ts"], second_ts)
+
     mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone_3)
+
+    profile = edb.get_profile_db().find_one({"user_id": self.testUserUUID})
+    self.assertEqual(profile["last_location_ts"], third_ts + 30)
+    self.assertEqual(profile["last_phone_data_ts"], third_ts + 30)
 
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
 

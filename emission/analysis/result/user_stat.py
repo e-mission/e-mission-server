@@ -7,12 +7,29 @@ from typing import Optional, Dict, Any
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.user as ecwu
 
+def update_upload_timestamp(user_id: str, stat_name: str, ts: float) -> None:
+    """
+    Updates the upload timestamps in the profile
+
+    :param user_id: The user's UUID
+    :type user_id: str
+    :param stat_name: The field name that is updated
+    :type stat_name: str
+    :param ts: The timestamp to store (may not always be 'now')
+    :type ts: float
+    :return: None
+    """
+    update_data = {
+        stat_name: ts
+    }
+    update_user_profile(user_id, update_data)
+
 def update_last_call_timestamp(user_id: str, call_path: str) -> Optional[int]:
     """
     Updates the user profile with server call starts
 
     :param user_id: The user's UUID
-    :type ts: str
+    :type user_id: str
     :param call_path: Can be used to store different call stats
     :type ts: str
     :return: None
