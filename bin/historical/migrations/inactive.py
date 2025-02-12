@@ -3,6 +3,7 @@ import pymongo
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 import bin.debug.common as common
+from _common import run_on_all_deployments
 
 NOW_SECONDS = arrow.now().timestamp()
 
@@ -44,6 +45,18 @@ def purge_users(uuids):
         print(f'Purging user {u}')
         common.purge_entries_for_user(u, True)
 
+def start_inactive(threshold_s, purge):
+    total_users = edb.get_uuid_db().count_documents({})
+    print(f'Total users: {total_users}')
+    uuids_entries = edb.get_uuid_db().find()
+    print('Finding inactive users...')
+    inactive_uuids = find_inactive_uuids(uuids_entries, threshold_s)
+    print(f'Of {total_users} users, found {len(inactive_uuids)} inactive users:')
+    print(inactive_uuids)
+
+    if purge:
+        purge_users(inactive_uuids)
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(
@@ -56,14 +69,6 @@ if __name__ == '__main__':
 
     threshold_s = 60 * 60 * 24 * int(args.threshold)
 
-    total_users = edb.get_uuid_db().count_documents({})
-    print(f'Total users: {total_users}')
-    uuids_entries = edb.get_uuid_db().find()
-    print('Finding inactive users...')
-    inactive_uuids = find_inactive_uuids(uuids_entries, threshold_s)
-    print(f'Of {total_users} users, found {len(inactive_uuids)} inactive users:')
-    print(inactive_uuids)
+    run_on_all_deployments(start_inactive, threshold_s, args.purge)
 
-    if args.purge:
-        purge_users(inactive_uuids)
 
