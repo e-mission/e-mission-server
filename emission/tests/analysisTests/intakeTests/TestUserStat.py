@@ -35,16 +35,12 @@ class TestUserStats(unittest.TestCase):
         """
         # Set up the real example data with entries
         self.testUUID = uuid.uuid4()
-        with open("emission/tests/data/real_examples/shankari_2015-aug-21") as fp:
-            self.entries = json.load(fp, object_hook = esj.wrapped_object_hook)
         # Retrieve the user profile
-        etc.setupRealExampleWithEntries(self)
         profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
         if profile is None:
             # Initialize the profile if it does not exist
             edb.get_profile_db().insert_one({"user_id": self.testUUID})
 
-        etc.runIntakePipeline(self.testUUID)
         logging.debug("UUID = %s" % (self.testUUID))
 
     def tearDown(self):
@@ -57,12 +53,18 @@ class TestUserStats(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_profile_db().delete_one({"user_id": self.testUUID})
 
+    def testWithTrips(self):
+        with open("emission/tests/data/real_examples/shankari_2015-aug-21") as fp:
+            self.entries = json.load(fp, object_hook = esj.wrapped_object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
     def testGetAndStoreUserStats(self):
         """
         Test get_and_store_user_stats for the user to ensure that user statistics
         are correctly aggregated and stored in the user profile.
         """
-
+        self.testWithTrips()
         # Retrieve the updated user profile from the database
         profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
 
@@ -104,7 +106,7 @@ class TestUserStats(unittest.TestCase):
         self.assertNotIn("last_call_ts", profile)
 
         enacw.request.params.user_uuid = self.testUUID
-        enacw.request.path = "TEST_PATH_CURRENTLY_IGNORED"
+        enacw.request.environ['PATH_INFO'] = "TEST_PATH"
         enacw.before_request()
         enacw.after_request()
 
@@ -112,6 +114,9 @@ class TestUserStats(unittest.TestCase):
         profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
 
         self.assertIn("last_call_ts", profile)
+        self.assertNotIn("last_sync_ts", profile)
+        self.assertNotIn("last_put_ts", profile)
+        self.assertNotIn("last_diary_fetch_ts", profile)
 
         # We don't know exactly when the profile was updated, but we do know
         # that it must have been after the start
@@ -119,6 +124,98 @@ class TestUserStats(unittest.TestCase):
 
         self.assertGreater(actual_last_call_ts, enacw.request.params.start_ts)
         self.assertLess(actual_last_call_ts, arrow.now().timestamp())
+
+    def checkTimestamp(self, saved_ts, request, now):
+        self.assertGreater(saved_ts, request.params.start_ts)
+        self.assertLess(saved_ts, now)
+
+
+    def testLastSync(self):
+        # TODO: should this be here or in TestWebserver?
+        import emission.net.api.cfc_webapp as enacw
+
+        # Retrieve the initial user profile from the database
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertNotIn("last_call_ts", profile)
+        self.assertNotIn("last_sync_ts", profile)
+
+        enacw.request.params.user_uuid = self.testUUID
+        enacw.request.environ['PATH_INFO'] = "usercache/get"
+        enacw.before_request()
+        enacw.after_request()
+
+        # Retrieve the updated profile from the database
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+
+        self.assertIn("last_call_ts", profile)
+        self.assertIn("last_sync_ts", profile)
+        self.assertNotIn("last_put_ts", profile)
+        self.assertNotIn("last_diary_fetch_ts", profile)
+
+        now = arrow.now().timestamp()
+
+        # We don't know exactly when the profile was updated, but we do know
+        # that it must have been after the start
+        self.checkTimestamp(profile.get("last_call_ts"), enacw.request, now)
+        self.checkTimestamp(profile.get("last_sync_ts"), enacw.request, now)
+
+    def testLastPut(self):
+        import emission.net.api.cfc_webapp as enacw
+
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertNotIn("last_call_ts", profile)
+        self.assertNotIn("last_sync_ts", profile)
+        self.assertNotIn("last_put_ts", profile)
+
+        enacw.request.params.user_uuid = self.testUUID
+        enacw.request.environ['PATH_INFO'] = "usercache/put"
+        enacw.before_request()
+        enacw.after_request()
+
+        # Retrieve the updated profile from the database
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+
+        self.assertIn("last_call_ts", profile)
+        self.assertIn("last_sync_ts", profile)
+        self.assertIn("last_put_ts", profile)
+        self.assertNotIn("last_diary_fetch_ts", profile)
+
+        now = arrow.now().timestamp()
+
+        # We don't know exactly when the profile was updated, but we do know
+        # that it must have been after the start
+        self.checkTimestamp(profile.get("last_call_ts"), enacw.request, now)
+        self.checkTimestamp(profile.get("last_sync_ts"), enacw.request, now)
+        self.checkTimestamp(profile.get("last_put_ts"), enacw.request, now)
+
+    def testDiaryFetch(self):
+        import emission.net.api.cfc_webapp as enacw
+
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertNotIn("last_call_ts", profile)
+        self.assertNotIn("last_sync_ts", profile)
+        self.assertNotIn("last_put_ts", profile)
+        self.assertNotIn("last_diary_fetch_ts", profile)
+
+        enacw.request.params.user_uuid = self.testUUID
+        enacw.request.environ['PATH_INFO'] = "pipeline/get_range_ts"
+        enacw.before_request()
+        enacw.after_request()
+
+        # Retrieve the updated profile from the database
+        profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+
+        self.assertIn("last_call_ts", profile)
+        self.assertNotIn("last_sync_ts", profile)
+        self.assertNotIn("last_put_ts", profile)
+        self.assertIn("last_diary_fetch_ts", profile)
+
+        now = arrow.now().timestamp()
+
+        # We don't know exactly when the profile was updated, but we do know
+        # that it must have been after the start
+        self.checkTimestamp(profile.get("last_call_ts"), enacw.request, now)
+        self.checkTimestamp(profile.get("last_diary_fetch_ts"), enacw.request, now)
 
 if __name__ == '__main__':
     # Configure logging for the test

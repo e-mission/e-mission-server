@@ -13,14 +13,21 @@ def update_last_call_timestamp(user_id: str, call_path: str) -> Optional[int]:
 
     :param user_id: The user's UUID
     :type ts: str
-    :param call_path: Can be used to store different call stats (e.g. last call
-        versus last push, currently a NOP)
+    :param call_path: Can be used to store different call stats
     :type ts: str
     :return: None
     """
+    logging.debug(f"update_last_call_timestamp called with: {user_id=}, {call_path=}")
+    now = arrow.now().timestamp()
     update_data = {
-        "last_call_ts": arrow.now().timestamp()
+        "last_call_ts": now
     }
+    if "usercache" in call_path:
+        update_data["last_sync_ts"] = now
+    if "usercache/put" in call_path:
+        update_data["last_put_ts"] = now
+    if call_path == "/pipeline/get_range_ts":
+        update_data["last_diary_fetch_ts"] = now
     update_user_profile(user_id, update_data)
 
 def update_user_profile(user_id: str, data: Dict[str, Any]) -> None:
