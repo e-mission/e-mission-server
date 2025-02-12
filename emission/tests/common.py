@@ -207,8 +207,6 @@ def runIntakePipeline(uuid):
     eaum.create_confirmed_objects(uuid)
     eapcc.create_composite_objects(uuid)
     eaurs.get_and_store_pipeline_dependent_user_stats(uuid, "analysis/composite_trip")
-    eaurs.get_and_store_pipeline_independent_user_stats(uuid)
-    
 
 def configLogging():
     """

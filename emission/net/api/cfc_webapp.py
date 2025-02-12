@@ -53,6 +53,8 @@ import emission.core.timer as ect
 import emission.core.get_database as edb
 import emission.core.backwards_compat_config as ecbc
 
+import emission.analysis.result.user_stat as earus
+
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 
 # Constants that we don't read from the configuration
@@ -477,6 +479,7 @@ def after_request():
   request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
   new_duration = request.params.timer.elapsed
+  earus.update_last_call_timestamp(request.params.user_uuid, request.path)
   if round(old_div((duration - new_duration), new_duration) > 100) > 0:
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %

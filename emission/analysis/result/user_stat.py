@@ -7,23 +7,45 @@ from typing import Optional, Dict, Any
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.user as ecwu
 
-def get_last_call_timestamp(ts: esta.TimeSeries) -> Optional[int]:
+def update_upload_timestamp(user_id: str, stat_name: str, ts: float) -> None:
     """
-    Retrieves the last API call timestamp.
+    Updates the upload timestamps in the profile
 
-    :param ts: The time series object.
-    :type ts: esta.TimeSeries
-    :return: The last call timestamp or None if not found.
-    :rtype: Optional[int]
+    :param user_id: The user's UUID
+    :type user_id: str
+    :param stat_name: The field name that is updated
+    :type stat_name: str
+    :param ts: The timestamp to store (may not always be 'now')
+    :type ts: float
+    :return: None
     """
-    last_call_ts = ts.get_first_value_for_field(
-        key='stats/server_api_time',
-        field='data.ts',
-        sort_order=pymongo.DESCENDING
-    )
-    logging.debug(f"Last call timestamp: {last_call_ts}")
-    return None if last_call_ts == -1 else last_call_ts
+    update_data = {
+        stat_name: ts
+    }
+    update_user_profile(user_id, update_data)
 
+def update_last_call_timestamp(user_id: str, call_path: str) -> Optional[int]:
+    """
+    Updates the user profile with server call starts
+
+    :param user_id: The user's UUID
+    :type user_id: str
+    :param call_path: Can be used to store different call stats
+    :type ts: str
+    :return: None
+    """
+    logging.debug(f"update_last_call_timestamp called with: {user_id=}, {call_path=}")
+    now = arrow.now().timestamp()
+    update_data = {
+        "last_call_ts": now
+    }
+    if "usercache" in call_path:
+        update_data["last_sync_ts"] = now
+    if "usercache/put" in call_path:
+        update_data["last_put_ts"] = now
+    if call_path == "/pipeline/get_range_ts":
+        update_data["last_diary_fetch_ts"] = now
+    update_user_profile(user_id, update_data)
 
 def update_user_profile(user_id: str, data: Dict[str, Any]) -> None:
     """
@@ -86,27 +108,3 @@ def get_and_store_pipeline_dependent_user_stats(user_id: str, trip_key: str) -> 
     except Exception as e:
         logging.error(f"Error in get_and_store_dependent_user_stats for user_id {user_id}: {e}")
 
-def get_and_store_pipeline_independent_user_stats(user_id: str) -> None:
-    """
-    Aggregates and stores pipeline indepedent statistics into the user profile.
-    These are statistics based on raw data, such as the last call, last push
-    or last location received.
-
-    :param user_id: The UUID of the user.
-    :type user_id: str
-    :return: None
-    """
-
-    try:
-        logging.info(f"Starting get_and_store_pipeline_independent_user_stats for user_id: {user_id}")
-        ts = esta.TimeSeries.get_time_series(user_id)
-        last_call_ts = get_last_call_timestamp(ts)
-        logging.info(f"Last call timestamp: {last_call_ts}")
-
-        update_data = {
-            "last_call_ts": last_call_ts
-        }
-        update_user_profile(user_id, update_data)
-
-    except Exception as e:
-        logging.error(f"Error in get_and_store_independent_user_stats for user_id {user_id}: {e}")
