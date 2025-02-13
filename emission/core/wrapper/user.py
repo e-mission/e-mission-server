@@ -9,6 +9,7 @@ from builtins import object
 from past.utils import old_div
 import json
 import logging
+from datetime import datetime
 
 # Our imports
 from emission.core.get_database import get_profile_db, get_uuid_db
@@ -126,20 +127,26 @@ class User(object):
     return retSettings
 
   @staticmethod
-  def createProfile(uuid, ts):
+  def _createInitialProfile(uuid):
+    now = datetime.now()
     initProfileObj = {
                       'user_id': uuid,
                       'source':'Shankari',
-                      'update_ts': ts,
+                      'create_ts': now,
+                      'update_ts': now,
                       'mpg_array': [defaultMpg],
                       'mode': {},
                       'purpose': {}
                     }
-    writeResultProfile = get_profile_db().update_one(
-        {'user_id': uuid},
-        {'$set': initProfileObj},
-        upsert=True)
-    return writeResultProfile
+    return get_profile_db().insert_one(initProfileObj)
+
+  @staticmethod
+  def _createInitialMapping(userEmail):
+    import uuid
+    now = datetime.now()
+    emailUUIDObject = {'user_email': userEmail, 'uuid': uuid.uuid4(), "create_ts": now, 'update_ts': now}
+    get_uuid_db().insert_one(emailUUIDObject)
+    return emailUUIDObject["uuid"]
 
   # Create assumes that we will definitely create a new one every time.
   # This introduces state and makes things complex.
@@ -149,78 +156,31 @@ class User(object):
   # not part of a study
   @staticmethod
   def register(userEmail):
-    import uuid
-    # This is the UUID that will be stored in the trip database
-    # in order to do some fig leaf of anonymity
-    # Since we now generate truly anonymized UUIDs, and we expect that the
-    # register operation is idempotent, we need to check and ensure that we don't
-    # change the UUID if it already exists.
-    existing_entry = get_uuid_db().find_one({"user_email": userEmail})
-    if existing_entry is None:
-        anonUUID = uuid.uuid4()
-    else:
-        anonUUID = existing_entry['uuid']
-    return User.registerWithUUID(userEmail, anonUUID)
-
-  @staticmethod
-  def registerWithUUID(userEmail, anonUUID):
-    from datetime import datetime
-    from emission.core.wrapper.client import Client
-
-    # We are accessing three databases here:
-    # - The list of pending registrations (people who have filled out demographic
-    # information but not installed the app)
-    # - The mapping from the userEmail to the user UUID
-    # - The mapping from the UUID to other profile information about the user
-    # The first two are indexed by the user email. We will use the same field
-    # name in both to indicate that it is a shared key. This also allows us to
-    # have a simple query that we can reuse.
+    # we create entries in two databases when we register:
+    # `uuid_db`: which has the mapping between the token and the UUID
+    # `profile_db`: which only has the UUID but a bunch of other information
+    # related to the user, such as the phone make/model, and summaries about
+    # number of trips, last trip, last call, las push, etc
+    # Since we make two DB calls, we can end up with an inconsistency where the
+    # UUID is created but not the profile. If we detect that, we will try to
+    # create the profile anyway.
     userEmailQuery = {'user_email': userEmail}
+    existing_mapping = get_uuid_db().find_one(userEmailQuery)
+    if existing_mapping is None:
+        uuid = User._createInitialMapping(userEmail)
+    else:
+        uuid = existing_mapping['uuid']
+        get_uuid_db().update_one(userEmailQuery, {"$set": {"update_ts": datetime.now()}})
 
-    # First, we construct the email -> uuid mapping and store it in the appropriate database.
-    # At this point, we don't know or care whether the user is part of a study
-    # We also store a create timestamp just because that's always a good idea
-    # What happens if the user calls register() again? Do we want to generate a new UUID?
-    # Do we want to update the create timestamp?
-    # For now, let's assume that the answer to both of those questions is yes,
-    # because that allows us to use upsert :)
-    # A bonus fix is that if something is messed up in the DB, calling create again will fix it.
+    useridQuery = {"user_id": uuid}
+    existing_profile = get_profile_db().find_one(useridQuery)
+    if existing_profile is None:
+        profile_id = User._createInitialProfile(uuid)
+    else:
+        profile_id = existing_profile["_id"]
+        get_profile_db().update_one(useridQuery, {"$set": {"update_ts": datetime.now()}})
 
-
-    emailUUIDObject = {'user_email': userEmail, 'uuid': anonUUID, 'update_ts': datetime.now()}
-    writeResultMap = get_uuid_db().replace_one(userEmailQuery, emailUUIDObject, upsert=True)
-    # Note, if we did want the create_ts to not be overwritten, we can use the
-    # writeResult to decide how to deal with the values
-
-    # Now, we look to see if the user is part of a study. We can either store
-    # this information in the profile database, or the mapping, or both. For now,
-    # let us store this in the profile database since it is sufficient for it to
-    # be associated with the UUID, we anticipate using it for customization, and
-    # we assume that other customization stuff will be stored in the profile.
-
-    # We could also assume that we will create the profile if we created the map
-    # and update if we updated. But that has some reliability issues. For
-    # example, what if creating the map succeeded but creating the profile
-    # failed? Subsequently calling the method again to try and fix the profile
-    # will continue to fail because we will be trying to update.
-    # Much better to deal with it separately by doing a separate upsert
-
-    # Second decision: what do we do if the user is not part of a study? Create a
-    # profile anyway with an empty list, or defer the creation of the profile?
-    # 
-    # Decision: create profile with empty list for two reasons:
-    # a) for most of the functions, we want to use the profile data. We should
-    # only use the email -> uuid map in the API layer to get the UUID, and use
-    # the UUID elsewhere. So we need to have profiles for non-study participants
-    # as well.
-    # b) it will also make the scripts to update the profile in the background
-    # easier to write. They won't have to query the email -> UUID database and
-    # create the profile if it doesn't exist - they can just work off the profile
-    # database.
-    # TODO: Write a script that periodically goes through and identifies maps
-    # that don't have an associated profile and fix them
-    writeResultProfile = User.createProfile(anonUUID, datetime.now())
-    return User.fromUUID(anonUUID)
+    return User.fromUUID(uuid)
 
   @staticmethod
   def unregister(userEmail):
@@ -301,4 +261,3 @@ class User(object):
 
     get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
     return self.getUserCustomLabel(key)
-  
