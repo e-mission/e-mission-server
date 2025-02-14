@@ -71,7 +71,9 @@ class TestTripSegmentation(unittest.TestCase):
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
         loc_df = ts.get_data_df("background/filtered_location", tq)
-        segmentation_points = dstfsm.segment_into_trips(ts, tq, loc_df)
+        transition_df = ts.get_data_df("statemachine/transition", tq)
+        motion_df = ts.get_data_df("background/motion_activity", tq)
+        segmentation_points = dstfsm.segment_into_trips(loc_df, transition_df, motion_df)
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)
@@ -90,7 +92,9 @@ class TestTripSegmentation(unittest.TestCase):
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
         loc_df = ts.get_data_df("background/filtered_location", tq)
-        segmentation_points = dstdsm.segment_into_trips(ts, tq, loc_df)
+        transition_df = ts.get_data_df("statemachine/transition", tq)
+        motion_df = ts.get_data_df("background/motion_activity", tq)
+        segmentation_points = dstdsm.segment_into_trips(loc_df, transition_df, motion_df)
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)

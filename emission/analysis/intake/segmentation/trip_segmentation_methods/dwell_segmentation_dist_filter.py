@@ -42,7 +42,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, timeseries, time_query, loc_df):
+    def segment_into_trips(self, loc_df, transition_df, motion_df):
         """
         A vectorized implementation of the distance–based segmentation.
         This function examines a range of the timeseries data and returns a list of
@@ -77,10 +77,8 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         loc_df['valid'] = True
         loc_df['index'] = loc_df.index
 
-        # Retrieve transition events (e.g. tracking restarts) for the given time range.
-        self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-        # Retrieve motion events as a DataFrame for vectorized operations.
-        self.motion_df = timeseries.get_data_df("background/motion_activity", time_query)
+        self.transition_df = transition_df
+        self.motion_df = motion_df
 
         # --- Compute vectorized differences ---
         # Calculate the time difference (in seconds) between consecutive points.

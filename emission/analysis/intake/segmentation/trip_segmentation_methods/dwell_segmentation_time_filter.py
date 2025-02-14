@@ -62,7 +62,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.distance_threshold = distance_threshold
 
 
-    def segment_into_trips(self, timeseries, time_query, loc_df):
+    def segment_into_trips(self, loc_df, transition_df, motion_df):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -76,8 +76,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         ]
         loc_df.reset_index(inplace=True)
 
-        self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-        self.motion_df = timeseries.get_data_df("background/motion_activity", time_query)
+        self.transition_df = transition_df
+        self.motion_df = motion_df
 
         if len(self.transition_df) > 0:
             logging.debug(f"self.transition_df = {self.transition_df[['fmt_time', 'transition']]}")
