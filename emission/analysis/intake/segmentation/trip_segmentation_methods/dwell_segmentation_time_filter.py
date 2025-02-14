@@ -24,21 +24,10 @@ import emission.analysis.intake.segmentation.restart_checking as eaisr
 import emission.storage.decorations.stats_queries as esds
 import emission.core.timer as ect
 import emission.core.wrapper.pipelinestate as ecwp
+from emission.core.common import haversine_numpy
 
 
 TWELVE_HOURS = 12 * 60 * 60
-
-
-def haversine(lon1, lat1, lon2, lat2):
-    earth_radius = 6371000  # meters
-    lat1, lat2 = np.radians(lat1), np.radians(lat2)
-    lon1, lon2 = np.radians(lon1), np.radians(lon2)
-    
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
-    return 2 * earth_radius * np.arcsin(np.sqrt(a))
-
 
 class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
     def __init__(self, time_threshold, point_threshold, distance_threshold):
@@ -243,7 +232,10 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
 
         recent_dists_and_times = pd.Series([
             np.array([
-                haversine(lon[start_indices[i]:i], lat[start_indices[i]:i], lon[i], lat[i]),
+                haversine_numpy(
+                    lon[start_indices[i]:i], lat[start_indices[i]:i],
+                    lon[i], lat[i]
+                ),
                 timestamps[i] - timestamps[start_indices[i]:i],
             ])
             if start_indices[i] < i else np.empty((2, self.point_threshold))

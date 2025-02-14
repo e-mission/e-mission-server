@@ -19,32 +19,9 @@ import emission.analysis.intake.segmentation.trip_segmentation_methods.trip_end_
 import emission.storage.decorations.stats_queries as esds
 import emission.core.timer as ect
 import emission.core.wrapper.pipelinestate as ecwp
-
+from emission.core.common import haversine_numpy
 
 TWELVE_HOURS = 12 * 60 * 60
-
-
-def haversine(lon1, lat1, lon2, lat2):
-    """
-    Computes the great-circle distance between two arrays of longitude and latitude
-    points. Uses the haversine formula.
-
-    :param lon1: array-like longitudes for the first set of points
-    :param lat1: array-like latitudes for the first set of points
-    :param lon2: array-like longitudes for the second set of points
-    :param lat2: array-like latitudes for the second set of points
-    :return: array-like distances in meters
-    """
-    earth_radius = 6371000
-    # Convert coordinates to radians for computation.
-    lat1, lat2 = np.radians(lat1), np.radians(lat2)
-    lon1, lon2 = np.radians(lon1), np.radians(lon2)
-
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    # Haversine formula for computing great-circle distance.
-    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
-    return 2 * earth_radius * np.arcsin(np.sqrt(a))
 
 
 class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
@@ -96,6 +73,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         :return: A list of tuples. Each tuple contains a start and end point (wrapped as AttrDict)
                  that demarcate a trip.
         """
+        user_id = loc_df["user_id"].iloc[0]
         loc_df['valid'] = True
         loc_df['index'] = loc_df.index
 
@@ -108,7 +86,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         # Calculate the time difference (in seconds) between consecutive points.
         loc_df['ts_diff'] = loc_df['ts'].diff()
         # Calculate the distance difference between consecutive points using the haversine function.
-        loc_df['dist_diff'] = haversine(
+        loc_df['dist_diff'] = haversine_numpy(
             loc_df['longitude'].shift(1).to_numpy(), loc_df['latitude'].shift(1).to_numpy(),
             loc_df['longitude'].to_numpy(), loc_df['latitude'].to_numpy()
         )
@@ -125,67 +103,75 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         # For a candidate segmentation, if the speed is below this threshold, then the phone may be stationary.
         speed_threshold = float(self.distance_threshold * 2) / (self.time_threshold / 2)
 
-        # --- Identify candidate segmentation points ---
-        # A candidate segmentation point must have:
-        #   (i) A time gap greater than time_threshold, AND
-        #  (ii) Either a tracking restart occurred, there is no ongoing motion,
-        #       the time gap exceeds 12 hours, or the computed speed is below speedThreshold,
-        #   (iii) The distance gap is at least the distance_threshold.
-        candidate_flag = (loc_df['ts_diff'] > self.time_threshold) & (
-            (loc_df['tracking_restarted'])
-            | (~loc_df['ongoing_motion'])
-            | (loc_df['ts_diff'] > TWELVE_HOURS)
-            | (loc_df['speed'] < speed_threshold)
-        )
-        # Replace any missing values (NaN) with False.
-        candidate_flag = candidate_flag.fillna(False)
+        with ect.Timer() as t_loop:
+            # --- Identify candidate segmentation points ---
+            # A candidate segmentation point must have:
+            #   (i) A time gap greater than time_threshold, AND
+            #  (ii) Either a tracking restart occurred, there is no ongoing motion,
+            #       the time gap exceeds 12 hours, or the computed speed is below speedThreshold,
+            #   (iii) The distance gap is at least the distance_threshold.
+            candidate_flag = (loc_df['ts_diff'] > self.time_threshold) & (
+                (loc_df['tracking_restarted'])
+                | (~loc_df['ongoing_motion'])
+                | (loc_df['ts_diff'] > TWELVE_HOURS)
+                | (loc_df['speed'] < speed_threshold)
+            )
+            # Replace any missing values (NaN) with False.
+            candidate_flag = candidate_flag.fillna(False)
 
-        # --- Placeholder for row-by-row check for huge invalid timestamp offset ---
-        # Currently, no individual timestamp is flagged as invalid.
-        huge_invalid = np.zeros(len(loc_df), dtype=bool)
+            # --- Placeholder for row-by-row check for huge invalid timestamp offset ---
+            # Currently, no individual timestamp is flagged as invalid.
+            huge_invalid = np.zeros(len(loc_df), dtype=bool)
 
-        # Exclude any candidates that were invalidated due to huge timestamp offsets.
-        candidate_flag = candidate_flag & (~huge_invalid)
-        self.last_ts_processed = None
+            # Exclude any candidates that were invalidated due to huge timestamp offsets.
+            candidate_flag = candidate_flag & (~huge_invalid)
+            self.last_ts_processed = None
 
-        # --- Split the data into trips using candidate segmentation flags ---
-        segmentation_idx_pairs = []
-        trip_start_idx = 0
-        candidate_indices = np.where(candidate_flag)[0]
-        # Iterate over all candidate segmentation points.
-        for idx in candidate_indices:
-            if idx > trip_start_idx:
-                # Define the current trip to run from trip_start_idx to the point before the candidate index.
-                trip_end_idx = idx - 1
-                segmentation_idx_pairs.append((trip_start_idx, trip_end_idx))
-                self.last_ts_processed = loc_df.iloc[idx]['metadata_write_ts']
-                trip_start_candidates = loc_df[
-                    (loc_df['index'] > trip_end_idx) & (loc_df['dist_diff'] >= self.distance_threshold)
+            # --- Split the data into trips using candidate segmentation flags ---
+            segmentation_idx_pairs = []
+            trip_start_idx = 0
+            candidate_indices = np.where(candidate_flag)[0]
+            # Iterate over all candidate segmentation points.
+            for idx in candidate_indices:
+                if idx > trip_start_idx:
+                    # Define the current trip to run from trip_start_idx to the point before the candidate index.
+                    trip_end_idx = idx - 1
+                    segmentation_idx_pairs.append((trip_start_idx, trip_end_idx))
+                    self.last_ts_processed = loc_df.iloc[idx]['metadata_write_ts']
+                    trip_start_candidates = loc_df[
+                        (loc_df['index'] > trip_end_idx) & (loc_df['dist_diff'] >= self.distance_threshold)
+                    ]
+                    if len(trip_start_candidates) == 0:
+                        logging.debug(f'no more candidates after {trip_end_idx}, this is the last trip')
+                        trip_start_idx = len(loc_df)
+                    else:
+                        trip_start_idx = trip_start_candidates.iloc[0]['index']
+                        logging.debug(f'using {trip_start_idx} as trip start index')
+
+            # --- Force trip end at the final point if a transition event occurs ---
+            # If there is evidence (from transition events) that the user has stopped moving
+            # after the last point in our data, force the end of the trip at the final point.
+            if len(self.transition_df) > 0 and trip_start_idx < len(loc_df):
+                last_point = ad.AttrDict(loc_df.iloc[-1])
+                stopped_moving_after_last = self.transition_df[
+                    (self.transition_df.ts > last_point.ts) & (self.transition_df.transition == 2)
                 ]
-                if len(trip_start_candidates) == 0:
-                    logging.debug(f'no more candidates after {trip_end_idx}, this is the last trip')
-                    trip_start_idx = len(loc_df)
-                else:
-                    trip_start_idx = trip_start_candidates.iloc[0]['index']
-                    logging.debug(f'using {trip_start_idx} as trip start index')
+                if len(stopped_moving_after_last) > 0:
+                    if segmentation_idx_pairs:
+                        # Finish out this trip ending at the last point.
+                        segmentation_idx_pairs.append((trip_start_idx, len(loc_df) - 1))
+                    else:
+                        # If no segmentation has been found so far, consider the entire series as one trip.
+                        segmentation_idx_pairs.append((0, len(loc_df) - 1))
+                    # Record the last processed timestamp.
+                    self.last_ts_processed = float(loc_df.iloc[-1]['metadata_write_ts'])
 
-        # --- Force trip end at the final point if a transition event occurs ---
-        # If there is evidence (from transition events) that the user has stopped moving
-        # after the last point in our data, force the end of the trip at the final point.
-        if len(self.transition_df) > 0 and trip_start_idx < len(loc_df):
-            last_point = ad.AttrDict(loc_df.iloc[-1])
-            stopped_moving_after_last = self.transition_df[
-                (self.transition_df.ts > last_point.ts) & (self.transition_df.transition == 2)
-            ]
-            if len(stopped_moving_after_last) > 0:
-                if segmentation_idx_pairs:
-                    # Finish out this trip ending at the last point.
-                    segmentation_idx_pairs.append((trip_start_idx, len(loc_df) - 1))
-                else:
-                    # If no segmentation has been found so far, consider the entire series as one trip.
-                    segmentation_idx_pairs.append((0, len(loc_df) - 1))
-                # Record the last processed timestamp.
-                self.last_ts_processed = float(loc_df.iloc[-1]['metadata_write_ts'])
+        esds.store_pipeline_time(
+            user_id,
+            ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips_dist/loop",
+            time.time(),
+            t_loop.elapsed
+        )
 
         # --- Convert index pairs to segmentation points ---
         # For each pair of start and end indices, wrap the corresponding rows in an AttrDict
