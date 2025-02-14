@@ -40,6 +40,7 @@ class RuleEngineModeInferencePipeline:
         return self.last_section_done
   
     def runPredictionPipeline(self, user_id, timerange):
+        self.user_id = user_id
         self.ts = esta.TimeSeries.get_time_series(user_id)
         self.toPredictSections = esda.get_entries(esda.CLEANED_SECTION_KEY, user_id, 
             time_query=timerange)
@@ -62,6 +63,10 @@ class RuleEngineModeInferencePipeline:
         Converts list of sections -> list of predicted probability maps
         """
         predictedProb = []
+        locs_where_no_prediction = []
+
+        # first pass; air, walk, and bike will be identified
+        # without needing to query overpass
         for (i, section_entry) in enumerate(self.toPredictSections):
             logging.debug('~' * 10 + 
                 "About to get predicted value for section %s (%s -> %s)" %
@@ -71,7 +76,25 @@ class RuleEngineModeInferencePipeline:
             if section_entry.data.sensed_mode == ecwma.MotionTypes.AIR_OR_HSR:
                 predictedProb.append({'AIR_OR_HSR': 1})
             else:
-                predictedProb.append(get_prediction(i, section_entry))
+                prediction = get_prediction(section_entry)
+                if prediction is None:
+                    locs_where_no_prediction.append(section_entry.data.start_loc['coordinates'])
+                    locs_where_no_prediction.append(section_entry.data.end_loc['coordinates'])
+                predictedProb.append(prediction)
+
+        # for sections that we could not predict on first pass,
+        # query overpass for public transit stops near the start/end locations
+        stop_radius = eac.get_config()["section.startStopRadius"]
+        transit_stops_map = dict(zip(
+            [str(loc) for loc in locs_where_no_prediction],
+            enetm.get_stops_near(locs_where_no_prediction, stop_radius),
+        ))
+
+        # second pass; now that we have transit stops, try to predict sections
+        # that we couldn't predict before
+        for (i, section_entry) in enumerate(self.toPredictSections):
+            if predictedProb[i] is None:
+                predictedProb[i] = get_prediction(section_entry, transit_stops_map)
 
         return predictedProb
 
@@ -106,15 +129,15 @@ class RuleEngineModeInferencePipeline:
         # during inference, we will not save results and never re-run
         self.last_section_done = self.toPredictSections[-1]
 
-def get_prediction(i, section_entry):
+def get_prediction(section_entry, transit_stops_map=None):
     if section_entry.data.sensed_mode == ecwma.MotionTypes.UNKNOWN:
-        return get_unknown_prediction(i, section_entry)
+        return get_unknown_prediction(section_entry, transit_stops_map)
     elif eaid.is_motorized(section_entry.data.sensed_mode):
-        return get_motorized_prediction(i, section_entry)
+        return get_motorized_prediction(section_entry, transit_stops_map)
     else:
-        return get_non_motorized_prediction(i, section_entry)
+        return get_non_motorized_prediction(section_entry)
 
-def get_non_motorized_prediction(i, section_entry):
+def get_non_motorized_prediction(section_entry):
     """
     This one is relatively easy. Only non-motorized predictions are WALK and BIKE.
     If 75% speed < walking speed, WALK
@@ -130,20 +153,22 @@ def get_non_motorized_prediction(i, section_entry):
     else:
         return {'BICYCLING': 1} 
 
-def get_motorized_prediction(i, section_entry):
+def get_motorized_prediction(section_entry, transit_stops_map=None):
     """
     This is a bit trickier, but still relatively simple.
     First, we get the stops for the beginning and end of the section.
     If there is overlap between the stops, we name it transit, otherwise we
     name it car.
     """
-    predicted_transit_mode = _get_transit_prediction(i, section_entry)
+    if transit_stops_map is None:
+        return None
+    predicted_transit_mode = _get_transit_prediction(section_entry, transit_stops_map)
     if predicted_transit_mode is not None:
         return {predicted_transit_mode: 1}
     else:
         return {'CAR': 1}
 
-def get_unknown_prediction(i, section_entry):
+def get_unknown_prediction(section_entry, transit_stops_map=None):
     """
     For unknown sections, we sometimes have points and sometimes not. If we
     have points, use the median speed as always. Otherwise, we cannot to fine
@@ -158,7 +183,9 @@ def get_unknown_prediction(i, section_entry):
         logging.debug("overall speed is walking, UNKNOWN -> WALKING")
         return {'WALKING': 1}
     else:
-        predicted_transit_mode = _get_transit_prediction(i, section_entry)
+        if transit_stops_map is None:
+            return None
+        predicted_transit_mode = _get_transit_prediction(section_entry, transit_stops_map)
         if predicted_transit_mode is not None:
             logging.debug("predicted transit mode is not None, UNKNOWN -> %s" % 
                 predicted_transit_mode)
@@ -168,12 +195,12 @@ def get_unknown_prediction(i, section_entry):
             logging.debug("no luck finding a match, stay UNKNOWN")
             return {'UNKNOWN': 1}
 
-def _get_transit_prediction(i, section_entry):
-    # Let's make the start a little more forgiving than the end
-    start_radius = eac.get_config()["section.startStopRadius"]
-    end_radius = eac.get_config()["section.startStopRadius"]
-    start_transit_stops = enetm.get_stops_near(section_entry.data.start_loc, start_radius)
-    end_transit_stops = enetm.get_stops_near(section_entry.data.end_loc, end_radius)
+def _get_transit_prediction(section_entry, transit_stops_map=None):
+    if transit_stops_map is None:
+        return None
+    start_transit_stops = transit_stops_map.get(str(section_entry.data.start_loc['coordinates']))
+    end_transit_stops = transit_stops_map.get(str(section_entry.data.end_loc['coordinates']))
+    print(f'start_transit_stops = {start_transit_stops}, end_transit_stops = {end_transit_stops}')
     predicted_transit_modes = enetm.get_predicted_transit_mode(start_transit_stops,
         end_transit_stops)
     logging.debug("Got predicted transit mode %s" % predicted_transit_modes)

@@ -29,7 +29,10 @@ class OverpassTest(unittest.TestCase):
         sample_data = '[out:json][bbox];way[amenity=parking];out;&bbox=-122.1111238,37.4142118,-122.1055791,37.4187945'
         call_base = 'api/interpreter?data='
         self.public_url_base = 'https://lz4.overpass-api.de/'+ call_base + sample_data
-        self.gfbk_url_base = 'https://overpass.geofabrik.de/' + GEOFABRIK_OVERPASS_KEY + '/' + call_base + sample_data
+        if GEOFABRIK_OVERPASS_KEY:
+            self.gfbk_url_base = 'https://overpass.geofabrik.de/' + GEOFABRIK_OVERPASS_KEY + '/' + call_base + sample_data
+        else:
+            self.gfbk_url_base = None
 
     def test_overpass(self):
         r_gfbk = requests.get(self.gfbk_url_base)
@@ -44,16 +47,21 @@ class OverpassTest(unittest.TestCase):
 
     #Test utilizes the functions get_stops_near, get_public_transit_stops, and make_request_and_catch.  
     def test_get_stops_near(self):
-        actual_result = enetm.get_stops_near(loc1, 150.0)[0]['routes'][0]['tags']
-        expected_result = {'from': 'National Renewable Energy Lab', 'name': 'RTD Route 125: Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
-        self.assertEqual(expected_result, actual_result)
+        stops_at_loc1 = enetm.get_stops_near(loc1['coordinates'], 150.0)[0]
+        first_stop_routes = stops_at_loc1[0]['routes']
+        self.assertEqual(len(first_stop_routes), 2)
+        first_stop_first_route_tags = first_stop_routes[0]['tags']
+        expected_tags = {'from': 'National Renewable Energy Lab', 'name': 'RTD Route 125: Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
+        self.assertEqual(first_stop_first_route_tags, expected_tags)
    
     #Get_stops_near generates two stops from the given coordinates.
     # Get_predicted_transit_mode finds a common route between them (train).
     def test_get_predicted_transit_mode(self):
-        stop1 = enetm.get_stops_near(loc2, 400.0)
-        stop2 = enetm.get_stops_near(loc3, 400.0)
-        actual_result = enetm.get_predicted_transit_mode(stop1, stop2)
+        [stops_at_loc2, stops_at_loc3] = enetm.get_stops_near(
+            [loc2['coordinates'], loc3['coordinates']],
+            400.0,
+        )
+        actual_result = enetm.get_predicted_transit_mode(stops_at_loc2, stops_at_loc3)
         expected_result = ['train', 'train']
         self.assertEqual(actual_result, expected_result)
 

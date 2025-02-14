@@ -14,14 +14,6 @@ except:
     print("overpass not configured, falling back to public overpass api")
     url = "https://lz4.overpass-api.de/"
 
-try:
-    with open('conf/net/ext_service/overpass_transit_stops_query_template', 'r', encoding='UTF-8') as query_file:
-        query_string = "".join(query_file.readlines())
-except FileNotFoundError:
-    print("transit stops query not configured, falling back to default")
-    with open('conf/net/ext_service/overpass_transit_stops_query_template.sample', 'r', encoding='UTF-8') as query_file:
-        query_string = "".join(query_file.readlines())
-
 RETRY = -1
 
 def make_request_and_catch(overpass_query):
@@ -67,11 +59,32 @@ def make_request_and_catch(overpass_query):
             all_results = []
     return all_results
 
-def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
-    bbox_string = "%s,%s,%s,%s" % (min_lat, min_lon, max_lat, max_lon)
-    logging.debug("bbox_string = %s" % bbox_string)
-    overpass_public_transit_query_template = query_string
-    overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
+
+def get_query_for_bbox(bbox):
+    bbox_string = "%s,%s,%s,%s" % bbox
+    return f'''
+    (
+        node["highway"="bus_stop"]({bbox_string});
+        node["railway"="station"]({bbox_string});
+        node["public_transport"]({bbox_string});
+        way["railway"="station"]({bbox_string});
+        relation["route"]({bbox_string});
+    );
+    out body;
+    out count;
+    >;
+    '''
+
+
+def get_query_for_bboxes(bboxes):
+    query = '[out:json][timeout:25];\n'
+    for bbox in bboxes:
+        query += get_query_for_bbox(bbox)
+    return query
+
+
+def get_public_transit_stops(bboxes):
+    overpass_query = get_query_for_bboxes(bboxes)
     call_return = RETRY
     retry_count = 0
     while call_return == RETRY:
@@ -86,9 +99,22 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     logging.info(f"after all retries, retry_count = {retry_count}, call_return = {'RETRY' if call_return == RETRY else len(call_return)}...")
     all_results = call_return
 
-    relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
+    locs_results = []
+    current_loc_results = []
+    for result in all_results:
+        if result.get("type") == "count":
+            locs_results.append(current_loc_results)
+            current_loc_results = []
+        else:
+            current_loc_results.append(result)
+
+    return [get_stops_from_results(loc_results) for loc_results in locs_results]
+
+
+def get_stops_from_results(results):
+    relations = [ad.AttrDict(r) for r in results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
-    stops = [ad.AttrDict(r) for r in all_results if r["type"] != "relation"]
+    stops = [ad.AttrDict(r) for r in results if r["type"] != "relation"]
     logging.debug("Found %d stops" % len(stops))
     rel_map = {}
     for relation in relations:
@@ -109,22 +135,23 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
                 stop["routes"].append({"id": relation["id"], "tags": relation["tags"]})
     return stops
 
-# https://gis.stackexchange.com/a/19761
-def get_stops_near(loc, distance_in_meters):
-    COORDS = "coordinates"
+def get_stops_near(coord_pairs, distance_in_meters):
+    # https://gis.stackexchange.com/a/19761
     # 10001.965729km = 90 degrees
     # 1km = 90/10001.965729 degrees
     # 1000m = 90/10001.965729 degrees
     # 1m = 90/(10001.965729 * 1000)
     meter2deg = 90/(10001.965729 * 1000)
     bbox_delta = meter2deg * distance_in_meters
-    lon = loc[COORDS][0]
-    lat = loc[COORDS][1]
-    stops = get_public_transit_stops(lat - bbox_delta, lon - bbox_delta, lat + bbox_delta, lon + bbox_delta)
-    logging.debug("Found %d stops" % len(stops))
-    for i, stop in enumerate(stops):
-        logging.debug("STOP %d: %s" % (i, stop))
-    return stops
+    bboxes = [
+        (lat - bbox_delta, lon - bbox_delta,
+         lat + bbox_delta, lon + bbox_delta)
+        for [lon, lat] in coord_pairs
+    ]
+    locs_stops = get_public_transit_stops(bboxes)
+    for i, loc_stops in enumerate(locs_stops):
+        logging.debug(f"Found {len(loc_stops)} stops for bbox {bboxes[i]}")
+    return locs_stops
 
 def get_predicted_transit_mode(start_stops, end_stops):
     """
