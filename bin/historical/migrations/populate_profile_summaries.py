@@ -5,6 +5,7 @@ import logging
 import arrow
 import datetime
 import argparse
+import time
 
 import collections.abc as cabc
 
@@ -40,6 +41,25 @@ def update_user_profile(user_id: str, data: dict[str, any]) -> None:
     logging.debug(f"User profile updated with data: {data}")
     logging.debug(f"New profile: {user.getProfile()}")
 
+def query_with_retry(timeseries_db, aggregate_ops):
+    # this is initialized to 1 so that we will wait for at least one minute
+    # even on the first retry. If we do get an OOM, there's no point in
+    # retrying after 0 secs
+    retry_count = 1
+    while retry_count < 6:
+        try:
+            return list(timeseries_db.aggregate(aggregate_ops))
+        except pymongo.errors.OperationFailure as e:
+            if e.code == 39:
+                print(f"{arrow.now()} On {retry_count=}, got OOM {e.details}, sleeping for {retry_count * 60} secs before retrying")
+                retry_count += 1
+                time.sleep(retry_count * 60)
+            else:
+                logging.exception(e)
+                raise
+    assert retry_count == 6
+    raise TimeoutError("Too many retries {retry_count=}, giving up for now")
+
 def get_recent_entry(user_id: str, key: str, name: str, timeseries_db: pymongo.collection):
     # we are going to use edb directly since this is a one-off throwaway script
     # and using a direct query allows us to filter instead of reading
@@ -48,8 +68,13 @@ def get_recent_entry(user_id: str, key: str, name: str, timeseries_db: pymongo.c
     query = {"user_id": user_id, "metadata.key": key}
     if name is not None:
         query["data.name"] = name
-    result_list = list(timeseries_db.find(query) \
-        .sort("data.ts", pymongo.DESCENDING).limit(1))
+
+    result_list = query_with_retry(timeseries_db,
+    [
+        {"$match": query},
+        {"$sort": {"data.ts": -1}},
+        {"$limit": 1}
+    ])
     # again, we should be using "data.ts" instead of "metadata.write_ts", but 
     # "metadata.write_ts" is guaranteed to exist, and we don't want to miss entries
     # and this is backfilling for compatibility anyway
@@ -59,7 +84,11 @@ def fill_if_missing(profile: dict, fill_fn: cabc.Callable, field_arg_map: dict) 
     update_data = {}
     for field, fill_arg in field_arg_map.items():
         if field not in profile:
-            update_data[field] = fill_fn(fill_arg)
+            print(f"Filling missing {field=} with {fill_arg=} ")
+            try:
+                update_data[field] = fill_fn(fill_arg)
+            except TimeoutError as e:
+                print(f"Too many retries, skipping {field=} with {fill_arg=}")
     return update_data
 
 def populate_call_summary(profile: dict, timeseries_db: pymongo.collection):
@@ -87,22 +116,34 @@ def populate_upload_summary(profile: dict, timeseries_db: pymongo.collection):
     update_data = fill_if_missing(profile, get_upload_ts, UPLOAD_SUMMARY_MAP)
     update_user_profile(profile["user_id"], update_data)
 
+def get_create_update_data(profile: dict, timeseries_db: pymongo.collection):
+    query = {
+        "user_id": profile["user_id"],
+        "metadata.key": "stats/server_api_time",
+        "data.name": "POST_/datastreams/find_entries/timestamp"
+    }
+    first_create_entry = query_with_retry(timeseries_db, [
+                {"$match": query},
+                {"$sort": {"data.ts": 1}},
+                {"$limit": 1}
+    ])
+    raw_create_ts = -1 if len(first_create_entry) == 0 else first_create_entry[0]["data"]["ts"]
+    update_data = {"create_ts": -1 if raw_create_ts == -1 else datetime.datetime.fromtimestamp(raw_create_ts)}
+    return update_data
+
 def populate_create_ts(profile: dict, timeseries_db: pymongo.collection):
     print(f"{arrow.now()} Populating create ts for {profile['user_id']}")
-    create_ts = None
+    create_update_data = None
     # The obvious approach would be to use `/profile/create`, but it is not
     # linked with a UUID, so we use the first `/datastreams/find_entries/timestamp`
     # which occurs right after the profile creation to retrieve the demographic survey
     # https://github.com/e-mission/e-mission-docs/issues/1111#issuecomment-2655738722
     if 'create_ts' not in profile:
-        first_create_entry = list(timeseries_db\
-            .find({"user_id": profile["user_id"],
-                    "metadata.key": "stats/server_api_time",
-                    "data.name": "POST_/datastreams/find_entries/timestamp"})\
-            .sort("data.ts", pymongo.ASCENDING).limit(1))
-        create_ts = -1 if len(first_create_entry) == 0 else first_create_entry[0]["data"]["ts"]
-        update_data = {"create_ts": -1 if create_ts == -1 else datetime.datetime.fromtimestamp(create_ts)}
-        update_user_profile(profile["user_id"], update_data)
+        try:
+            create_update_data = get_create_update_data(profile, timeseries_db)
+            update_user_profile(profile["user_id"], create_update_data)
+        except TimeoutError as e:
+            print(f"Too many retries, skipping create_ts setting in the profile DB")
 
     uuid_entry = edb.get_uuid_db().find_one({"uuid": profile["user_id"]})
     if "create_ts" not in uuid_entry:
@@ -110,16 +151,20 @@ def populate_create_ts(profile: dict, timeseries_db: pymongo.collection):
         # entry will not either. And both of them should have the `create_ts`
         # set to the same value. So let's reuse where we can instead of
         # querying the database again
-        if create_ts is not None:
-            first_create_entry = list(timeseries_db\
-                .find({"user_id": profile["user_id"],
-                        "metadata.key": "stats/server_api_time",
-                        "data.name": "POST_/datastreams/find_entries/timestamp"})\
-                .sort("data.ts", pymongo.ASCENDING).limit(1))
-            create_ts = -1 if len(first_create_entry) == 0 else first_create_entry[0]["data"]["ts"]
-            create_ts = datetime.datetime.fromtimestamp(create_ts) if create_ts != -1 else create_ts
-        edb.get_uuid_db().update_one({"uuid": profile["user_id"]},
-            {"$set": {"create_ts": create_ts}})
+        if create_update_data is None:
+            # this may be None even if there is valid entry in the timeseries
+            # because the profile already had a `create_ts` field so we didn't
+            # read anything
+            try:
+                create_update_data = get_create_update_data(profile, timeseries_db)
+                edb.get_uuid_db().update_one({"uuid": profile["user_id"]},
+                    {"$set": create_update_data})
+            except TimeoutError as e:
+                print(f"Too many retries, skipping create_ts setting in the UUID DB")
+        else:
+            assert create_update_data is not None
+            edb.get_uuid_db().update_one({"uuid": profile["user_id"]},
+                {"$set": create_update_data})
 
 def populate_profiles(profile_list = None):
     timeseries_db = edb.get_timeseries_db()
