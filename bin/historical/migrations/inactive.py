@@ -11,22 +11,31 @@ def find_inactive_uuids(uuids_entries, threshold):
     inactive_uuids = []
     for u in uuids_entries:
         print(f'Checking activity for user {u["uuid"]}')
+        profile_data = edb.get_profile_db().find_one({'user_id': u})
         ts = esta.TimeSeries.get_time_series(u['uuid'])
 
-        last_call_ts = ts.get_first_value_for_field(
-            key='stats/server_api_time',
-            field='data.ts',
-            sort_order=pymongo.DESCENDING
-        )
+        if profile_data:
+            last_call_ts = profile_data.get('last_call_ts')
+        else:
+            last_call_ts = ts.get_first_value_for_field(
+                key='stats/server_api_time',
+                field='data.ts',
+                sort_order=pymongo.DESCENDING
+            )
+
         print(f'for user {u["uuid"]}, last call was {last_call_ts}')
         if last_call_ts > NOW_SECONDS - threshold:
             continue
 
-        last_loc_ts = ts.get_first_value_for_field(
-            key='background/location',
-            field='data.ts',
-            sort_order=pymongo.DESCENDING
-        )
+        if profile_data:
+            last_loc_ts = profile_data.get('last_loc_ts')
+        else:
+            last_loc_ts = ts.get_first_value_for_field(
+                key='background/location',
+                field='data.ts',
+                sort_order=pymongo.DESCENDING
+            )
+
         print(f'for user {u["uuid"]}, last location was {last_loc_ts}')
         if last_loc_ts > NOW_SECONDS - threshold:
             continue
