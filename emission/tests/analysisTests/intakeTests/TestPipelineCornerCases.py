@@ -49,7 +49,11 @@ class TestPipelineCornerCases(unittest.TestCase):
             ewps.PipelineStages.ALTERNATIVES,
             ewps.PipelineStages.USER_MODEL,
             ewps.PipelineStages.RECOMMENDATION,
-            ewps.PipelineStages.OUTPUT_GEN]
+            ewps.PipelineStages.OUTPUT_GEN,
+            ewps.PipelineStages.EXPORT_DATA,
+            ewps.PipelineStages.PURGE_TIMESERIES_DATA,
+            ewps.PipelineStages.RESTORE_TIMESERIES_DATA
+            ]
         
         for pse in ewps.PipelineStages.__iter__():
             if pse in stages_skipped_in_testing:
@@ -80,7 +84,11 @@ class TestPipelineCornerCases(unittest.TestCase):
             ewps.PipelineStages.ALTERNATIVES,
             ewps.PipelineStages.USER_MODEL,
             ewps.PipelineStages.RECOMMENDATION,
-            ewps.PipelineStages.OUTPUT_GEN]
+            ewps.PipelineStages.OUTPUT_GEN,
+            ewps.PipelineStages.EXPORT_DATA,
+            ewps.PipelineStages.PURGE_TIMESERIES_DATA,
+            ewps.PipelineStages.RESTORE_TIMESERIES_DATA
+            ]
         test_run_states = list([pse.value for pse in
             filter(lambda pse: pse not in stages_skipped_in_testing,
                 ewps.PipelineStages.__iter__())])
