@@ -166,7 +166,10 @@ def build_mock_trip(
             "type": "Point",
             "coordinates": destination
         },
-        "user_input": labels
+        #necessary valued for random forest model
+        "user_input": labels,
+        "duration": end_ts-start_ts,
+        "distance": ecc.calDistance(origin,destination) 
     }
 
     return ecwe.Entry.create_fake_entry(user_id, key, data, write_ts=time.time())
