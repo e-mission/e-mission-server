@@ -246,7 +246,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                     logging.debug("After dropping %d, filtered points = %s" % 
                         (currPoint.idx, self.filtered_points_df.iloc[currPoint.idx - 5:currPoint.idx + 5][["valid", "fmt_time"]]))
                     logging.debug("remove huge invalid ts offset point = %s" % currPoint)
-                    timeseries.invalidate_raw_entry(currPoint["_id"])
+                    timeseries.invalidate_raw_entry([currPoint["_id"]])
                     # We currently re-retrieve the last point every time, so
                     # searching upwards is good enough but if we use
                     # lastPoint = currPoint, we should update currPoint here
