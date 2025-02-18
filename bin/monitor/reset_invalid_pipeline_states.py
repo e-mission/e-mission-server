@@ -12,7 +12,8 @@ import emission.pipeline.reset as epr
 
 def reset_all_invalid_state(args):
     # all_invalid_states = [ecwp.PipelineState(p) for p in edb.get_pipeline_state_db().find({"curr_run_ts": {"$ne": None}})]
-    epr.auto_reset(args.dry_run, args.only_calc)
+    print(f"{args.user_exclude=}")
+    epr.auto_reset(args.dry_run, args.only_calc, args.user_exclude)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -21,5 +22,7 @@ if __name__ == '__main__':
                         help="only calculate the reset timestamps, don't launch the reset process")
     parser.add_argument("-n", "--dry_run", action="store_true", default=False,
                         help="do everything except actually perform the operations")
+    parser.add_argument("-u", "--user_exclude", nargs="+",
+                        help="users whose pipeline states will not be reset")
     args = parser.parse_args()
     reset_all_invalid_state(args)
