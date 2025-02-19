@@ -7,6 +7,8 @@ import os
 import time
 import hashlib
 
+import emission.analysis.config as eac
+
 # Set up Overpass API and caching configuration
 CACHE_DIR = None
 
@@ -22,6 +24,44 @@ except:
     os.makedirs(CACHE_DIR, exist_ok=True)
 
 RETRY = -1
+MAX_BBOXES_PER_QUERY = 10
+
+def query_overpass(overpass_query):
+    """
+    Wrapper function that handles caching of Overpass API responses.
+    If in production mode (CACHE_DIR is None), directly uses make_request_and_catch.
+    Otherwise, tries to use cached response if available, or makes request and caches the result.
+    """
+    if CACHE_DIR is None:
+        return make_request_and_catch(overpass_query)
+    
+    # Create a unique filename based on the query hash
+    query_hash = hashlib.md5(overpass_query.encode()).hexdigest()
+    cache_file = os.path.join(CACHE_DIR, f"{query_hash}.json")
+    
+    # If the cached response exists, use it
+    if os.path.exists(cache_file):
+        logging.info(f"Using cached response from {cache_file}")
+        try:
+            with open(cache_file, 'r') as f:
+                all_results = json.load(f)
+            return all_results
+        except Exception as e:
+            logging.warning(f"Error reading cache file: {e}, falling back to API")
+    
+    # Else, make the request and cache the response before returning
+    all_results = make_request_and_catch(overpass_query)
+    
+    # Only cache successful results (not RETRY signal)
+    if all_results != RETRY and all_results:
+        try:
+            with open(cache_file, 'w') as f:
+                json.dump(all_results, f)
+            logging.info(f"Cached API response to {cache_file}")
+        except Exception as e:
+            logging.warning(f"Error caching response: {e}")
+    
+    return all_results
 
 def query_overpass(overpass_query):
     """
@@ -105,20 +145,37 @@ def make_request_and_catch(overpass_query):
     return all_results
 
 
-def get_query_for_bbox(bbox):
-    bbox_string = "%s,%s,%s,%s" % bbox
-    return f'''
+def load_overpass_query_template():
+    config = eac.get_config()
+    template_path = config.get("OVERPASS_QUERY_TEMPLATE_PATH")
+    
+    if template_path and os.path.exists(template_path):
+        try:
+            with open(template_path, 'r', encoding='UTF-8') as query_file:
+                logging.info("Loaded Overpass query template from %s", template_path)
+                return "".join(query_file.readlines())
+        except Exception as e:
+            logging.error("Error reading template file at %s: %s", template_path, e)
+    
+    # Fallback: use default inline template
+    logging.info("Using default inline Overpass query template")
+    return '''
     (
-        node["highway"="bus_stop"]({bbox_string});
-        node["railway"="station"]({bbox_string});
-        node["public_transport"]({bbox_string});
-        way["railway"="station"]({bbox_string});
-        relation["route"]({bbox_string});
+        node["highway"="bus_stop"]({bbox});
+        node["railway"="station"]({bbox});
+        node["public_transport"]({bbox});
+        way["railway"="station"]({bbox});
+        relation["route"]({bbox});
     );
     out body;
     out count;
     >;
     '''
+
+def get_query_for_bbox(bbox):
+    bbox_string = "%s,%s,%s,%s" % bbox
+    template = load_overpass_query_template()
+    return template.format(bbox=bbox_string)
 
 
 def get_query_for_bboxes(bboxes):
@@ -127,33 +184,43 @@ def get_query_for_bboxes(bboxes):
         query += get_query_for_bbox(bbox)
     return query
 
+# Add limit to how many locations are in one query via chunking
+def chunk_list(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
 
 def get_public_transit_stops(bboxes):
-    overpass_query = get_query_for_bboxes(bboxes)
-    call_return = RETRY
-    retry_count = 0
-    while call_return == RETRY:
-        if retry_count > 0:
-            logging.info(f"call_return = {call_return}, retrying...")
-        call_return = query_overpass(overpass_query)
-        logging.info(f"after retry, got {'RETRY' if call_return == RETRY else len(call_return)}...")
-        if call_return == RETRY:
-            retry_count = retry_count + 1
-            logging.info(f"after incrementing, retry_count = {retry_count}...")
-
-    logging.info(f"after all retries, retry_count = {retry_count}, call_return = {'RETRY' if call_return == RETRY else len(call_return)}...")
-    all_results = call_return
-
-    locs_results = []
-    current_loc_results = []
-    for result in all_results:
-        if result.get("type") == "count":
-            locs_results.append(current_loc_results)
-            current_loc_results = []
-        else:
-            current_loc_results.append(result)
-
-    return [get_stops_from_results(loc_results) for loc_results in locs_results]
+    all_stops = []
+    # Process bboxes in chunks to avoid oversized queries.
+    for bbox_chunk in chunk_list(bboxes, MAX_BBOXES_PER_QUERY):
+        overpass_query = get_query_for_bboxes(bbox_chunk)
+        call_return = RETRY
+        retry_count = 0
+        logging.debug("Using bbox chunk: %s", bbox_chunk)
+        logging.debug("Overpass query: %s", overpass_query)
+        while call_return == RETRY:
+            if retry_count > 0:
+                logging.info(f"call_return = {call_return}, retrying chunk query...")
+            call_return = query_overpass(overpass_query)
+            logging.info(f"after retry, got {'RETRY' if call_return == RETRY else len(call_return)} for chunk...")
+            if call_return == RETRY:
+                retry_count += 1
+        # Process the results from this chunk.
+        chunk_results = call_return
+        locs_results = []
+        current_loc_results = []
+        for result in chunk_results:
+            if result.get("type") == "count":
+                locs_results.append(current_loc_results)
+                current_loc_results = []
+            else:
+                current_loc_results.append(result)
+        # Append stops from this chunk.
+        stops_for_chunk = [get_stops_from_results(loc_results) for loc_results in locs_results]
+        all_stops.extend(stops_for_chunk)
+    return all_stops
 
 
 def get_stops_from_results(results):

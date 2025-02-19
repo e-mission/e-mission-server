@@ -35,6 +35,9 @@ class OverpassTest(unittest.TestCase):
             self.gfbk_url_base = None
 
     def test_overpass(self):
+        # Skip test if Geofabrik Overpass key is not configured
+        if not self.gfbk_url_base:
+            self.skipTest("GEOFABRIK_OVERPASS_KEY not configured, skipping test_overpass")
         r_gfbk = requests.get(self.gfbk_url_base)
         r_public = requests.get(self.public_url_base)
         
@@ -47,7 +50,7 @@ class OverpassTest(unittest.TestCase):
 
     #Test utilizes the functions get_stops_near, get_public_transit_stops, and make_request_and_catch.  
     def test_get_stops_near(self):
-        stops_at_loc1 = enetm.get_stops_near(loc1['coordinates'], 150.0)[0]
+        stops_at_loc1 = enetm.get_stops_near([loc1['coordinates']], 150.0)[0]
         first_stop_routes = stops_at_loc1[0]['routes']
         self.assertEqual(len(first_stop_routes), 2)
         first_stop_first_route_tags = first_stop_routes[0]['tags']
