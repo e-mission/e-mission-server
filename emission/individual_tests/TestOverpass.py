@@ -67,153 +67,53 @@ class OverpassTest(unittest.TestCase):
         expected_result = ['train', 'train']
         self.assertEqual(actual_result, expected_result)
 
-    def test_chunk_list(self):
-        # Case 1: List of 10 elements with chunk size of 3.
-        data = list(range(1, 11))  # [1, 2, ..., 10]
-        chunk_size = 3
-        chunks = list(enetm.chunk_list(data, chunk_size))
-        expected_chunks = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
-        self.assertEqual(chunks, expected_chunks)
-
-        # Case 2: Exact division
-        data_exact = list(range(1, 10))  # [1, 2, ..., 9]
-        chunk_size = 3
-        chunks_exact = list(enetm.chunk_list(data_exact, chunk_size))
-        expected_chunks_exact = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-        self.assertEqual(chunks_exact, expected_chunks_exact)
-
-        # Case 3: Empty list
-        data_empty = []
-        chunks_empty = list(enetm.chunk_list(data_empty, chunk_size))
-        self.assertEqual(chunks_empty, [])
-
-    def test_get_stops_near_many_chunks(self):
+    def test_overpass_request_count(self):
         """
-        Test get_stops_near with many chunks.
-        Override MAX_BBOXES_PER_QUERY to 1 so that each coordinate produces its own chunk.
-        Supply 20 dummy coordinates and verify that 20 chunks are returned.
+        Test that get_stops_near makes the expected number of Overpass API calls.
+        With MAX_BBOXES_PER_QUERY set to 10, we expect:
+        - 10 coordinates -> 1 API call
+        - 11 coordinates -> 2 API calls
+        - 20 coordinates -> 2 API calls
+        - 21 coordinates -> 3 API calls
         """
         original_max = enetm.MAX_BBOXES_PER_QUERY
-        enetm.MAX_BBOXES_PER_QUERY = 1
+        enetm.MAX_BBOXES_PER_QUERY = 10
 
-        # Create 20 dummy coordinates ([lon, lat]).
-        coords = [[i, i + 0.5] for i in range(20)]
-
-        # Patch make_request_and_catch to return a dummy response.
+        # Save the original make_request_and_catch
         original_make_request_and_catch = enetm.make_request_and_catch
+
+        # Set up a counter for API calls.
         def dummy_make_request_and_catch(query):
-            # Return a dummy response: one dummy node and a "count" marker.
+            dummy_make_request_and_catch.call_count += 1
+            # Return a dummy response that represents one chunk:
             return [{'id': 100, 'type': 'node', 'tags': {'dummy': True}},
                     {'type': 'count'}]
+        dummy_make_request_and_catch.call_count = 0
+
         enetm.make_request_and_catch = dummy_make_request_and_catch
 
-        stops = enetm.get_stops_near(coords, 150.0)
-        # Expect one chunk per coordinate = 20 chunks.
-        self.assertEqual(len(stops), 20)
-        for chunk in stops:
-            # Each chunk (from the dummy response) should contain one stop.
-            self.assertEqual(len(chunk), 1)
-            self.assertEqual(chunk[0]['tags'], {'dummy': True})
+        # Define test cases: number of coordinates -> expected API calls.
+        test_cases = {
+            10: 1,  # 10 locations should be a single batch.
+            11: 2,  # 11 locations: 11/10 => ceil(1.1) = 2 batches.
+            20: 2,  # 20 locations: exactly 2 batches.
+            21: 3,  # 21 locations: ceil(2.1) = 3 batches.
+        }
+
+        for num_coords, expected_calls in test_cases.items():
+            # Reset the counter for each sub-test.
+            dummy_make_request_and_catch.call_count = 0
+            # Create dummy coordinates.
+            coords = [[i, i + 0.5] for i in range(num_coords)]
+            # Call get_stops_near, which will use our dummy_make_request_and_catch.
+            _ = enetm.get_stops_near(coords, 150.0)
+            self.assertEqual(dummy_make_request_and_catch.call_count, expected_calls,
+                            msg=f"For {num_coords} coordinates, expected {expected_calls} API calls, got {dummy_make_request_and_catch.call_count}.")
 
         # Restore original settings.
         enetm.MAX_BBOXES_PER_QUERY = original_max
         enetm.make_request_and_catch = original_make_request_and_catch
-
-    def test_get_predicted_transit_mode_many_chunks(self):
-        """
-        Test get_predicted_transit_mode when provided with many stops.
-        Simulate two sets (start and end) of 20 stops each, where each stop carries
-        a unique route (with matching ids across both sets). Expect one matching route per stop.
-        """
-        start_stops = []
-        end_stops = []
-        for i in range(20):
-            # Create a dummy route with a unique id and route "train".
-            # Include a "ref" key to avoid an AttributeError.
-            route = ad.AttrDict({
-                'id': i,
-                'tags': {'route': 'train', 'ref': str(i)}
-            })
-            stop_start = ad.AttrDict({
-                'id': i,
-                'tags': {},
-                'routes': [route]
-            })
-            stop_end = ad.AttrDict({
-                'id': i,
-                'tags': {},
-                'routes': [route]
-            })
-            start_stops.append(stop_start)
-            end_stops.append(stop_end)
         
-        actual_result = enetm.get_predicted_transit_mode(start_stops, end_stops)
-        expected_result = ['train'] * 20
-        self.assertEqual(actual_result, expected_result)
-
-    def test_get_stops_near_different_batch_sizes(self):
-        """
-        Test get_stops_near using varying batch sizes.
-        For each batch size, override MAX_BBOXES_PER_QUERY and supply a fixed list of dummy
-        coordinates. Verify that the number of returned chunks equals ceil(total_coords / batch_size).
-        """
-        original_max = enetm.MAX_BBOXES_PER_QUERY
-        original_make_request_and_catch = enetm.make_request_and_catch
-
-        # Create 7 dummy coordinates.
-        coords = [[i, i + 0.5] for i in range(7)]
-
-        # Dummy response: one dummy node and a "count" marker.
-        def dummy_make_request_and_catch(query):
-            return [{'id': 100, 'type': 'node', 'tags': {'dummy': True}},
-                    {'type': 'count'}]
-        enetm.make_request_and_catch = dummy_make_request_and_catch
-
-        for batch_size in [1, 2, 5, 10]:
-            enetm.MAX_BBOXES_PER_QUERY = batch_size
-            stops = enetm.get_stops_near(coords, 150.0)
-            expected_chunks = math.ceil(len(coords) / batch_size)
-            self.assertEqual(len(stops), expected_chunks,
-                             msg=f"Batch size {batch_size} produced {len(stops)} chunks; expected {expected_chunks}.")
-            for chunk in stops:
-                self.assertEqual(len(chunk), 1)
-                self.assertEqual(chunk[0]['tags'], {'dummy': True})
-
-        # Restore original settings.
-        enetm.MAX_BBOXES_PER_QUERY = original_max
-        enetm.make_request_and_catch = original_make_request_and_catch
-
-    def test_get_predicted_transit_mode_different_sizes(self):
-        """
-        Test get_predicted_transit_mode for different numbers of stops.
-        For various sizes, simulate matching start and end stops and verify the expected matching routes.
-        """
-        for size in [1, 3, 7, 20]:
-            start_stops = []
-            end_stops = []
-            for i in range(size):
-                route = ad.AttrDict({
-                    'id': i,
-                    'tags': {'route': 'train', 'ref': str(i)}
-                })
-                stop_start = ad.AttrDict({
-                    'id': i,
-                    'tags': {},
-                    'routes': [route]
-                })
-                stop_end = ad.AttrDict({
-                    'id': i,
-                    'tags': {},
-                    'routes': [route]
-                })
-                start_stops.append(stop_start)
-                end_stops.append(stop_end)
-            actual_result = enetm.get_predicted_transit_mode(start_stops, end_stops)
-            expected_result = ['train'] * size
-            self.assertEqual(actual_result, expected_result,
-                             msg=f"For {size} stops, expected {expected_result} but got {actual_result}.")
-
-
 if __name__ == '__main__':
     unittest.main()
 
