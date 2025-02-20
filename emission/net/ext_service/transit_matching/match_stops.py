@@ -146,19 +146,9 @@ def make_request_and_catch(overpass_query):
 
 
 def load_overpass_query_template():
-    config = eac.get_config()
-    template_path = config.get("OVERPASS_QUERY_TEMPLATE_PATH")
-    
-    if template_path and os.path.exists(template_path):
-        try:
-            with open(template_path, 'r', encoding='UTF-8') as query_file:
-                logging.info("Loaded Overpass query template from %s", template_path)
-                return "".join(query_file.readlines())
-        except Exception as e:
-            logging.error("Error reading template file at %s: %s", template_path, e)
-    
-    # Fallback: use default inline template
-    logging.info("Using default inline Overpass query template")
+    # Return a static inline query template.
+    # Removed any configurability here because the code expects these specific features.
+    logging.info("Using static inline Overpass query template")
     return '''
     (
         node["highway"="bus_stop"]({bbox});
@@ -179,7 +169,11 @@ def get_query_for_bbox(bbox):
 
 
 def get_query_for_bboxes(bboxes):
-    query = '[out:json][timeout:25];\n'
+    # Retrieve the timeout from config; default to 25 if not set.
+    config = eac.get_config()
+    timeout = config.get("OVERPASS_QUERY_TIMEOUT", 25)
+    # Build the header with the configurable timeout.
+    query = f'[out:json][timeout:{timeout}];\n'
     for bbox in bboxes:
         query += get_query_for_bbox(bbox)
     return query
