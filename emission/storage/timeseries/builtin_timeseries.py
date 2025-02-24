@@ -18,10 +18,13 @@ import inspect
 
 import emission.core.wrapper.entry as ecwe
 
-ts_enum_map = {
-    esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
-    esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
-}
+def _get_enum_map():
+    return {
+        esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
+        esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+    }
+
+ts_enum_map = _get_enum_map()
 
 INVALID_QUERY = {'metadata.key': 'invalid'}
 
@@ -242,6 +245,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
             hint_arr =  [("metadata.key", 1)] if (sort_key is None) or ("metadata" in sort_key) else [(sort_key, -1)]
+            # print(f"for query {ts_query=}, when indices are {tsdb.index_information()}, {sort_key=} so {hint_arr=}")
             ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
             ts_db_count = tsdb.count_documents(ts_query, hint=hint_arr)
             if sort_key is None:
