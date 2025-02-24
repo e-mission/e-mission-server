@@ -195,6 +195,7 @@ def get_timeseries_db():
     TimeSeries.create_index([("metadata.key", pymongo.ASCENDING)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
     _migrate_sparse_to_dense(TimeSeries, "data.loc_2dsphere")
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
     return TimeSeries
