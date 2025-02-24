@@ -241,8 +241,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         if key_list is None or len(key_list) > 0:
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
-            ts_db_cursor = tsdb.find(ts_query)
-            ts_db_count = tsdb.count_documents(ts_query)
+            hint_arr =  [("metadata.key", 1)] if (sort_key is None) or ("metadata" in sort_key) else [(sort_key, -1)]
+            ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
+            ts_db_count = tsdb.count_documents(ts_query, hint=hint_arr)
             if sort_key is None:
                 ts_db_result = ts_db_cursor
             else:
@@ -258,7 +259,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # Out[593]: 449869
             ts_db_result.limit(edb.result_limit)
         else:
-            ts_db_result = tsdb.find(INVALID_QUERY)
+            ts_db_result = tsdb.find(INVALID_QUERY).hint([("metadata.key", 1)])
             ts_db_count = 0
 
         logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
