@@ -15,10 +15,13 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
 
-ts_enum_map = {
-    esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
-    esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
-}
+def _get_enum_map():
+    return {
+        esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
+        esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+    }
+
+ts_enum_map = _get_enum_map()
 
 INVALID_QUERY = {'metadata.key': 'invalid'}
 
@@ -231,8 +234,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
         if key_list is None or len(key_list) > 0:
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
-            ts_db_cursor = tsdb.find(ts_query)
-            ts_db_count = tsdb.count_documents(ts_query)
+            hint_arr =  [("metadata.key", 1)] if (sort_key is None) or ("metadata" in sort_key) else [(sort_key, -1)]
+            # print(f"for query {ts_query=}, when indices are {tsdb.index_information()}, {sort_key=} so {hint_arr=}")
+            ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
+            ts_db_count = tsdb.count_documents(ts_query, hint=hint_arr)
             if sort_key is None:
                 ts_db_result = ts_db_cursor
             else:
@@ -248,7 +253,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # Out[593]: 449869
             ts_db_result.limit(edb.result_limit)
         else:
-            ts_db_result = tsdb.find(INVALID_QUERY)
+            ts_db_result = tsdb.find(INVALID_QUERY).hint([("metadata.key", 1)])
             ts_db_count = 0
 
         logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
