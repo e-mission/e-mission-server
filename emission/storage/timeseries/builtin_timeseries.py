@@ -9,9 +9,12 @@ import logging
 import pandas as pd
 import pymongo
 import itertools
+import emission.storage.decorations.stats_queries as esds
 
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
+import time
+import inspect
 
 import emission.core.wrapper.entry as ecwe
 
@@ -228,6 +231,13 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                     extra_query_list, sort_key):
         # workaround for https://github.com/e-mission/e-mission-server/issues/271
         # during the migration
+
+        esds.store_pipeline_time(
+            self.user_id,
+            'get_entries_for_timeseries',
+            time.time(),
+            inspect.stack()[1][3],
+        )
         if key_list is None or len(key_list) > 0:
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
