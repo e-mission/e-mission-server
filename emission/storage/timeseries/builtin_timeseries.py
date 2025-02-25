@@ -15,6 +15,7 @@ import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 import time
 import inspect
+import traceback
 
 import emission.core.wrapper.entry as ecwe
 
@@ -229,6 +230,29 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
             (orig_ts_db_count, analysis_ts_db_count))
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
+    
+    def find_entries_only_timeseries(self, key_list=None, time_query=None, geo_query=None, extra_query_list=None):
+        """
+        Returns an iterator over entries from only the timeseries_db (raw sensor data),
+        ignoring entries from the analysis_timeseries_db.
+        """
+        sort_key = self._get_sort_key(time_query)
+        logging.debug("find_entries_only_timeseries: curr_query = %s, sort_key = %s" %
+                      (self._get_query(key_list, time_query, geo_query, extra_query_list), sort_key))
+        if key_list is None:
+            key_list = []
+        timeseries_only_keys = [key for key in key_list if self.get_timeseries_db(key) == self.timeseries_db]
+        logging.debug("find_entries_only_timeseries: using only timeseries_db keys: %s" % timeseries_only_keys)
+        
+        (ts_count, ts_result) = self._get_entries_for_timeseries(self.timeseries_db,
+                                                                 timeseries_only_keys,
+                                                                 time_query,
+                                                                 geo_query,
+                                                                 extra_query_list,
+                                                                 sort_key)
+        logging.debug("find_entries_only_timeseries: timeseries_db count = %s" % ts_count)
+        return ts_result
+
 
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
                                     extra_query_list, sort_key):
@@ -239,7 +263,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             self.user_id,
             'get_entries_for_timeseries',
             time.time(),
-            inspect.stack()[1][3],
+            traceback.format_stack(),
         )
         if key_list is None or len(key_list) > 0:
             ts_query = self._get_query(key_list, time_query, geo_query,
