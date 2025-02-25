@@ -29,7 +29,7 @@ import emission.core.timer as ect
 import emission.core.wrapper.pipelinestate as ecwp
 
 class TripSegmentationMethod(object):
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self, loc_df, transition_df, motion_df):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -100,7 +100,9 @@ def segment_current_trips(user_id):
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
         with ect.Timer() as t_segment_trips:
-            segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(ts, time_query, loc_df)
+            transition_df = ts.get_data_df("statemachine/transition", time_query)
+            motion_df = ts.get_data_df("background/motion_activity", time_query)
+            segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(loc_df, transition_df, motion_df)
         esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips", time.time(), t_segment_trips.elapsed)
     else:
         with ect.Timer() as t_get_combined_segmentation:
@@ -167,7 +169,9 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
             (curr_filter, time_query.startTs, time_query.endTs))
         curr_filter_loc_df = loc_df.loc[startIndex:endIndex]
         curr_filter_loc_df.reset_index(drop=True, inplace=True)
-        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query, curr_filter_loc_df)
+        curr_filter_transition_df = ts.get_data_df("statemachine/transition", time_query)
+        curr_filter_motion_df = ts.get_data_df("background/motion_activity", time_query)
+        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(curr_filter_loc_df, curr_filter_transition_df, curr_filter_motion_df)
     logging.debug("After filtering, segmentation_map has keys %s" % list(segmentation_map.keys()))
     sortedStartTsList = sorted(segmentation_map.keys())
     segmentation_points = []
