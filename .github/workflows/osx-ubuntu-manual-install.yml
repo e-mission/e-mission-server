@@ -35,6 +35,12 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
+    - name: check my platform
+      shell: bash -l {0}
+      run: |
+        uname -a
+        uname -m
+
     - name: Install miniconda
       shell: bash -l {0}
       run: |
