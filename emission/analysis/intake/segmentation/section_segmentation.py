@@ -67,13 +67,13 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
     time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
     distance_from_place = _get_distance_from_start_place_to_end(trip_entry)
     # Preload BLE entries for the trip
-    ble_entries_during_trip = ts.find_entries(["background/bluetooth_ble"], time_query)
+    ble_entries_during_trip = ts.find_entries_only_timeseries(["background/bluetooth_ble"], time_query)
     
     # ------------------------------------------------------------------
     # Preload all "background/filtered_location" entries upfront to avoid
     # repetitive database queries on a point-by-point basis.
     # ------------------------------------------------------------------
-    filtered_loc_entries = ts.find_entries(["background/filtered_location"], time_query)
+    filtered_loc_entries = ts.find_entries_only_timeseries(["background/filtered_location"], time_query)
     # Build a lookup dictionary mapping timestamp to entry (assuming unique timestamps).
     filtered_loc_lookup = {entry["data"]["ts"]: entry for entry in filtered_loc_entries}
     
