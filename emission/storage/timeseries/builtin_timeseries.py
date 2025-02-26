@@ -172,6 +172,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                     expanded_key = "%s_%s" % (ld_key,field_key)
                     ret_val[expanded_key] = ret_val[ld_key][field_key]
                 del ret_val[ld_key]
+        ret_val["metadata_key"] = entry["metadata"]["key"]
         ret_val["_id"] = entry["_id"]
         ret_val['user_id'] = entry['user_id']
         ret_val["metadata_write_ts"] = entry["metadata"]["write_ts"]
@@ -223,7 +224,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
             (orig_ts_db_count, analysis_ts_db_count))
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
-
+    
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
                                     extra_query_list, sort_key):
         # workaround for https://github.com/e-mission/e-mission-server/issues/271

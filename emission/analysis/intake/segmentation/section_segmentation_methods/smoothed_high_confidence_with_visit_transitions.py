@@ -58,7 +58,7 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         })
         return new_mc
 
-    def segment_into_sections(self, timeseries, distance_from_place, time_query):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query, preload = None):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
         :param timeseries: the time series for this user
