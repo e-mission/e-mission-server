@@ -23,8 +23,6 @@ def _get_enum_map():
 
 ts_enum_map = _get_enum_map()
 
-INVALID_QUERY = {'metadata.key': 'invalid'}
-
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
@@ -258,7 +256,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # Out[593]: 449869
             ts_db_result.limit(edb.result_limit)
         else:
-            ts_db_result = tsdb.find(INVALID_QUERY).hint([("metadata.key", 1)])
+            ts_db_result = []
             ts_db_count = 0
 
         logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
@@ -483,8 +481,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
         # Segregate orig_tsdb and analysis_tsdb keys so as to fetch counts on each dataset
         (orig_tsdb_keys, analysis_tsdb_keys) = self._split_key_list(key_list)
 
-        orig_tsdb_count = self._get_entries_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list, None)[0]
-        analysis_tsdb_count = self._get_entries_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list, None)[0]
+        (orig_tsdb_count, _) = self._get_entries_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list, None)
+        (analysis_tsdb_count, _) = self._get_entries_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list, None)
 
         total_matching_count = orig_tsdb_count + analysis_tsdb_count
         return total_matching_count
