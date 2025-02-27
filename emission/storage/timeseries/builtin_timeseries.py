@@ -235,9 +235,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
             hint_arr =  [("metadata.key", 1)] if (sort_key is None) or ("metadata" in sort_key) else [(sort_key, -1)]
+
             # print(f"for query {ts_query=}, when indices are {tsdb.index_information()}, {sort_key=} so {hint_arr=}")
-            ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
-            ts_db_count = tsdb.count_documents(ts_query, hint=hint_arr)
+            if edb.use_hints:
+                ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
+                ts_db_count = tsdb.count_documents(ts_query, hint=hint_arr)
+            else:
+                ts_db_cursor = tsdb.find(ts_query)
+                ts_db_count = tsdb.count_documents(ts_query)
             if sort_key is None:
                 ts_db_result = ts_db_cursor
             else:

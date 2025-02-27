@@ -16,7 +16,7 @@ config = ecbc.get_config('conf/storage/db.conf',
     {"DB_HOST": "timeseries.url", "DB_RESULT_LIMIT": "timeseries.result_limit"})
 
 db_config = {}
-for key in ["DB_HOST", "DB_RESULT_LIMIT"]:
+for key in ["DB_HOST", "DB_RESULT_LIMIT", "USE_HINTS"]:
     if key in config:
         db_config[key] = config.get(key)
     else:
@@ -27,6 +27,11 @@ try:
     result_limit = int(config.get("DB_RESULT_LIMIT", 250000))
 except ValueError:
     result_limit = 250000
+
+try:
+    use_hints = bool(config.get("USE_HINTS", False))
+except ValueError:
+    use_hints = False
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
