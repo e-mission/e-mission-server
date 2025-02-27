@@ -66,8 +66,17 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
     ts = esta.TimeSeries.get_time_series(user_id)
     time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
     distance_from_place = _get_distance_from_start_place_to_end(trip_entry)
-    ble_entries_during_trip = ts.find_entries(["background/bluetooth_ble"], time_query)
-
+    # Preload BLE entries for the trip
+    ble_entries_during_trip = ts.find_entries_only_timeseries(["background/bluetooth_ble"], time_query)
+    
+    # ------------------------------------------------------------------
+    # Preload all "background/filtered_location" entries upfront to avoid
+    # repetitive database queries on a point-by-point basis.
+    # ------------------------------------------------------------------
+    filtered_loc_entries = ts.find_entries_only_timeseries(["background/filtered_location"], time_query)
+    # Build a lookup dictionary mapping timestamp to entry (assuming unique timestamps).
+    filtered_loc_lookup = {entry["data"]["ts"]: entry for entry in filtered_loc_entries}
+    
     if (trip_source == "DwellSegmentationTimeFilter"):
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
         shcmsm = shcm.SmoothedHighConfidenceMotion(60, 100, [ecwm.MotionTypes.TILTING,
@@ -99,14 +108,42 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
     # set it properly.
     ts = esta.TimeSeries.get_time_series(user_id)
 
-    get_loc_for_ts = lambda time: ecwl.Location(ts.get_entry_at_ts("background/filtered_location", "data.ts", time)["data"])
+    # ------------------------------------------------------------------
+    # Define a function to use preloaded filtered locations instead of querying on each point.
+    # Logs indicate whether the preloaded lookup or the fallback method is used.
+    # Looks like preloaded lookup is used for all points, so the fallback method is not used -- well according to tests that is
+    # ------------------------------------------------------------------
+    def get_loc_for_ts(time):
+        if time in filtered_loc_lookup:
+            print("Using preloaded filtered location for time: %s" % time)
+            return ecwl.Location(filtered_loc_lookup[time]["data"])
+        else:
+            print("Using fallback get_entry_at_ts for time: %s" % time)
+            entry = ts.get_entry_at_ts("background/filtered_location", "data.ts", time)
+            return ecwl.Location(entry["data"])
+
     trip_start_loc = get_loc_for_ts(trip_entry.data.start_ts)
     trip_end_loc = get_loc_for_ts(trip_entry.data.end_ts)
     logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
 
+    # ------------------------------------------------------------------
+    # Define a function for retrieving a location from a row with logging.
+    # Logs whether preloaded lookup or fallback (df_row_to_entry) is used.
+    # Looks like preloaded lookup is used for all rows, so the fallback method is not used -- well according to tests that is
+    # ------------------------------------------------------------------
+    def get_loc_for_row(row):
+        ts_val = row["ts"]
+        if ts_val in filtered_loc_lookup:
+            print("Using preloaded filtered location for row with ts: %s" % ts_val)
+            return ecwl.Location(filtered_loc_lookup[ts_val]["data"])
+        else:
+            print("Using fallback df_row_to_entry for row with ts: %s" % ts_val)
+            entry = ts.df_row_to_entry("background/filtered_location", row)
+            return ecwl.Location(entry["data"])
+
     for (i, (start_loc_doc, end_loc_doc, sensed_mode)) in enumerate(segmentation_points):
         logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
-        get_loc_for_row = lambda row: ts.df_row_to_entry("background/filtered_location", row).data
+
         start_loc = get_loc_for_row(start_loc_doc)
         end_loc = get_loc_for_row(end_loc_doc)
         logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
