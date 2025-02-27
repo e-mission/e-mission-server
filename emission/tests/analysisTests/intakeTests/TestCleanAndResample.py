@@ -55,7 +55,7 @@ class TestCleanAndResample(unittest.TestCase):
                                                    dummy_loc))
 
         tq = estt.TimeQuery("data.ts", TS_START - 10, TS_START + 10 + 10)
-        loc_entries = list(self.ts.find_entries(["background/filtered_location"], tq))
+        loc_entries = self.ts.find_entries(["background/filtered_location"], tq)
         loc_df = self.ts.get_data_df("background/filtered_location", tq)
         filtered_loc_df = eaicc.remove_outliers(loc_entries, loc_df["_id"])
         self.assertEqual(len(loc_entries), len(loc_df))

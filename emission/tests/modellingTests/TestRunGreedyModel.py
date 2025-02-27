@@ -43,7 +43,7 @@ class TestRunGreedyModel(unittest.TestCase):
 
         # test data can be saved between test invocations, check if data exists before generating
         ts = esta.TimeSeries.get_time_series(user_id)
-        test_data = list(ts.find_entries(["analysis/confirmed_trip"]))  
+        test_data = ts.find_entries(["analysis/confirmed_trip"])
         if len(test_data) == 0:
             # generate test data for the database
             logging.debug(f"inserting mock Confirmedtrips into database")

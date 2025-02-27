@@ -733,7 +733,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile+".expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -749,7 +749,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile+".inferred_section.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -769,7 +769,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         end_run = time.time()
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         for ct in composite_trips:
             # for this data, every composite trip should come from a confirmed trip,
             # NOT from untracked time
@@ -785,7 +785,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         end_run = time.time()
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         countUntrackedTime = 0
         for ct in composite_trips:
             if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
@@ -802,7 +802,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         end_run = time.time()
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         countUntrackedTime = 0
         for ct in composite_trips:
             logging.debug("composite trip metadata %s = " % ct['metadata'])
@@ -821,7 +821,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -833,7 +833,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         # They should all match the final place
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -846,7 +846,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         # The place additions should be dispersed to the actual places
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".spread-across-aug-5.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -860,7 +860,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         # They should all match the actual entries
         # Trip matches should also work
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".trip-matches-check-aug-4.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -876,7 +876,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".before-user-inputs.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -891,7 +891,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         # They should all match the final place
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".all-match-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -904,7 +904,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         # The place additions should be dispersed to the actual places
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".retained-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))

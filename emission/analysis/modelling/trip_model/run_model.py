@@ -133,7 +133,7 @@ def _get_training_data(user_id: UUID, time_query: Optional[estt.TimeQuery]):
     """
     
     ts = esta.TimeSeries.get_time_series(user_id)
-    trips = list(ts.find_entries([esda.CONFIRMED_TRIP_KEY], time_query=time_query))  
+    trips = ts.find_entries([esda.CONFIRMED_TRIP_KEY], time_query=time_query)
     print(f'found {len(trips)} training rows')
     labeled_trips = [trip for trip in trips if trip['data']['user_input'] != {}]
 

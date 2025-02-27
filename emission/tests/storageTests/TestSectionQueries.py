@@ -86,8 +86,8 @@ class TestSectionQueries(unittest.TestCase):
         ts_agg = esta.TimeSeries.get_aggregate_time_series()
         
         # Preparing section_user_list of sections and user_ids dictionary to be passed as function parameter
-        doc_cursor = ts_agg.find_entries([esda.CLEANED_SECTION_KEY])
-        sections_entries = [ecwe.Entry(doc) for doc in doc_cursor]
+        sections = ts_agg.find_entries([esda.CLEANED_SECTION_KEY])
+        sections_entries = [ecwe.Entry(s) for s in sections]
         section_user_list = []
         for i, section in enumerate(sections_entries):
             section_id = section.get_id()

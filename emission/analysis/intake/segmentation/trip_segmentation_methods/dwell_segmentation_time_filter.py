@@ -75,7 +75,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         ]
         filtered_points_df.reset_index(inplace=True)
         self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-        self.motion_list = list(timeseries.find_entries(["background/motion_activity"], time_query))
+        self.motion_list = timeseries.find_entries(["background/motion_activity"], time_query)
 
         if len(self.transition_df) > 0:
             logging.debug("self.transition_df = %s" % self.transition_df[["fmt_time", "transition"]])
