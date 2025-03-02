@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from pytz import timezone
 import math
+import numpy as np
 
 def isMillisecs(ts):
   return not (ts < 10 ** 11)
@@ -38,6 +39,22 @@ def Include_place_2(lst,place,radius):
 def travel_date_time(time1,time2):
     travel_time = time2-time1
     return travel_time.seconds
+
+def haversine_numpy(lon1, lat1, lon2, lat2):
+    """
+    Haversine distance using 'numpy'
+    :return distance in meters
+    """
+    earth_radius = 6371000
+
+    lat1, lat2 = np.radians(lat1), np.radians(lat2)
+    lon1, lon2 = np.radians(lon1), np.radians(lon2)
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
+    return 2 * earth_radius * np.arcsin(np.sqrt(a))
 
 def calDistance(point1, point2, coordinates=False):
     """haversine distance
