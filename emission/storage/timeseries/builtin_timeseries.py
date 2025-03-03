@@ -226,7 +226,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
             (orig_ts_db_count, analysis_ts_db_count))
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
-
+    
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
                                     extra_query_list, sort_key):
         # workaround for https://github.com/e-mission/e-mission-server/issues/271

@@ -21,6 +21,8 @@ import emission.core.common as ecc
 import emission.analysis.config as eac
 import emission.analysis.intake.location_utils as eail
 import emission.analysis.intake.domain_assumptions as eaid
+import pandas as pd
+from emission.storage.timeseries import builtin_timeseries as bts
 
 class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
     """
@@ -46,7 +48,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.debug("%s, returning False" % activity_dump)
             return False
 
-    def segment_into_motion_changes(self, timeseries, time_query):
+    def segment_into_motion_changes(self, preload):
         """
         Use the motion changes detected on the phone to detect sections (consecutive chains of points)
         that have a consistent motion.
@@ -58,7 +60,12 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         how to deal with them (combine with first, combine with second, split in the middle). This policy can be
         enforced when we map the activity changes to locations.
         """
-        motion_df = timeseries.get_data_df("background/motion_activity", time_query)
+        motion_entries = [
+            entry for entry in preload
+            if entry["metadata"]["key"] == "background/motion_activity"
+        ]
+        row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in motion_entries]
+        motion_df = pd.DataFrame(row_list)
         filter_mask = motion_df.apply(self.is_filtered, axis=1)
         # Calling np.nonzero on the filter_mask even if it was related trips with zero sections
         # has not been a problem before this - the subsequent check on the
@@ -123,7 +130,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
     # Overridden in smoothed_high_confidence_with_visit_transitions.py.
     # Consider porting any changes there as well if applicable.
-    def segment_into_sections(self, timeseries, distance_from_place, time_query):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query, preload = None):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
         :param timeseries: the time series for this user
@@ -131,11 +138,11 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         :return: a list of tuples [(start1, end1), (start2, end2), ...] that represent the start and end of sections
         in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
         """
-        self.get_location_streams_for_trip(timeseries, time_query)
-        motion_changes = self.segment_into_motion_changes(timeseries, time_query)
+        self.get_location_streams_for_trip(preload)
+        motion_changes = self.segment_into_motion_changes(preload)
 
         if len(self.location_points) == 0:
-            logging.debug("No location points found for query %s, returning []" % time_query)
+            logging.debug("No location points found , returning []" % time_query)
             return []
 
         fp = self.location_points.iloc[0]
@@ -180,16 +187,27 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
         return section_list
 
+    def get_location_streams_for_trip(self, preloaded_entries):
+        # Filter the raw entries by the metadata key before converting them
+        unfiltered_entries = [
+            e for e in preloaded_entries if e["metadata"]["key"] == "background/location"
+        ]
+        filtered_entries = [
+            e for e in preloaded_entries if e["metadata"]["key"] == "background/filtered_location"
+        ]
 
-    def get_location_streams_for_trip(self, timeseries, time_query):
-        # Let's also read the unfiltered locations so that we can combine them with 
-        # the sampled locations
-        self.unfiltered_loc_df = timeseries.get_data_df("background/location", time_query)
-        self.location_points = timeseries.get_data_df("background/filtered_location", time_query)
-        # Location points can have big gaps. Let's extrapolate them so that we
-        # can use them better.
-        # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-377323407
-        self.resampled_loc_df = eail.resample(self.location_points, interval = 10)
+        # Convert each group into a list of DataFrame rows
+        unfiltered_rows = [bts.BuiltinTimeSeries._to_df_entry(e) for e in unfiltered_entries]
+        filtered_rows = [bts.BuiltinTimeSeries._to_df_entry(e) for e in filtered_entries]
+
+        # Create DataFrames for each stream
+        self.unfiltered_loc_df = pd.DataFrame(unfiltered_rows)
+        self.location_points = pd.DataFrame(filtered_rows)
+        
+        # Resample the filtered location points DataFrame as needed
+        self.resampled_loc_df = eail.resample(self.location_points, interval=10)
+
+
 
     def filter_points_for_range(self, df, start_motion, end_motion):
         """
@@ -285,3 +303,4 @@ def prev2end(prev_motion, curr_motion):
     curr_end_motion["type"] = curr_motion.type
     curr_end_motion["confidence"] = curr_motion.confidence
     return curr_end_motion
+
