@@ -173,16 +173,14 @@ def get_perturbed_trips_db():
     Perturbed_trips=_get_current_db().Stage_alternative_trips
     return Perturbed_trips
 
-UserCache = None
 def get_usercache_db():
-    global UserCache
-    if UserCache is None:
-        UserCache = _get_current_db().Stage_usercache
-        UserCache.create_index([("user_id", pymongo.ASCENDING)])
-        UserCache.create_index([("metadata.type", pymongo.ASCENDING)])
-        UserCache.create_index([("metadata.key", pymongo.ASCENDING)])
-        UserCache.create_index([("metadata.write_ts", pymongo.DESCENDING)])
-        UserCache.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    #current_db = MongoClient().Stage_database
+    UserCache = _get_current_db().Stage_usercache
+    UserCache.create_index([("user_id", pymongo.ASCENDING)])
+    UserCache.create_index([("metadata.type", pymongo.ASCENDING)])
+    UserCache.create_index([("metadata.key", pymongo.ASCENDING)])
+    UserCache.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    UserCache.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
     return UserCache
 
 def _migrate_sparse_to_dense(collection, geo_index):
@@ -195,18 +193,16 @@ def _migrate_sparse_to_dense(collection, geo_index):
         collection.drop_index(geo_index)
         print("Found sparse geosphere index, dropping %s, index list after=%s" % (geo_index, collection.index_information().keys()))
 
-TimeSeries = None
 def get_timeseries_db():
-    global TimeSeries
-    if TimeSeries is None:
-        TimeSeries = _get_current_db().Stage_timeseries
-        TimeSeries.create_index([("user_id", pymongo.ASCENDING)])
-        TimeSeries.create_index([("metadata.key", pymongo.ASCENDING)])
-        TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
-        TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
-        TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
-        _migrate_sparse_to_dense(TimeSeries, "data.loc_2dsphere")
-        TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
+    #current_db = MongoClient().Stage_database
+    TimeSeries = _get_current_db().Stage_timeseries
+    TimeSeries.create_index([("user_id", pymongo.ASCENDING)])
+    TimeSeries.create_index([("metadata.key", pymongo.ASCENDING)])
+    TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
+    _migrate_sparse_to_dense(TimeSeries, "data.loc_2dsphere")
+    TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
     return TimeSeries
 
 def get_timeseries_error_db():
@@ -214,31 +210,25 @@ def get_timeseries_error_db():
     TimeSeriesError = _get_current_db().Stage_timeseries_error
     return TimeSeriesError
 
-AnalysisTimeSeries = None
 def get_analysis_timeseries_db():
     """
     " Stores the results of the analysis performed on the raw timeseries
     """
-    global AnalysisTimeSeries
-    if AnalysisTimeSeries is None:
-        AnalysisTimeSeries = _get_current_db().Stage_analysis_timeseries
-        AnalysisTimeSeries.create_index([("user_id", pymongo.ASCENDING)])
-        _create_analysis_result_indices(AnalysisTimeSeries)
+    #current_db = MongoClient().Stage_database
+    AnalysisTimeSeries = _get_current_db().Stage_analysis_timeseries
+    AnalysisTimeSeries.create_index([("user_id", pymongo.ASCENDING)])
+    _create_analysis_result_indices(AnalysisTimeSeries)
     return AnalysisTimeSeries
 
-NonUserTimeSeries = None
 def get_non_user_timeseries_db():
     """
     " Stores the data that is not associated with a particular user
     """
-    global NonUserTimeSeries
-    if NonUserTimeSeries is None:
-        NonUserTimeSeries = _get_current_db().Stage_analysis_timeseries
-        NonUserTimeSeries.create_index([("user_id", pymongo.ASCENDING)])
-        _create_analysis_result_indices(NonUserTimeSeries)
+    NonUserTimeSeries = _get_current_db().Stage_analysis_timeseries
+    NonUserTimeSeries.create_index([("user_id", pymongo.ASCENDING)])
+    _create_analysis_result_indices(NonUserTimeSeries)
     return NonUserTimeSeries
 
-ModelDB = None
 def get_model_db():
     """
     " Let's create a separate model DB to store periodically updated documents
@@ -254,12 +244,10 @@ def get_model_db():
     " will eventually delete them. This means that the elements are essentially
     " getting updated, only over time and as a log-structured filesystem.
     """
-    global ModelDB
-    if ModelDB is None:
-        ModelDB = _get_current_db().Stage_updateable_models
-        ModelDB.create_index([("user_id", pymongo.ASCENDING)])
-        ModelDB.create_index([("metadata.key", pymongo.ASCENDING)])
-        ModelDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    ModelDB = _get_current_db().Stage_updateable_models
+    ModelDB.create_index([("user_id", pymongo.ASCENDING)])
+    ModelDB.create_index([("metadata.key", pymongo.ASCENDING)])
+    ModelDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     return ModelDB
 
 def _create_analysis_result_indices(tscoll):
