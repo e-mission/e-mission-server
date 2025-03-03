@@ -254,17 +254,18 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # In [593]: edb.get_timeseries_db().find({"user_id": UUID('ea59084e-11d4-4076-9252-3b9a29ce35e0')}).count()
             # Out[593]: 449869
             ts_db_result.limit(edb.result_limit)
-        else:
-            ts_db_result = []
 
-        # This list() conversion causes the cursor to be consumed, which is memory-expensive,
-        # but faster as it allows us to get the count without having to make an additional
-        # "count_documents" DB call.
-        # In a future situation where memory is constrained or DB calls are less expensive,
-        # we could skip the list() conversion and return the cursor directly.
-        # https://github.com/e-mission/e-mission-server/pull/1032#issuecomment-2685846702
-        ts_db_entries = list(ts_db_result)
-        ts_db_count = len(ts_db_entries)
+            # This list() conversion causes the cursor to be consumed, which is memory-expensive,
+            # but faster as it allows us to get the count without having to make an additional
+            # "count_documents" DB call.
+            # In a future situation where memory is constrained or DB calls are less expensive,
+            # we could skip the list() conversion and return the cursor directly.
+            # https://github.com/e-mission/e-mission-server/pull/1032#issuecomment-2685846702
+            ts_db_entries = list(ts_db_result)
+            ts_db_count = len(ts_db_entries)
+        else:
+            ts_db_entries = []
+            ts_db_count = 0
 
         logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
         return (ts_db_count, ts_db_entries)
