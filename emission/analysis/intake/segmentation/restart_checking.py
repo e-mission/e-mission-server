@@ -61,7 +61,7 @@ def tracking_restarted_in_loc_df(loc_df, transition_df):
     return tracking_restarted
 
 
-def is_tracking_restarted_in_range(start_ts, end_ts, timeseries, transition_df=None):
+def is_tracking_restarted_in_range(start_ts, end_ts, transition_df=None):
     """
     Check to see if tracing was restarted between the times specified
     :param start_ts: the start of the time range to check
@@ -70,15 +70,9 @@ def is_tracking_restarted_in_range(start_ts, end_ts, timeseries, transition_df=N
     :param transition_df: dataframe of transitions to use (if None, will be fetched from timeseries)
     :return:
     """
-    if transition_df is not None:
-        transition_df = transition_df[
-            (transition_df['ts'] >= start_ts) & (transition_df['ts'] <= end_ts)
-        ]
-    else:
-        import emission.storage.timeseries.timequery as estt
-        tq = estt.TimeQuery(timeType="data.ts", startTs=start_ts,
-                            endTs=end_ts)
-        transition_df = timeseries.get_data_df("statemachine/transition", tq)
+    transition_df = transition_df[
+        (transition_df['ts'] >= start_ts) & (transition_df['ts'] <= end_ts)
+    ]
 
     if len(transition_df) == 0:
         logging.debug("In range %s -> %s found no transitions" %
