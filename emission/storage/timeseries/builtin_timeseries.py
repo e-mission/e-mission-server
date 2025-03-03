@@ -175,7 +175,6 @@ class BuiltinTimeSeries(esta.TimeSeries):
                     expanded_key = "%s_%s" % (ld_key,field_key)
                     ret_val[expanded_key] = ret_val[ld_key][field_key]
                 del ret_val[ld_key]
-        ret_val["metadata_key"] = entry["metadata"]["key"]
         ret_val["_id"] = entry["_id"]
         ret_val['user_id'] = entry['user_id']
         ret_val["metadata_write_ts"] = entry["metadata"]["write_ts"]

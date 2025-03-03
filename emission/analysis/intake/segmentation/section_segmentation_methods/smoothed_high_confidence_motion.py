@@ -60,9 +60,12 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         how to deal with them (combine with first, combine with second, split in the middle). This policy can be
         enforced when we map the activity changes to locations.
         """
-        row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in preload]
-        df = pd.DataFrame(row_list)
-        motion_df = df[df.metadata_key == "background/motion_activity"]
+        motion_entries = [
+            entry for entry in preload
+            if entry["metadata"]["key"] == "background/motion_activity"
+        ]
+        row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in motion_entries]
+        motion_df = pd.DataFrame(row_list)
         filter_mask = motion_df.apply(self.is_filtered, axis=1)
         # Calling np.nonzero on the filter_mask even if it was related trips with zero sections
         # has not been a problem before this - the subsequent check on the
@@ -185,20 +188,25 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         return section_list
 
     def get_location_streams_for_trip(self, preloaded_entries):
-        """
-        If `preloaded_entries` is given, we process that. Otherwise, we query the DB.
-        """
-        row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in preloaded_entries]
+        # Filter the raw entries by the metadata key before converting them
+        unfiltered_entries = [
+            e for e in preloaded_entries if e["metadata"]["key"] == "background/location"
+        ]
+        filtered_entries = [
+            e for e in preloaded_entries if e["metadata"]["key"] == "background/filtered_location"
+        ]
 
-        df = pd.DataFrame(row_list)
-        if not df.empty:
-            df = df.drop_duplicates(subset=["_id"]).reset_index(drop=True)
+        # Convert each group into a list of DataFrame rows
+        unfiltered_rows = [bts.BuiltinTimeSeries._to_df_entry(e) for e in unfiltered_entries]
+        filtered_rows = [bts.BuiltinTimeSeries._to_df_entry(e) for e in filtered_entries]
 
-        # Now set or return the data frames
-        self.unfiltered_loc_df = df[df.metadata_key == "background/location"]
-        self.location_points   = df[df.metadata_key == "background/filtered_location"]
+        # Create DataFrames for each stream
+        self.unfiltered_loc_df = pd.DataFrame(unfiltered_rows)
+        self.location_points = pd.DataFrame(filtered_rows)
         
+        # Resample the filtered location points DataFrame as needed
         self.resampled_loc_df = eail.resample(self.location_points, interval=10)
+
 
 
     def filter_points_for_range(self, df, start_motion, end_motion):
