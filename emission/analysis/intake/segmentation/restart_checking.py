@@ -5,11 +5,63 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
+import pandas as pd
+import numpy as np
 import logging
 import emission.core.wrapper.transition as ecwt
 import emission.storage.timeseries.timequery as estt
 
-def is_tracking_restarted_in_range(start_ts, end_ts, timeseries, transition_df=None):
+
+def ongoing_motion_in_loc_df(loc_df, motion_df):
+    """
+    Return a Series of booleans that indicates, for each row in loc_df,
+    whether there was any background/motion_activity between the previous
+    row and the current row.
+    """
+    if motion_df.empty:
+        return pd.Series(False, index=loc_df.index)
+    
+    motion_timestamps = motion_df['ts'].values
+    motion_idxs = np.searchsorted(loc_df['ts'].values, motion_timestamps)
+    motion_idxs = motion_idxs[motion_idxs < len(loc_df)]
+    logging.debug(f'motion_timestamps = {motion_timestamps}, motion_idxs = {motion_idxs}')
+    ongoing_motion = pd.Series(False, index=loc_df.index)
+    ongoing_motion[motion_idxs] = True
+    return ongoing_motion
+
+
+def tracking_restarted_in_loc_df(loc_df, transition_df):
+    """
+    Return a Series of booleans that indicates, for each row in loc_df,
+    whether there were any tracking restarts between the previous
+    row and the current row.
+
+    A tracking restart is defined as one of:
+     - a STOP_TRACKING transition
+     - a BOOTED transition (Android)
+     - a VISIT_ENDED transition with curr_state WAITING_FOR_TRIP_START (iOS).
+    """
+    if transition_df.empty:
+        return pd.Series(False, index=loc_df.index)
+    
+    restart_transitions_df = transition_df[
+        (transition_df.transition == ecwt.TransitionType.STOP_TRACKING.value) |
+        # Android
+        (transition_df.transition == ecwt.TransitionType.BOOTED.value) |
+        # iOS
+        ((transition_df.curr_state == ecwt.State.WAITING_FOR_TRIP_START.value) &
+         (transition_df.transition == ecwt.TransitionType.VISIT_ENDED.value))
+    ]
+    restart_timestamps = restart_transitions_df['ts'].values
+    restart_idxs = np.searchsorted(loc_df['ts'].values, restart_timestamps)
+    restart_idxs = restart_idxs[restart_idxs < len(loc_df)]
+    logging.debug(f'restart_timestamps = {restart_timestamps}, restart_idxs = {restart_idxs}')
+    tracking_restarted = pd.Series(False, index=loc_df.index)
+    tracking_restarted[restart_idxs] = True
+    return tracking_restarted
+
+
+def is_tracking_restarted_in_range(start_ts, end_ts, transition_df=None):
     """
     Check to see if tracing was restarted between the times specified
     :param start_ts: the start of the time range to check
@@ -18,15 +70,9 @@ def is_tracking_restarted_in_range(start_ts, end_ts, timeseries, transition_df=N
     :param transition_df: dataframe of transitions to use (if None, will be fetched from timeseries)
     :return:
     """
-    if transition_df is not None:
-        transition_df = transition_df[
-            (transition_df['ts'] >= start_ts) & (transition_df['ts'] <= end_ts)
-        ]
-    else:
-        import emission.storage.timeseries.timequery as estt
-        tq = estt.TimeQuery(timeType="data.ts", startTs=start_ts,
-                            endTs=end_ts)
-        transition_df = timeseries.get_data_df("statemachine/transition", tq)
+    transition_df = transition_df[
+        (transition_df['ts'] >= start_ts) & (transition_df['ts'] <= end_ts)
+    ]
 
     if len(transition_df) == 0:
         logging.debug("In range %s -> %s found no transitions" %
