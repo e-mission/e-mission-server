@@ -53,6 +53,8 @@ import emission.core.timer as ect
 import emission.core.get_database as edb
 import emission.core.backwards_compat_config as ecbc
 
+import emission.analysis.result.user_stat as earus
+
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 
 # Constants that we don't read from the configuration
@@ -68,6 +70,7 @@ socket_timeout = config.get("WEBSERVER_TIMEOUT", 3600)
 auth_method = config.get("WEBSERVER_AUTH", "skip")
 aggregate_call_auth = config.get("WEBSERVER_AGGREGATE_CALL_AUTH", "no_auth")
 not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nrel.gov/openpath")
+dynamic_config = None
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -243,10 +246,16 @@ def getFromCache():
 @post('/usercache/put')
 def putIntoCache():
   logging.debug("Called userCache.put")
-  user_uuid=getUUID(request)
-  logging.debug("user_uuid %s" % user_uuid)
-  from_phone = request.json['phone_to_server']
-  return usercache.sync_phone_to_server(user_uuid, from_phone)
+  user_context=getUUID(request, return_context=True)
+  logging.debug("user_uuid %s" % user_context)
+  suspended_subgroups = dynamic_config.get("opcode", {}).get("suspended_subgroups", [])
+  logging.debug(f"{suspended_subgroups=}")
+  curr_subgroup = user_context.get('subgroup', None)
+  if curr_subgroup in suspended_subgroups:
+      logging.info(f"Received put message for subgroup {curr_subgroup} in {suspended_subgroups=}, ignoring")
+  else:
+      from_phone = request.json['phone_to_server']
+      usercache.sync_phone_to_server(user_context['user_id'], from_phone)
 
 @post('/usercache/putone')
 def putIntoOneEntry():
@@ -470,6 +479,7 @@ def after_request():
   request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
   new_duration = request.params.timer.elapsed
+  earus.update_last_call_timestamp(request.params.user_uuid, request.path)
   if round(old_div((duration - new_duration), new_duration) > 100) > 0:
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
@@ -482,6 +492,25 @@ def after_request():
         msTimeNow, duration)
   stats.store_server_api_time(request.params.user_uuid, "%s_%s_cputime" % (request.method, request.path),
         msTimeNow, new_duration)
+
+# Dynamic config BEGIN
+
+def get_dynamic_config():
+    logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
+    download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
+    logging.debug("About to download config from %s" % download_url)
+    r = requests.get(download_url)
+    if r.status_code != 200:
+        logging.debug(f"Unable to download study config for {STUDY_CONFIG=}, status code: {r.status_code}")
+        return None
+    else:
+        dynamic_config = json.loads(r.text)
+        logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
+            f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
+            f"and data collection URL {dynamic_config.get('server', {}).get('connectUrl', 'OS DEFAULT')}")
+        return dynamic_config
+
+# Dynamic config END
 
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
@@ -511,33 +540,27 @@ def get_user_or_aggregate_auth(request):
     logging.debug(f"Aggregate call, checking {aggregate_call_auth} policy")
     return aggregate_call_map[aggregate_call_auth](request)
 
-def getUUID(request, inHeader=False):
+def getUUID(request, inHeader=False, return_context=False):
     try:
-        retUUID = enaa.getUUID(request, auth_method, inHeader)
-        logging.debug("retUUID = %s" % retUUID)
-        if retUUID is None:
+        retContext = enaa.getUUID(request, auth_method, inHeader, dynamic_config)
+        logging.debug("retUUID = %s" % retContext)
+        if retContext is None:
            raise HTTPError(403, "token is valid, but no account found for user")
-        return retUUID
+
+        if return_context:
+            return retContext
+        else:
+            return retContext['user_id']
     except ValueError as e:
         traceback.print_exc()
         abort(403, e)
 
 def resolve_auth(auth_method):
     if auth_method == "dynamic":
-        logging.debug("auth_method is dynamic")
-        logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
-        download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
-        logging.debug("About to download config from %s" % download_url)
-        r = requests.get(download_url)
-        if r.status_code != 200:
-            logging.debug(f"Unable to download study config, status code: {r.status_code}")
+        logging.debug("auth_method is dynamic, using dynamic config to find the actual auth method")
+        if dynamic_config is None:
             sys.exit(1)
         else:
-            dynamic_config = json.loads(r.text)
-            logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
-                f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
-                f"and data collection URL {dynamic_config['server']['connectUrl']}")
-
             if "opcode" in dynamic_config:
                 # New style config
                 if dynamic_config["opcode"]["autogen"] == True:
@@ -567,6 +590,7 @@ if __name__ == '__main__':
 
     logging.config.dictConfig(webserver_log_config)
     logging.debug("attempting to resolve auth_method")
+    dynamic_config = get_dynamic_config()
     auth_method = resolve_auth(auth_method)
 
     logging.debug(f"Using auth method {auth_method}")
