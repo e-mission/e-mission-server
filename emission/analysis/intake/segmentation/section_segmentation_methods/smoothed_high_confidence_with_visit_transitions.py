@@ -58,7 +58,7 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         })
         return new_mc
 
-    def segment_into_sections(self, timeseries, distance_from_place, time_query, preload = None):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query, preload):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
         :param timeseries: the time series for this user
@@ -69,8 +69,8 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
 
         # Since we are going to use a hybrid model, let's just read all kinds
         # of locations upfront
-        self.get_location_streams_for_trip(timeseries, time_query)
-        motion_changes = self.segment_into_motion_changes(timeseries, time_query)
+        self.get_location_streams_for_trip(preload)
+        motion_changes = self.segment_into_motion_changes(preload)
 
         if len(self.location_points) == 0:
             logging.debug("There are no points in the trip. How the heck did we segment it?")

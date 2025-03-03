@@ -78,26 +78,18 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
     ]
     combined_entries_during_trip = ts.find_entries(keys_we_need, time_query)
 
-    # ---------------------------------------------------------------
-    # Split them by key in memory
-    # ---------------------------------------------------------------
-    ble_entries_during_trip = []
-    filtered_loc_entries    = []
-    unfiltered_loc_entries  = []
-    motion_entries = []
-
+    # Group entries by key
+    entries_by_key = {k: [] for k in keys_we_need}
     for entry in combined_entries_during_trip:
-        k = entry["metadata"]["key"]
-        if k == "background/bluetooth_ble":
-            ble_entries_during_trip.append(entry)
-        elif k == "background/filtered_location":
-            filtered_loc_entries.append(entry)
-        elif k == "background/location":
-            unfiltered_loc_entries.append(entry)
-        elif k == "background/motion_activity":
-            motion_entries.append(entry)
-        else:
-            pass
+        key = entry["metadata"]["key"]
+        if key in entries_by_key:
+            entries_by_key[key].append(entry)
+
+    # Now extract individual lists as needed
+    ble_entries_during_trip      = entries_by_key["background/bluetooth_ble"]
+    filtered_loc_entries         = entries_by_key["background/filtered_location"]
+    unfiltered_loc_entries       = entries_by_key["background/location"]
+    motion_entries               = entries_by_key["background/motion_activity"]
 
     # Build a lookup dictionary for the filtered_loc entries
     filtered_loc_lookup = {entry["data"]["ts"]: entry for entry in filtered_loc_entries}
@@ -133,38 +125,16 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
     # set it properly.
     ts = esta.TimeSeries.get_time_series(user_id)
 
-    # ------------------------------------------------------------------
-    # Define a function to use preloaded filtered locations instead of querying on each point.
-    # Logs indicate whether the preloaded lookup or the fallback method is used.
-    # Looks like preloaded lookup is used for all points, so the fallback method is not used -- well according to tests that is
-    # ------------------------------------------------------------------
     def get_loc_for_ts(time):
-        if time in filtered_loc_lookup:
-            logging.info("Using preloaded filtered location for time: %s" % time)
-            return ecwl.Location(filtered_loc_lookup[time]["data"])
-        else:
-            logging.info("Using fallback get_entry_at_ts for time: %s" % time)
-            entry = ts.get_entry_at_ts("background/filtered_location", "data.ts", time)
-            return ecwl.Location(entry["data"])
+        return ecwl.Location(filtered_loc_lookup[time]["data"])
 
     trip_start_loc = get_loc_for_ts(trip_entry.data.start_ts)
     trip_end_loc = get_loc_for_ts(trip_entry.data.end_ts)
     logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
 
-    # ------------------------------------------------------------------
-    # Define a function for retrieving a location from a row with logging.
-    # Logs whether preloaded lookup or fallback (df_row_to_entry) is used.
-    # Looks like preloaded lookup is used for all rows, so the fallback method is not used -- well according to tests that is
-    # ------------------------------------------------------------------
     def get_loc_for_row(row):
         ts_val = row["ts"]
-        if ts_val in filtered_loc_lookup:
-            print("Using preloaded filtered location for row with ts: %s" % ts_val)
-            return ecwl.Location(filtered_loc_lookup[ts_val]["data"])
-        else:
-            print("Using fallback df_row_to_entry for row with ts: %s" % ts_val)
-            entry = ts.df_row_to_entry("background/filtered_location", row)
-            return ecwl.Location(entry["data"])
+        return ecwl.Location(filtered_loc_lookup[ts_val]["data"])
 
     for (i, (start_loc_doc, end_loc_doc, sensed_mode)) in enumerate(segmentation_points):
         logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))

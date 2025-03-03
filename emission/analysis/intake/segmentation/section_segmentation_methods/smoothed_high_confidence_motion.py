@@ -48,7 +48,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.debug("%s, returning False" % activity_dump)
             return False
 
-    def segment_into_motion_changes(self, timeseries, time_query, preload = None):
+    def segment_into_motion_changes(self, preload):
         """
         Use the motion changes detected on the phone to detect sections (consecutive chains of points)
         that have a consistent motion.
@@ -60,12 +60,9 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         how to deal with them (combine with first, combine with second, split in the middle). This policy can be
         enforced when we map the activity changes to locations.
         """
-        if preload is not None:
-            row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in preload]
-            df = pd.DataFrame(row_list)
-            motion_df = df[df.metadata_key == "background/motion_activity"]
-        else:
-            motion_df = timeseries.get_data_df("background/motion_activity", time_query)
+        row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in preload]
+        df = pd.DataFrame(row_list)
+        motion_df = df[df.metadata_key == "background/motion_activity"]
         filter_mask = motion_df.apply(self.is_filtered, axis=1)
         # Calling np.nonzero on the filter_mask even if it was related trips with zero sections
         # has not been a problem before this - the subsequent check on the
@@ -138,11 +135,11 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         :return: a list of tuples [(start1, end1), (start2, end2), ...] that represent the start and end of sections
         in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
         """
-        self.get_location_streams_for_trip(timeseries, time_query, preload)
-        motion_changes = self.segment_into_motion_changes(timeseries, time_query, preload)
+        self.get_location_streams_for_trip(preload)
+        motion_changes = self.segment_into_motion_changes(preload)
 
         if len(self.location_points) == 0:
-            logging.debug("No location points found for query %s, returning []" % time_query)
+            logging.debug("No location points found , returning []" % time_query)
             return []
 
         fp = self.location_points.iloc[0]
@@ -187,19 +184,11 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
         return section_list
 
-    def get_location_streams_for_trip(self, timeseries, time_query, preloaded_entries=None):
+    def get_location_streams_for_trip(self, preloaded_entries):
         """
         If `preloaded_entries` is given, we process that. Otherwise, we query the DB.
         """
-        if preloaded_entries is not None:
-            row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in preloaded_entries]
-        else:
-            # If we have nothing preloaded, query the DB
-            entries_it = timeseries.find_entries(
-                ["background/location", "background/filtered_location"],
-                time_query=time_query
-            )
-            row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in entries_it]
+        row_list = [bts.BuiltinTimeSeries._to_df_entry(e) for e in preloaded_entries]
 
         df = pd.DataFrame(row_list)
         if not df.empty:

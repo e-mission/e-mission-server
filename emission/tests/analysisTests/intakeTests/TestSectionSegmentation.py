@@ -73,7 +73,27 @@ class TestSectionSegmentation(unittest.TestCase):
         shcmsm = shcm.SmoothedHighConfidenceMotion(60, 100, [ecwm.MotionTypes.TILTING,
                                                         ecwm.MotionTypes.UNKNOWN,
                                                         ecwm.MotionTypes.STILL])
-        segmentation_points = shcmsm.segment_into_sections(ts, 0, tq)
+        
+        keys_we_need = [
+            "background/bluetooth_ble",
+            "background/filtered_location",
+            "background/location",
+            "background/motion_activity"
+        ]
+        combined_entries_during_trip = ts.find_entries(keys_we_need, tq)
+
+        # Group entries by key
+        entries_by_key = {k: [] for k in keys_we_need}
+        for entry in combined_entries_during_trip:
+            key = entry["metadata"]["key"]
+            if key in entries_by_key:
+                entries_by_key[key].append(entry)
+
+        filtered_loc_entries         = entries_by_key["background/filtered_location"]
+        unfiltered_loc_entries       = entries_by_key["background/location"]
+        motion_entries               = entries_by_key["background/motion_activity"]
+        preload = unfiltered_loc_entries + filtered_loc_entries + motion_entries
+        segmentation_points = shcmsm.segment_into_sections(ts, 0, tq, preload)
 
         for (start, end, motion) in segmentation_points:
             logging.info("section is from %s (%f) -> %s (%f) using mode %s" %
