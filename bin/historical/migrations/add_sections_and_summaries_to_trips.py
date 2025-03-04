@@ -33,9 +33,9 @@ def add_sections_to_trips(process_number, uuid_list, skip_if_no_new_data):
     
 def add_sections_to_trips_for_user(uuid):
     ts = esta.TimeSeries.get_time_series(uuid)
-    cleaned_trips = list(ts.find_entries([esda.CLEANED_TRIP_KEY]))
-    confirmed_trips = list(ts.find_entries([esda.CONFIRMED_TRIP_KEY]))
-    composite_trips =  list(ts.find_entries([esda.COMPOSITE_TRIP_KEY]))
+    cleaned_trips = ts.find_entries([esda.CLEANED_TRIP_KEY])
+    confirmed_trips = ts.find_entries([esda.CONFIRMED_TRIP_KEY])
+    composite_trips =  ts.find_entries([esda.COMPOSITE_TRIP_KEY])
     cleaned_trips_map = dict((t["_id"], t) for t in cleaned_trips)
     composite_trips_map = dict((t["data"]["confirmed_trip"], t) for t in composite_trips)
     # This script is slow due to DB queries

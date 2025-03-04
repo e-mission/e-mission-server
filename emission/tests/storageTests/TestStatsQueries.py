@@ -38,13 +38,13 @@ class TestFunctionTiming(unittest.TestCase):
         # Prepare keys for database query based on expected entries.
         key_list = [key for (key, _, _) in expected_entries]
         # Fetch matching entries from the timeseries database.
-        stored_entrys = list(self.timeseries_db.find_entries(key_list))
+        stored_entries = self.timeseries_db.find_entries(key_list)
         # Check if the number of retrieved entries matches expectations.
-        self.assertEqual(len(stored_entrys), len(expected_entries))
+        self.assertEqual(len(stored_entries), len(expected_entries))
 
         # Validate each stored entry against the expected data.
         for i in range(len(expected_entries)):
-            stored_entry = stored_entrys[i]
+            stored_entry = stored_entries[i]
             expected_key, expected_name, expected_reading = expected_entries[i]
             logging.debug(f"Comparing expected {expected_entries[i]} " +
                           f"with stored {stored_entry['metadata']['key']} {stored_entry['data']}")

@@ -117,7 +117,7 @@ def section_to_geojson(section, tl):
     """
 
     ts = esta.TimeSeries.get_time_series(section.user_id)
-    entry_it = ts.find_entries(["analysis/recreated_location"],
+    section_locations = ts.find_entries(["analysis/recreated_location"],
                                esda.get_time_query_for_trip_like(
                                    "analysis/cleaned_section",
                                    section.get_id()))
@@ -126,7 +126,7 @@ def section_to_geojson(section, tl):
     # dataframes insert nans. We could use fillna to fill with default values, but if we are not actually
     # using dataframe features here, it is unclear how much that would help.
     feature_array = []
-    section_location_entries = [ecwe.Entry(entry) for entry in entry_it]
+    section_location_entries = [ecwe.Entry(e) for e in section_locations]
     if len(section_location_entries) != 0:
         logging.debug("first element in section_location_array = %s" % section_location_entries[0])
 
@@ -193,7 +193,7 @@ def geojson_incidents_in_range(user_id, start_ts, end_ts):
     ts = esta.TimeSeries.get_time_series(user_id)
     uc = enua.UserCache.getUserCache(user_id)
     tq = estt.TimeQuery("data.ts", start_ts, end_ts)
-    incident_entry_docs = list(ts.find_entries([MANUAL_INCIDENT_KEY], time_query=tq)) \
+    incident_entry_docs = ts.find_entries([MANUAL_INCIDENT_KEY], time_query=tq) \
         + list(uc.getMessage([MANUAL_INCIDENT_KEY], tq))
     incidents = [ecwe.Entry(doc) for doc in incident_entry_docs]
     return list(map(incident_to_geojson, incidents))
@@ -309,10 +309,9 @@ def get_all_points_for_range(user_id, key, start_ts, end_ts):
     
     tq = estt.TimeQuery("metadata.write_ts", start_ts, end_ts)
     ts = esta.TimeSeries.get_time_series(user_id)
-    entry_it = ts.find_entries([key], tq)
-    points_array = [ecwe.Entry(entry) for entry in entry_it]
-
-    return get_feature_list_for_point_array(points_array)
+    points_list = ts.find_entries([key], tq)
+    points_entries = [ecwe.Entry(p) for p in points_list]
+    return get_feature_list_for_point_array(points_entries)
 
 
 def get_feature_list_for_point_array(points_array):

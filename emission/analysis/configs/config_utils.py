@@ -16,7 +16,7 @@ def get_last_entry(user_id, time_query, config_key):
     # get the list of overrides for this time range. This should be non zero
     # only if there has been an override since the last run, which needs to be
     # saved back into the cache.
-    config_overrides = list(user_ts.find_entries([config_key], time_query))
+    config_overrides = user_ts.find_entries([config_key], time_query)
     logging.debug("Found %d user overrides for user %s" % (len(config_overrides), user_id))
     if len(config_overrides) == 0:
         logging.warning("No user defined overrides for key %s and user %s, early return" % (config_key, user_id))

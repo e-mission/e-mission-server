@@ -556,13 +556,17 @@ class TestPipelineReset(unittest.TestCase):
         self.assertEqual(api_result, [])
 
         # And the last raw place on the first day is where the chain terminates
-        last_raw_place_first_day = list(timeseries.find_entries(["segmentation/raw_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)))[-1]
+        last_raw_place_first_day = timeseries.find_entries(
+            ["segmentation/raw_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)
+        )[-1]
         self.assertNotIn("exit_ts", last_raw_place_first_day["data"])
 
         # Similarly for the last cleaned place
-        last_cleaned_place_first_day = list(timeseries.find_entries(["analysis/cleaned_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)))[-1]
+        last_cleaned_place_first_day = timeseries.find_entries(
+            ["analysis/cleaned_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)
+        )[-1]
         self.assertNotIn("exit_ts", last_cleaned_place_first_day["data"])
 
         # Now, load more entries
@@ -590,19 +594,25 @@ class TestPipelineReset(unittest.TestCase):
         self.assertEqual(api_result, [])
 
         # since we failed partway, the raw place on the first day does not terminate
-        last_raw_place_first_day = list(timeseries.find_entries(["segmentation/raw_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)))[-1]
+        last_raw_place_first_day = timeseries.find_entries(
+            ["segmentation/raw_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)
+        )[-1]
         self.assertIn("exit_ts", last_raw_place_first_day["data"])
 
         # but the cleaned place does since it is unchanged
-        last_cleaned_place_first_day = list(timeseries.find_entries(["analysis/cleaned_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)))[-1]
+        last_cleaned_place_first_day = timeseries.find_entries(
+            ["analysis/cleaned_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)
+        )[-1]
         self.assertNotIn("exit_ts", last_cleaned_place_first_day["data"])
 
         # and we have some raw trips after the reset
-        self.assertGreater(len(list(timeseries.find_entries(["segmentation/raw_trip"],
-            esttc.TimeComponentQuery("data.start_local_dt", start_ld_1, start_ld_2)))),
-            0)
+        raw_trips = timeseries.find_entries(
+            ["segmentation/raw_trip"],
+            esttc.TimeComponentQuery("data.start_local_dt", start_ld_1, start_ld_2)
+        )
+        self.assertGreater(len(raw_trips), 0)
 
         # we are going to reset to a point in the middle
         # Note that this is actually 23nd 16:00 PDT, so this is partway
@@ -611,28 +621,36 @@ class TestPipelineReset(unittest.TestCase):
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
 
         # now the raw place on the first day should terminate
-        last_raw_place_first_day = list(timeseries.find_entries(["segmentation/raw_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)))[-1]
+        last_raw_place_first_day = timeseries.find_entries(
+            ["segmentation/raw_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)
+        )[-1]
         self.assertNotIn("exit_ts", last_raw_place_first_day["data"])
         self.assertNotIn("exit_fmt_time", last_raw_place_first_day["data"])
 
         # and we have no raw trips after the reset
-        self.assertEquals(len(list(timeseries.find_entries(["segmentation/raw_trip"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_2)))),
-            0)
+        raw_trips = timeseries.find_entries(
+            ["segmentation/raw_trip"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_2)
+        )
+        self.assertEquals(len(raw_trips), 0)
 
         # Re-running the pipeline again
         etc.runIntakePipeline(self.testUUID)
 
         # now the raw place on the first day should not terminate
-        last_raw_place_first_day = list(timeseries.find_entries(["segmentation/raw_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)))[-1]
+        last_raw_place_first_day = timeseries.find_entries(
+            ["segmentation/raw_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_1, start_ld_1)
+        )[-1]
         self.assertIn("exit_ts", last_raw_place_first_day["data"])
         self.assertIn("exit_fmt_time", last_raw_place_first_day["data"])
 
         # but the last raw place on the last day should
-        last_raw_place_first_day = list(timeseries.find_entries(["segmentation/raw_place"],
-            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_2, start_ld_2)))[-1]
+        last_raw_place_first_day = timeseries.find_entries(
+            ["segmentation/raw_place"],
+            esttc.TimeComponentQuery("data.enter_local_dt", start_ld_2, start_ld_2)
+        )[-1]
         self.assertNotIn("exit_ts", last_raw_place_first_day["data"])
         self.assertNotIn("exit_fmt_time", last_raw_place_first_day["data"])
 

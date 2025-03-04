@@ -91,7 +91,7 @@ def get_ongoing_motion_in_range(start_ts, end_ts, timeseries, motion_list=None):
     else:
         tq = estt.TimeQuery(timeType = "data.ts", startTs = start_ts,
                             endTs = end_ts)
-        motion_list = list(timeseries.find_entries(["background/motion_activity"], tq))
+        motion_list = timeseries.find_entries(["background/motion_activity"], tq)
 
     logging.debug("Found %s motion_activity entries in range %s -> %s" %
                   (len(motion_list), start_ts, end_ts))

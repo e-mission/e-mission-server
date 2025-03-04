@@ -18,7 +18,7 @@ def save_diary(args):
 def save_ct_list(args):
     print("Saving confirmed trip list for %s to file %s" % (args.sel_uuid, args.file_name))
     ts = esta.TimeSeries.get_time_series(args.sel_uuid)
-    analysis_objects = list(ts.find_entries(args.key_list, None))
+    analysis_objects = ts.find_entries(args.key_list, None)
     print("Retrieved object is of length %s" % len(analysis_objects))
     json.dump(analysis_objects, open(args.file_name, "w"), indent=4, default=esj.wrapped_default)
 
