@@ -63,7 +63,7 @@ class RuleEngineModeInferencePipeline:
         Converts list of sections -> list of predicted probability maps
         """
         predictedProb = []
-        locs_where_no_prediction = []
+        locs_where_no_prediction = set()
 
         # first pass; air, walk, and bike will be identified
         # without needing to query overpass
@@ -78,17 +78,17 @@ class RuleEngineModeInferencePipeline:
             else:
                 prediction = get_prediction(section_entry)
                 if prediction is None:
-                    locs_where_no_prediction.append(section_entry.data.start_loc['coordinates'])
-                    locs_where_no_prediction.append(section_entry.data.end_loc['coordinates'])
+                    start_coords = section_entry.data.start_loc['coordinates']
+                    end_coords = section_entry.data.end_loc['coordinates']
+                    locs_where_no_prediction.add(tuple(start_coords))
+                    locs_where_no_prediction.add(tuple(end_coords))
                 predictedProb.append(prediction)
         
         # for sections that we could not predict on first pass,
         # query overpass for public transit stops near the start/end locations
         stop_radius = eac.get_config()["section.startStopRadius"]
-        transit_stops_map = dict(zip(
-            [str(loc) for loc in locs_where_no_prediction],
-            enetm.get_stops_near(locs_where_no_prediction, stop_radius),
-        ))
+        locs_stops = enetm.get_stops_near(locs_where_no_prediction, stop_radius)
+        transit_stops_map = dict(zip(locs_where_no_prediction, locs_stops))
         
         # second pass; now that we have transit stops, try to predict sections
         # that we couldn't predict before
@@ -198,8 +198,8 @@ def get_unknown_prediction(section_entry, transit_stops_map=None):
 def _get_transit_prediction(section_entry, transit_stops_map=None):
     if transit_stops_map is None:
         return None
-    start_transit_stops = transit_stops_map.get(str(section_entry.data.start_loc['coordinates']))
-    end_transit_stops = transit_stops_map.get(str(section_entry.data.end_loc['coordinates']))
+    start_transit_stops = transit_stops_map.get(tuple(section_entry.data.start_loc['coordinates']))
+    end_transit_stops = transit_stops_map.get(tuple(section_entry.data.end_loc['coordinates']))
     print(f'start_transit_stops = {start_transit_stops}, end_transit_stops = {end_transit_stops}')
     predicted_transit_modes = enetm.get_predicted_transit_mode(start_transit_stops,
         end_transit_stops)
