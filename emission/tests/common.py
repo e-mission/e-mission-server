@@ -48,6 +48,12 @@ def dropAllCollections(db):
     else: 
       print("Dropping collection %s" % coll)
       db.drop_collection(coll)
+ 
+  import emission.storage.timeseries.builtin_timeseries as bits
+  bits.ts_enum_map = bits._get_enum_map()
+  # we expect to see [7, 51]
+  print(f"After restoring indices on cached collections, we see {[len(bits.ts_enum_map[k].index_information().keys()) for k in bits.ts_enum_map]}")
+
 
 def purgeSectionData(Sections, userName):
     """

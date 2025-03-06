@@ -98,15 +98,17 @@ def create_places(list_of_cluster_data, user_id):
 ### Graph queries
 
 def get_succesor(user_id, place_id, time):
-    temp = pk.Vector()
-    day = time.weekday()
-    place = get_common_place_from_db(place_id)
-    for suc in place["successors"]:
-        trip = esdctp.get_common_trip_from_db(user_id, place_id, suc)
-        for temp_hour in range(time.hour, esdctp.HOURS_IN_DAY):
-            counter_key = ("%s" % suc, temp_hour)
-            temp[counter_key] = trip.probabilites[day, temp_hour]
-    return boi.ObjectId(temp.choose())
+#    temp = pk.Vector()
+#    day = time.weekday()
+#    place = get_common_place_from_db(place_id)
+#    for suc in place["successors"]:
+#        trip = esdctp.get_common_trip_from_db(user_id, place_id, suc)
+#        for temp_hour in range(time.hour, esdctp.HOURS_IN_DAY):
+#            counter_key = ("%s" % suc, temp_hour)
+#            temp[counter_key] = trip.probabilites[day, temp_hour]
+#    return boi.ObjectId(temp.choose())
+#   Commented out since `pykov` is no longer available in pip
+    return None
 
 def has_succesor(user_id, place_id, time):
     day = time.weekday()

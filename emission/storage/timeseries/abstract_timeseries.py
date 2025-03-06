@@ -38,7 +38,7 @@ class TimeSeries(object):
         return bits.BuiltinTimeSeries.get_uuid_list()
 
     def find_entries(self, key_list=None, time_query=None, geo_query=None,
-                     extra_query_list=None):
+                     extra_query_list=None) -> list:
         """
         Find the entries for the specified time query
         :param geo_query:

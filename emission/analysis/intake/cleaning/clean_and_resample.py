@@ -344,11 +344,10 @@ def get_filtered_points(section, filtered_section_data):
     logging.debug("Getting filtered points for section %s" % section)
     logging.debug("Saving entries into cleaned section %s" % filtered_section_data)
     ts = esta.TimeSeries.get_time_series(section.user_id)
-    loc_entry_it = ts.find_entries(["background/filtered_location"],
+    loc_list = ts.find_entries(["background/filtered_location"],
                                    esda.get_time_query_for_trip_like(
                                        esda.RAW_SECTION_KEY, section.get_id()))
-
-    loc_entry_list = [ecwe.Entry(e) for e in loc_entry_it]
+    loc_entry_list = [ecwe.Entry(e) for e in loc_list]
 
     # We know that the assertion fails in the geojson conversion code and we
     # handle it there, so we are just going to comment this out for now.

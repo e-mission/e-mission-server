@@ -23,5 +23,4 @@ dependencies:
   - pyfcm==2.0.1
   - pygeocoder==1.2.5
   - pymongo==4.3.3
-  - pykov==0.1
 prefix: /Users/shankari/OSS/anaconda/envs/emission

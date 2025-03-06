@@ -43,7 +43,7 @@ class TestExportModule(unittest.TestCase):
         for t in raw_data:
             if t['metadata']['key'] == "analysis/confirmed_trip":
                 confirmed_trips_raw.append(t)
-        confirmed_trips_db = list(ts.find_entries(["analysis/confirmed_trip"], None))
+        confirmed_trips_db = ts.find_entries(["analysis/confirmed_trip"], None)
 
         #Testing the matching total number of confirmed trips, testing no confirmed trips in raw.
         #Testing also for the first three trips that the object ids and user ids are consistent.
@@ -65,7 +65,7 @@ class TestExportModule(unittest.TestCase):
         for t in raw_data:
             if t['metadata']['key'] == "background/location":
                 background_location_raw.append(t)
-        background_location_db = list(ts.find_entries(["background/location"], None))
+        background_location_db = ts.find_entries(["background/location"], None)
         self.assertEqual(len(background_location_exported), len(background_location_raw))
         self.assertEqual(len(background_location_exported), len(background_location_db))
 

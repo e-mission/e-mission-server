@@ -17,7 +17,7 @@ services:
     networks:
        - emission
   db:
-    image: mongo:4.4.0
+    image: mongo:8.0.4
     deploy:
       replicas: 1
       restart_policy:

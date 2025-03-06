@@ -83,7 +83,7 @@ def filter_accuracy(user_id):
     SEL_FIELDS_FOR_DUP = ["latitude", "longitude", "ts", "accuracy"]
 
     try:
-        unfiltered_points_list = list(timeseries.find_entries(["background/location"], time_query))
+        unfiltered_points_list = timeseries.find_entries(["background/location"], time_query)
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
         if len(unfiltered_points_df) == 0:
             epq.mark_accuracy_filtering_done(user_id, None) 
