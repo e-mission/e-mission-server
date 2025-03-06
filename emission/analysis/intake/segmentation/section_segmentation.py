@@ -49,49 +49,53 @@ def segment_current_sections(user_id):
     time_query = epq.get_time_range_for_sectioning(user_id)
     try:
         trips_to_process = esda.get_entries(esda.RAW_TRIP_KEY, user_id, time_query)
+        ts = esta.TimeSeries.get_time_series(user_id)
+
         for trip_entry in trips_to_process:
             logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip_entry.get_id(), user_id)) + "+" * 20)
-            segment_trip_into_sections(user_id, trip_entry, trip_entry.data.source)
-        if len(trips_to_process) == 0:
-            # Didn't process anything new so start at the same point next time
-            last_trip_processed = None
-        else:    
-            last_trip_processed = trips_to_process[-1]
-        epq.mark_sectioning_done(user_id, last_trip_processed)
+            
+            trip_time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
+            
+            keys_we_need = [
+                "background/bluetooth_ble",
+                "background/filtered_location",
+                "background/location",
+                "background/motion_activity"
+            ]
+
+            combined_entries = ts.find_entries(keys_we_need, trip_time_query)
+
+            entries_by_key = {k: [] for k in keys_we_need}
+            for entry in combined_entries:
+                key = entry["metadata"]["key"]
+                entries_by_key[key].append(entry)
+
+            segment_trip_into_sections(
+                user_id,
+                trip_entry,
+                trip_entry.data.source,
+                entries_by_key
+            )
+
+        if trips_to_process:
+            epq.mark_sectioning_done(user_id, trips_to_process[-1])
+        else:
+            epq.mark_sectioning_done(user_id, None)
+
     except:
         logging.exception("Sectioning failed for user %s" % user_id)
         epq.mark_sectioning_failed(user_id)
 
-def segment_trip_into_sections(user_id, trip_entry, trip_source):
+
+def segment_trip_into_sections(user_id, trip_entry, trip_source, entries_by_key):
     ts = esta.TimeSeries.get_time_series(user_id)
-    time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
     distance_from_place = _get_distance_from_start_place_to_end(trip_entry)
+    time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
+    ble_entries_during_trip = entries_by_key["background/bluetooth_ble"]
+    filtered_loc_entries = entries_by_key["background/filtered_location"]
+    unfiltered_loc_entries = entries_by_key["background/location"]
+    motion_entries = entries_by_key["background/motion_activity"]
 
-    # ---------------------------------------------------------------
-    # Make ONE call for multiple keys: BLE, filtered_location, location
-    # ---------------------------------------------------------------
-    keys_we_need = [
-        "background/bluetooth_ble",
-        "background/filtered_location",
-        "background/location",
-        "background/motion_activity"
-    ]
-    combined_entries_during_trip = ts.find_entries(keys_we_need, time_query)
-
-    # Group entries by key
-    entries_by_key = {k: [] for k in keys_we_need}
-    for entry in combined_entries_during_trip:
-        key = entry["metadata"]["key"]
-        if key in entries_by_key:
-            entries_by_key[key].append(entry)
-
-    # Now extract individual lists as needed
-    ble_entries_during_trip      = entries_by_key["background/bluetooth_ble"]
-    filtered_loc_entries         = entries_by_key["background/filtered_location"]
-    unfiltered_loc_entries       = entries_by_key["background/location"]
-    motion_entries               = entries_by_key["background/motion_activity"]
-
-    # Build a lookup dictionary for the filtered_loc entries
     filtered_loc_lookup = {entry["data"]["ts"]: entry for entry in filtered_loc_entries}
     
     if (trip_source == "DwellSegmentationTimeFilter"):

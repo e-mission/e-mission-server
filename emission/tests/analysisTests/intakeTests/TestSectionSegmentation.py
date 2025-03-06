@@ -160,9 +160,26 @@ class TestSectionSegmentation(unittest.TestCase):
         test_trip_entry = ts.get_entry_from_id(esda.RAW_TRIP_KEY, test_trip_id)
         test_place.starting_trip = test_trip_id
         ts.insert(test_place_entry)
+        time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, test_trip_entry.get_id())
+        keys_we_need = [
+            "background/bluetooth_ble",
+            "background/filtered_location",
+            "background/location",
+            "background/motion_activity"
+        ]
+        combined_entries = ts.find_entries(keys_we_need, time_query)
 
-        eaiss.segment_trip_into_sections(self.androidUUID, test_trip_entry, "DwellSegmentationTimeFilter")
+        entries_by_key = {k: [] for k in keys_we_need}
+        for entry in combined_entries:
+            key = entry["metadata"]["key"]
+            entries_by_key[key].append(entry)
 
+        eaiss.segment_trip_into_sections(
+            self.androidUUID,
+            test_trip_entry,
+            "DwellSegmentationTimeFilter",
+            entries_by_key
+        )
         created_stops_entries = esdt.get_raw_stops_for_trip(self.androidUUID, test_trip_id)
         created_sections_entries = esdt.get_raw_sections_for_trip(self.androidUUID, test_trip_id)
         created_stops = [entry.data for entry in created_stops_entries]
