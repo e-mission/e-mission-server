@@ -131,7 +131,7 @@ def create_composite_objects(user_id):
         # composite trips are created from both confirmed trips and cleaned untracked trips
         # read them into memory immediately to avoid cursor timeouts
         # https://github.com/e-mission/e-mission-docs/issues/898#issuecomment-1526857742
-        triplikeEntries = list(ts.find_entries([esda.CONFIRMED_TRIP_KEY, esda.CONFIRMED_UNTRACKED_KEY], time_query=time_query))
+        triplikeEntries = ts.find_entries([esda.CONFIRMED_TRIP_KEY, esda.CONFIRMED_UNTRACKED_KEY], time_query=time_query)
         last_done_ts = None
         count_created = 0
         for t in triplikeEntries:

@@ -90,13 +90,13 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
 
         self.assertEqual(len(self.uc2.getMessage()), 30)
-        self.assertEqual(len(list(self.ts2.find_entries())), 0)
+        self.assertEqual(len(self.ts2.find_entries()), 0)
         
         self.assertEqual(len(self.ucios.getMessage()), 30)
-        self.assertEqual(len(list(self.tsios.find_entries())), 0)
+        self.assertEqual(len(self.tsios.find_entries()), 0)
 
 
         # Then we move entries for user1 into longterm
@@ -104,13 +104,13 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
         
         # Then, we move entries for the ios user into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUIDios).moveToLongTerm()
         
         self.assertEqual(len(self.ucios.getMessage()), 0)
-        self.assertEqual(len(list(self.tsios.find_entries())), 30)
+        self.assertEqual(len(self.tsios.find_entries()), 30)
         
         # 30 entries from android + 30 entries from ios = 60
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 60)
@@ -118,7 +118,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # But all existing entries still in usercache for the second user
         self.assertEqual(len(self.uc2.getMessage()), 30)
-        self.assertEqual(len(list(self.ts2.find_entries())), 0)
+        self.assertEqual(len(self.ts2.find_entries()), 0)
 
     def testMoveWhenEmpty(self):
         # 5 mins of data, every 30 secs = 10 entries per entry type. There are
@@ -126,14 +126,14 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
 
         # Then we move entries for user1 into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
         # Add an invalid type
         edb.get_usercache_db().insert_one({
@@ -156,7 +156,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # That was stored in error_db, no errors in main body
         self.assertEqual(edb.get_timeseries_error_db().count_documents({"user_id": self.testUserUUID1}), 1)
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
     def testMoveDuplicateKey(self):
         # 5 mins of data, every 30 secs = 10 entries per entry type. There are
@@ -164,7 +164,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
 
         # Store the entries before the move so that we can duplicate them later
         entries_before_move = self.uc1.getMessage()
@@ -174,7 +174,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
         # Put the same entries (with the same object IDs into the cache again)
         edb.get_usercache_db().insert_many(entries_before_move)
@@ -188,7 +188,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # Now, we should have 60 entries in the usercache (30 duplicates + 30 from user2)
         self.assertEqual(len(self.uc1.getMessage()), 60)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUserUUID1})
 
@@ -197,7 +197,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # All the duplicates should have been ignored, and the new entries moved into the timeseries
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 60)
+        self.assertEqual(len(self.ts1.find_entries()), 60)
 
     # The first query for every platform is likely to work 
     # because startTs = None and endTs, at least for iOS, is way out there
@@ -206,23 +206,23 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
     def testTwoLongTermCalls(self):
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
         
         self.assertEqual(len(self.ucios.getMessage()), 30)
-        self.assertEqual(len(list(self.tsios.find_entries())), 0)
+        self.assertEqual(len(self.tsios.find_entries()), 0)
 
         # Then we move entries for user1 into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
         
         # Then, we move entries for the ios user into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUIDios).moveToLongTerm()
         
         self.assertEqual(len(self.ucios.getMessage()), 0)
-        self.assertEqual(len(list(self.tsios.find_entries())), 30)
+        self.assertEqual(len(self.tsios.find_entries()), 30)
         
         # 30 entries from android + 30 entries from ios = 60
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 60)
@@ -247,11 +247,11 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # Now, repeat the above tests to ensure that they get moved again
         self.assertEqual(len(self.uc1.getMessage()), 30)
         # We will already have 30 entries in long-term for both android
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
         
         self.assertEqual(len(self.ucios.getMessage()), 30)
         # and ios
-        self.assertEqual(len(list(self.tsios.find_entries())), 30)
+        self.assertEqual(len(self.tsios.find_entries()), 30)
 
         # The timequery is 5 secs into the past, to avoid races
         # So let's sleep here for 5 secs
@@ -262,13 +262,13 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # Now, we have two sets of entries, so we will have 60 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 60)
+        self.assertEqual(len(self.ts1.find_entries()), 60)
         
         # Then, we move entries for the ios user into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUIDios).moveToLongTerm()
         
         self.assertEqual(len(self.ucios.getMessage()), 0)
-        self.assertEqual(len(list(self.tsios.find_entries())), 60)
+        self.assertEqual(len(self.tsios.find_entries()), 60)
         
         # 60 entries from android + 60 entries from ios = 120
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 120)
@@ -338,12 +338,12 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # we have munged, so these new entries should also be saved
         # and we should have 33 entries in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 33)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
         # since they were munged before saving into the usercache,
         # there should be no errors while copying to the timeseries
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 33)
+        self.assertEqual(len(self.ts1.find_entries()), 33)
 
     def testRemoteDotsIterateWhileModifyingSingleKey(self):
         test_with_single_key = {'ts': 1734661726.167,

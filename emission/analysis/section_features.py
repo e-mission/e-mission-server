@@ -78,7 +78,7 @@ def calHCR(section_entry):
 
     ts = esta.TimeSeries.get_time_series(section_entry.user_id)
     tq = esda.get_time_query_for_trip_like_object(section)
-    locations = list(ts.find_entries(["analysis/recreated_location"], tq))
+    locations = ts.find_entries(["analysis/recreated_location"], tq)
 
     if len(locations) < 3:
         return 0
