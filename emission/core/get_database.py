@@ -16,7 +16,7 @@ config = ecbc.get_config('conf/storage/db.conf',
     {"DB_HOST": "timeseries.url", "DB_RESULT_LIMIT": "timeseries.result_limit"})
 
 db_config = {}
-for key in ["DB_HOST", "DB_RESULT_LIMIT", "USE_HINTS"]:
+for key in ["DB_HOST", "DB_RESULT_LIMIT", "USE_HINTS", "MONITOR_DB"]:
     if key in config:
         db_config[key] = config.get(key)
     else:
@@ -32,6 +32,10 @@ try:
     use_hints = bool(config.get("USE_HINTS", False))
 except ValueError:
     use_hints = False
+
+if db_config.get("MONITOR_DB"):
+    import emission.storage.timeseries.db_query_monitor as estd
+    estd.register_db_query_monitor()
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
