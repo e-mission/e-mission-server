@@ -155,7 +155,7 @@ class TestSectionSegmentation(unittest.TestCase):
 
         dist_from_place = eaiss._get_distance_from_start_place_to_end(test_trip_entry,
                                                                      [test_place_entry])
-        eaiss.segment_trip_into_sections(
+        entries = eaiss.segment_trip_into_sections(
             ts,
             test_trip_entry,
             dist_from_place,
@@ -165,6 +165,7 @@ class TestSectionSegmentation(unittest.TestCase):
             unfiltered_loc_df,
             filtered_loc_df,
         )
+        ts.bulk_insert(entries, esta.EntryType.ANALYSIS_TYPE)
         
         created_stops_entries = esdt.get_raw_stops_for_trip(self.androidUUID, test_trip_id)
         created_sections_entries = esdt.get_raw_sections_for_trip(self.androidUUID, test_trip_id)

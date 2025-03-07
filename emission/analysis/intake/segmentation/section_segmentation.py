@@ -62,9 +62,10 @@ def segment_current_sections(user_id):
         unfiltered_loc_df = ts.get_data_df('background/location', time_query)
         filtered_loc_df = ts.get_data_df('background/filtered_location', time_query)
 
+        entries_to_insert = []
         for trip_entry in trips_to_process:
             dist_from_place = _get_distance_from_start_place_to_end(trip_entry, places_in_range)
-            segment_trip_into_sections(
+            entries_to_insert += segment_trip_into_sections(
                 ts,
                 trip_entry,
                 dist_from_place,
@@ -74,6 +75,8 @@ def segment_current_sections(user_id):
                 unfiltered_loc_df,
                 filtered_loc_df,
             )
+        if entries_to_insert:
+            ts.bulk_insert(entries_to_insert, esta.EntryType.ANALYSIS_TYPE)
         if len(trips_to_process) == 0:
             # Didn't process anything new so start at the same point next time
             last_trip_processed = None
@@ -127,8 +130,6 @@ def segment_trip_into_sections(ts, trip_entry, distance_from_place, trip_source,
     # So this is much simpler than the trip case.
     # Again, since this is segmenting a trip, we can just start with a section
 
-    prev_section_entry = None
-
     # TODO: Should we link the locations to the trips this way, or by using a foreign key?
     # If we want to use a foreign key, then we need to include the object id in the data df as well so that we can
     # set it properly.
@@ -137,6 +138,8 @@ def segment_trip_into_sections(ts, trip_entry, distance_from_place, trip_source,
     trip_end_loc = ecwl.Location(trip_filtered_loc_df.iloc[-1])
     logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
 
+    section_entries = []
+    stops_entries = []
     for (i, (start_loc_doc, end_loc_doc, sensed_mode)) in enumerate(segmentation_points):
         logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
         start_loc = ecwl.Location(start_loc_doc)
@@ -145,7 +148,7 @@ def segment_trip_into_sections(ts, trip_entry, distance_from_place, trip_source,
 
         section = ecwc.Section()
         section.trip_id = trip_entry['_id']
-        if prev_section_entry is None:
+        if len(section_entries) == 0:
             # This is the first point, so we want to start from the start of the trip, not the start of this segment
             start_loc = trip_start_loc
         if i == len(segmentation_points) - 1:
@@ -168,7 +171,7 @@ def segment_trip_into_sections(ts, trip_entry, distance_from_place, trip_source,
         section_entry = ecwe.Entry.create_entry(ts.user_id, esda.RAW_SECTION_KEY,
                                                 section, create_id=True)
 
-        if prev_section_entry is not None:
+        if len(section_entries) > 0:
             # If this is not the first section, create a stop to link the two sections together
             # The expectation is prev_section -> stop -> curr_section
             stop = ecws.Stop()
@@ -177,14 +180,11 @@ def segment_trip_into_sections(ts, trip_entry, distance_from_place, trip_source,
                                                  esda.RAW_STOP_KEY,
                                                  stop, create_id=True)
             logging.debug("stop = %s, stop_entry = %s" % (stop, stop_entry))
-            stitch_together(prev_section_entry, stop_entry, section_entry)
-            ts.insert(stop_entry)
-            ts.update(prev_section_entry)
-
-        # After we go through the loop, we will be left with the last section,
-        # which does not have an ending stop. We insert that too.
-        ts.insert(section_entry)
-        prev_section_entry = section_entry
+            stitch_together(section_entries[-1], stop_entry, section_entry)
+            stops_entries.append(stop_entry)
+        section_entries.append(section_entry)
+    
+    return section_entries + stops_entries
 
 
 def fill_section(section, start_loc, end_loc, sensed_mode, ble_sensed_mode=None):
