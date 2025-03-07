@@ -19,7 +19,6 @@ import emission.core.wrapper.location as ecwl
 import emission.core.common as ecc
 
 import emission.analysis.config as eac
-import emission.analysis.intake.location_utils as eail
 import emission.analysis.intake.domain_assumptions as eaid
 
 class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
@@ -46,31 +45,30 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.debug("%s, returning False" % activity_dump)
             return False
 
-    def segment_into_motion_changes(self, timeseries, time_query):
+    def segment_into_motion_changes(self, motion_df):
         """
         Use the motion changes detected on the phone to detect sections (consecutive chains of points)
         that have a consistent motion.
-        :param timeseries: the time series for this user
-        :param time_query: the range to consider for segmentation
+
+        :param motion_df: dataframe of background/motion_activity during this trip
         :return: a list of tuples [(start_motion, end_motion)] that represent the ranges with a consistent motion.
         The gap between end_motion[n] and start_motion[n+1] represents the transition between the activities.
         We don't actually know the motion/activity in that range with any level of confidence. We need a policy on
         how to deal with them (combine with first, combine with second, split in the middle). This policy can be
         enforced when we map the activity changes to locations.
         """
-        motion_df = timeseries.get_data_df("background/motion_activity", time_query)
         filter_mask = motion_df.apply(self.is_filtered, axis=1)
         # Calling np.nonzero on the filter_mask even if it was related trips with zero sections
         # has not been a problem before this - the subsequent check on the
         # length of the filtered dataframe was sufficient. But now both Tom and
         # I have hit it (on 18th and 21st of Sept) so let's handle it proactively here.
-        if filter_mask.shape == (0,0):
-            logging.info("Found filter_mask with shape (0,0), returning blank")
+        if len(filter_mask) == 0:
+            logging.info("Found filter_mask with len 0, returning blank")
             return []
 
         # Replace RUNNING with WALKING so that we don't get extra, incorrect sections 
         # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379496118
-        motion_df["type"].replace([8], 7, inplace=True)
+        motion_df.loc[motion_df["type"] == 8, "type"] = 7
 
         logging.debug("filtered points %s" % np.nonzero(filter_mask.to_numpy()))
         logging.debug("motion_df = %s" % motion_df.head())
@@ -123,23 +121,33 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
     # Overridden in smoothed_high_confidence_with_visit_transitions.py.
     # Consider porting any changes there as well if applicable.
-    def segment_into_sections(self, timeseries, distance_from_place, time_query):
+    def segment_into_sections(self, timeseries, time_query, distance_from_place, ble_list, motion_df, unfiltered_loc_df, filtered_loc_df):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
+
         :param timeseries: the time series for this user
         :param time_query: the range to consider for segmentation
+        :param distance_from_place: distance in m from the start place of the current trip to its end loc
+        :param ble_list: list of background/ble documents during this trip
+        :param motion_df: dataframe of background/motion_activity during this trip
+        :param unfiltered_loc_df: dataframe of background/location points during this trip
+        :param filtered_loc_df: dataframe of background/filtered_location points during this trip
         :return: a list of tuples [(start1, end1), (start2, end2), ...] that represent the start and end of sections
-        in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
+                 in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
         """
-        self.get_location_streams_for_trip(timeseries, time_query)
-        motion_changes = self.segment_into_motion_changes(timeseries, time_query)
+        self.ble_list = ble_list
+        self.motion_df = motion_df
+        self.unfiltered_loc_df = unfiltered_loc_df
+        self.filtered_loc_df = filtered_loc_df
 
-        if len(self.location_points) == 0:
-            logging.debug("No location points found for query %s, returning []" % time_query)
+        motion_changes = self.segment_into_motion_changes(motion_df)
+
+        if len(filtered_loc_df) == 0:
+            logging.debug("There are no points in the trip. How the heck did we segment it?")
             return []
 
-        fp = self.location_points.iloc[0]
-        lp = self.location_points.iloc[-1]
+        fp = filtered_loc_df.iloc[0]
+        lp = filtered_loc_df.iloc[-1]
 
         # Create sections for each motion. At this point, we need to decide a policy on how to deal with the gaps.
         # Let's pick a reasonable default for now.
@@ -149,8 +157,8 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.debug("Considering %s from %s -> %s" %
                           (start_motion.type, start_motion.fmt_time, end_motion.fmt_time))
             # Find points that correspond to this section
-            raw_section_df = self.location_points[(self.location_points.ts >= start_motion.ts) &
-                                             (self.location_points.ts <= end_motion.ts)]
+            raw_section_df = filtered_loc_df[(filtered_loc_df.ts >= start_motion.ts) &
+                                             (filtered_loc_df.ts <= end_motion.ts)]
             if len(raw_section_df) == 0:
                 logging.info("Found no location points between %s and %s" % (start_motion, end_motion))
             else:
@@ -180,16 +188,6 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
         return section_list
 
-
-    def get_location_streams_for_trip(self, timeseries, time_query):
-        # Let's also read the unfiltered locations so that we can combine them with 
-        # the sampled locations
-        self.unfiltered_loc_df = timeseries.get_data_df("background/location", time_query)
-        self.location_points = timeseries.get_data_df("background/filtered_location", time_query)
-        # Location points can have big gaps. Let's extrapolate them so that we
-        # can use them better.
-        # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-377323407
-        self.resampled_loc_df = eail.resample(self.location_points, interval = 10)
 
     def filter_points_for_range(self, df, start_motion, end_motion):
         """

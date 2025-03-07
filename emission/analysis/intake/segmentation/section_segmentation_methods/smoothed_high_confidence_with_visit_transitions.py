@@ -12,6 +12,7 @@ import logging
 import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as eaisms
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.localdate as ecwld
 
 class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfidenceMotion):
     def create_unknown_section(self, location_points_df):
@@ -36,7 +37,7 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         if distance_from_start > self.distance_threshold:
             logging.debug("found distance %s > threshold %s, returning dummy section" %
                           (distance_from_start, self.distance_threshold))
-            return self.create_unknown_section(self.location_points)
+            return self.create_unknown_section(self.filtered_loc_df)
 
         visit_ended_transition_df = transition_df[transition_df.transition == 14]
         if len(visit_ended_transition_df) == 0:
@@ -46,39 +47,46 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         # We have a visit transition, so we have a pretty good idea that
         # this is a real section. So let's create a dummy section for it and return
         logging.debug("found visit transition %s, returning dummy section" % visit_ended_transition_df[["transition", "fmt_time"]])
-        return self.create_unknown_section(self.location_points)
+        return self.create_unknown_section(self.filtered_loc_df)
 
     def extend_activity_to_location(self, motion_change, location_point):
         new_mc = ecwm.Motionactivity({
             'type': motion_change.type,
             'confidence': motion_change.confidence,
-            'ts': location_point.data.ts,
-            'local_dt': location_point.data.local_dt,
-            'fmt_time': location_point.data.fmt_time
+            'ts': location_point.ts,
+            'local_dt': ecwld.LocalDate.get_local_date(location_point.ts, location_point['local_dt_timezone']),
+            'fmt_time': location_point.fmt_time
         })
         return new_mc
 
-    def segment_into_sections(self, timeseries, distance_from_place, time_query):
+    def segment_into_sections(self, timeseries, time_query, distance_from_place, ble_list, motion_df, unfiltered_loc_df, filtered_loc_df):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
+        
         :param timeseries: the time series for this user
         :param time_query: the range to consider for segmentation
+        :param distance_from_place: distance in m from the start place of the current trip to its end loc
+        :param ble_list: list of background/ble documents during this trip
+        :param motion_df: dataframe of background/motion_activity during this trip
+        :param unfiltered_loc_df: dataframe of background/location points during this trip
+        :param filtered_loc_df: dataframe of background/filtered_location points during this trip
         :return: a list of tuples [(start1, end1), (start2, end2), ...] that represent the start and end of sections
-        in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
+                 in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
         """
+        self.ble_list = ble_list
+        self.motion_df = motion_df
+        self.unfiltered_loc_df = unfiltered_loc_df
+        self.filtered_loc_df = filtered_loc_df
 
-        # Since we are going to use a hybrid model, let's just read all kinds
-        # of locations upfront
-        self.get_location_streams_for_trip(timeseries, time_query)
-        motion_changes = self.segment_into_motion_changes(timeseries, time_query)
+        motion_changes = self.segment_into_motion_changes(motion_df)
 
-        if len(self.location_points) == 0:
+        if len(filtered_loc_df) == 0:
             logging.debug("There are no points in the trip. How the heck did we segment it?")
             return []
 
         if len(motion_changes) == 0:
             dummy_sec = self.get_section_if_applicable(timeseries, distance_from_place,
-                                                       time_query, self.location_points)
+                                                       time_query, filtered_loc_df)
             if dummy_sec is not None:
                 return [dummy_sec]
             else:
@@ -100,21 +108,27 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         # we cannot specify a sampling frequency for the motion activity
         # So let us extend the first motion change to the beginning of the
         # trip, and the last motion change to the end of the trip
-        motion_changes[0] = (self.extend_activity_to_location(motion_changes[0][0],
-                timeseries.df_row_to_entry("background/filtered_location",
-                                           self.location_points.iloc[0])),
-                             motion_changes[0][1])
-        motion_changes[-1] = (motion_changes[-1][0],
-            self.extend_activity_to_location(motion_changes[-1][1],
-                timeseries.df_row_to_entry("background/filtered_location",
-                                           self.location_points.iloc[-1])))
+        motion_changes[0] = (
+            self.extend_activity_to_location(
+                motion_changes[0][0],
+                ecwm.Motionactivity(filtered_loc_df.iloc[0])
+            ),
+            motion_changes[0][1],
+        )
+        motion_changes[-1] = (
+            motion_changes[-1][0],
+            self.extend_activity_to_location(
+                motion_changes[-1][1],
+                ecwm.Motionactivity(filtered_loc_df.iloc[-1])
+            ),
+        )
 
         for (start_motion, end_motion) in motion_changes:
             logging.debug("Considering %s from %s -> %s" %
                           (start_motion.type, start_motion.fmt_time, end_motion.fmt_time))
             # Find points that correspond to this section
-            raw_section_df = self.filter_points_for_range(self.location_points,
-                                        start_motion, end_motion)
+            raw_section_df = self.filter_points_for_range(filtered_loc_df,
+                                                          start_motion, end_motion)
 
             if len(raw_section_df) <=1:
                 logging.info("Found %d filtered points %s and %s for type %s, skipping..." % 

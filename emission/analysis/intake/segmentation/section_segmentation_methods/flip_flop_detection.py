@@ -88,7 +88,7 @@ class FlipFlopDetection():
             return True
         else:
             streak_locs = self.seg_method.filter_points_for_range(
-                self.seg_method.location_points, start_motion, end_motion)
+                self.seg_method.filtered_loc_df, start_motion, end_motion)
             logging.debug("in is_flip_flop: len(streak_locs) = %d" % len(streak_locs))
             if len(streak_locs) == 0:
                 return True
@@ -227,7 +227,7 @@ class FlipFlopDetection():
 
         ssm, sem = self.motion_changes[streak_start]
         streak_locs = self.seg_method.filter_points_for_range(
-            self.seg_method.location_points, ssm, sem)
+            self.seg_method.filtered_loc_df, ssm, sem)
         streak_unfiltered_locs = self.seg_method.filter_points_for_range(
             self.seg_method.unfiltered_loc_df, ssm, sem)
 
@@ -297,17 +297,17 @@ class FlipFlopDetection():
             return MergeResult(Direction.FORWARD, FinalMode.UNMERGED)
 
         loc_points = self.seg_method.filter_points_for_range(
-                self.seg_method.location_points, ssm, eem)
+                self.seg_method.filtered_loc_df, ssm, eem)
         loc_points.reset_index(inplace=True)
         with_speed_loc_points = eaicl.add_dist_heading_speed(loc_points)
 
         points_before = self.seg_method.filter_points_for_range(
-                self.seg_method.location_points, bsm, bem)
+                self.seg_method.filtered_loc_df, bsm, bem)
         points_before.reset_index(inplace=True)
         with_speed_points_before = eaicl.add_dist_heading_speed(points_before)
 
         points_after = self.seg_method.filter_points_for_range(
-                self.seg_method.location_points, asm, aem)
+                self.seg_method.filtered_loc_df, asm, aem)
         points_after.reset_index(inplace=True)
         with_speed_points_after = eaicl.add_dist_heading_speed(points_after)
 
@@ -407,7 +407,7 @@ class FlipFlopDetection():
 
     def get_median_speed(self, mcs, mce):
         loc_df = self.seg_method.filter_points_for_range(
-                self.seg_method.location_points, mcs, mce)
+                self.seg_method.filtered_loc_df, mcs, mce)
         if len(loc_df) > 0:
             loc_df.reset_index(inplace=True)
             with_speed_df = eaicl.add_dist_heading_speed(loc_df)

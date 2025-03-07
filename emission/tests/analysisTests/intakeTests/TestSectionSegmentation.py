@@ -73,7 +73,13 @@ class TestSectionSegmentation(unittest.TestCase):
         shcmsm = shcm.SmoothedHighConfidenceMotion(60, 100, [ecwm.MotionTypes.TILTING,
                                                         ecwm.MotionTypes.UNKNOWN,
                                                         ecwm.MotionTypes.STILL])
-        segmentation_points = shcmsm.segment_into_sections(ts, 0, tq)
+
+        ble_list = ts.find_entries(['background/bluetooth_ble'], tq)
+        motion_df = ts.get_data_df('background/motion_activity', tq)
+        unfiltered_loc_df = ts.get_data_df('background/location', tq)
+        filtered_loc_df = ts.get_data_df('background/filtered_location', tq)
+
+        segmentation_points = shcmsm.segment_into_sections(ts, tq, 0, ble_list, motion_df, unfiltered_loc_df, filtered_loc_df)
 
         for (start, end, motion) in segmentation_points:
             logging.info("section is from %s (%f) -> %s (%f) using mode %s" %
@@ -140,9 +146,26 @@ class TestSectionSegmentation(unittest.TestCase):
         test_trip_entry = ts.get_entry_from_id(esda.RAW_TRIP_KEY, test_trip_id)
         test_place.starting_trip = test_trip_id
         ts.insert(test_place_entry)
+        time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, test_trip_entry.get_id())
 
-        eaiss.segment_trip_into_sections(self.androidUUID, test_trip_entry, "DwellSegmentationTimeFilter")
+        ble_list = ts.find_entries(['background/bluetooth_ble'], time_query)
+        motion_df = ts.get_data_df('background/motion_activity', time_query)
+        unfiltered_loc_df = ts.get_data_df('background/location', time_query)
+        filtered_loc_df = ts.get_data_df('background/filtered_location', time_query)
 
+        dist_from_place = eaiss._get_distance_from_start_place_to_end(test_trip_entry,
+                                                                     [test_place_entry])
+        eaiss.segment_trip_into_sections(
+            ts,
+            test_trip_entry,
+            dist_from_place,
+            "DwellSegmentationTimeFilter",
+            ble_list,
+            motion_df,
+            unfiltered_loc_df,
+            filtered_loc_df,
+        )
+        
         created_stops_entries = esdt.get_raw_stops_for_trip(self.androidUUID, test_trip_id)
         created_sections_entries = esdt.get_raw_sections_for_trip(self.androidUUID, test_trip_id)
         created_stops = [entry.data for entry in created_stops_entries]
