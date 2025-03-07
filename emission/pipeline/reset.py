@@ -340,7 +340,7 @@ def get_all_resets(all_invalid_states):
     print(reset_ts)
     return reset_ts
 
-def auto_reset(dry_run, only_calc, excluded_users):
+def auto_reset(dry_run, only_calc, excluded_users=[]):
     # Only read all states that are not for `OUTPUT_GEN` since we are not going to reset that state
     # Also only read states which have been running for more than three hours
     # If we are running the pipeline every hour, then having a run_ts that is
