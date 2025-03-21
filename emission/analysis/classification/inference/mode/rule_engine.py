@@ -68,10 +68,14 @@ class RuleEngineModeInferencePipeline:
                 (section_entry.get_id(),
                  section_entry.data.start_fmt_time, section_entry.data.end_fmt_time) +
                 '~' * 10)
-            if section_entry.data.sensed_mode == ecwma.MotionTypes.AIR_OR_HSR:
-                predictedProb.append({'AIR_OR_HSR': 1})
-            else:
-                predictedProb.append(get_prediction(i, section_entry))
+            try:
+                if section_entry.data.sensed_mode == ecwma.MotionTypes.AIR_OR_HSR:
+                    predictedProb.append({'AIR_OR_HSR': 1})
+                else:
+                    predictedProb.append(get_prediction(i, section_entry))
+            except Exception as e:
+                logging.error(f"Found {e} while inferring sensed modes, skipping {section_entry.get_id()} and {section_entry.user_id}, starting at {section_entry.data.start_fmt_time}")
+                logging.exception(e)
 
         return predictedProb
 
