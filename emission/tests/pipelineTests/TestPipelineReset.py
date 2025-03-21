@@ -42,6 +42,7 @@ import emission.tests.common as etc
 class TestPipelineReset(unittest.TestCase):
     def setUp(self):
         np.random.seed(61297777)
+        etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
 
     def tearDown(self):
         if os.environ.get("SKIP_TEARDOWN", False):
@@ -59,6 +60,7 @@ class TestPipelineReset(unittest.TestCase):
                     self.testUUID = uuid
                     logging.info("Deleting entries for %s" % self.testUUID)
                     self.clearRelatedDb()
+            etc.clear_analysis_config()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -545,7 +547,9 @@ class TestPipelineReset(unittest.TestCase):
         del(last_place_gt_props["exit_local_dt"])
         del(last_place_gt_props["exit_fmt_time"])
         del(last_place_gt_props["starting_trip"])
-        del(last_place_gt_props["duration"])
+        # Check if duration exists before trying to delete it
+        if "duration" in last_place_gt_props:
+            del(last_place_gt_props["duration"])
         self.assertEqual(len(modified_gt), 3)
 
         # Checking that the modified ground truth is correct
@@ -792,8 +796,13 @@ class TestPipelineReset(unittest.TestCase):
         for index, e in invalid_states_mixed.iterrows():
             edb.get_pipeline_state_db().insert_one(e.to_dict())
 
-        df_from_cursor = pd.json_normalize(edb.get_pipeline_state_db().find())
-        df_from_list = pd.json_normalize(list(edb.get_pipeline_state_db().find()))
+        # Make sure we only get the records we just inserted
+        # Without it we get:
+        # self.assertEqual(len(df_from_cursor), len(invalid_states_mixed))
+        # AssertionError: 37 != 8
+
+        df_from_cursor = pd.json_normalize(edb.get_pipeline_state_db().find({"user_id": {"$in": self.testUUIDList}}))
+        df_from_list = pd.json_normalize(list(edb.get_pipeline_state_db().find({"user_id": {"$in": self.testUUIDList}})))
 
         self.assertEqual(len(df_from_cursor), len(invalid_states_mixed))
 
