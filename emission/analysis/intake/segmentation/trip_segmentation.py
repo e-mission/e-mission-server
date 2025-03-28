@@ -8,6 +8,8 @@ from builtins import *
 from builtins import object
 import logging
 import time
+import arrow
+import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.place_queries as esdp
@@ -87,8 +89,7 @@ def segment_current_trips(user_id):
 
     out_of_order_points = loc_df[loc_df.ts.diff() < 0]
     if len(out_of_order_points) > 0:
-        logging.info("Found out of order points!")
-        logging.info("%s" % out_of_order_points)
+        logging.info("Found out of order points! %s" % out_of_order_points.index)
         # drop from the table
         loc_df = loc_df.drop(out_of_order_points.index.tolist())
         loc_df.reset_index(inplace=True)
@@ -98,9 +99,25 @@ def segment_current_trips(user_id):
         for ooid in out_of_order_id_list:
             ts.invalidate_raw_entry(ooid)
 
-    filters_in_df = loc_df["filter"].dropna().unique()
+    after_out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    logging.info("After filtering, found out of order points! %s" % after_out_of_order_points.index)
 
+    if len(after_out_of_order_points) > 0:
+        logging.info(f"{after_out_of_order_points.index.intersection(out_of_order_points.index)=}")
+        before_index = after_out_of_order_points.index - 1
+        after_index = after_out_of_order_points.index + 1
+        with pd.option_context('display.float_format', '{:.2f}'.format,
+                                'display.max_columns', None,
+                                'display.max_rows', None):
+            before_after_indices = before_index.append(after_out_of_order_points.index)\
+                                        .append(after_index).sort_values()
+            before_after_loc_df = loc_df.loc[before_after_indices]
+            before_after_loc_df["metadata_write_fmt_time"] = before_after_loc_df.metadata_write_ts.apply(arrow.get)
+            logging.info(f"{before_after_loc_df[['_id', 'ts', 'metadata_write_ts', 'fmt_time', 'metadata_write_fmt_time']]}")
+
+    filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
+
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
         with ect.Timer() as t_segment_trips:
