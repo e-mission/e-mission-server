@@ -9,6 +9,7 @@ from builtins import object
 import logging
 import time
 import arrow
+import numpy as np
 import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -87,7 +88,9 @@ def segment_current_trips(user_id):
     transition_df = ts.get_data_df("statemachine/transition", time_query)
     motion_df = ts.get_data_df("background/motion_activity", time_query)
 
-    out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    ts_values = loc_df['ts'].to_numpy()
+    ts_cummax = np.maximum.accumulate(ts_values)
+    out_of_order_points = loc_df[ts_values != ts_cummax]
     if len(out_of_order_points) > 0:
         logging.info("Found out of order points! %s" % out_of_order_points.index)
         # drop from the table
