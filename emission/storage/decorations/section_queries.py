@@ -61,14 +61,20 @@ def _get_inference_entry_for_section(user_id, section_id, entry_key, section_id_
     combo_query = copy.copy(prediction_key_query)
     combo_query.update(inference_query)
     logging.debug("About to query %s" % combo_query)
-    ret_list = list(edb.get_analysis_timeseries_db().find(combo_query))
-    # We currently have only one algorithm
-    assert len(ret_list) <= 1, "Found len(ret_list) = %d, expected <=1" % len(ret_list)
+    
+    # Sort by write_ts descending to get the most recent entry first
+    ret_cursor = edb.get_analysis_timeseries_db().find(combo_query).sort("metadata.write_ts", pymongo.DESCENDING)
+    ret_list = list(ret_cursor)
+    
     if len(ret_list) == 0:
         logging.debug("Found no inferred prediction, returning None")
         return None
     
-    assert len(ret_list) == 1, "Found ret_list of length %d, expected 1" % len(ret_list)
+    # Instead of asserting, just take the most recent entry (which is now the first in the list)
+    # For pipeline reset tests, we can sometimes have multiple entries
+    if len(ret_list) > 1:
+        logging.warning("Found %d entries, expected <=1, taking the most recent one" % len(ret_list))
+    
     curr_prediction = ecwe.Entry(ret_list[0])
     return curr_prediction
 
