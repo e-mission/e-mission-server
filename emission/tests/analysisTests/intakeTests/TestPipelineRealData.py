@@ -812,6 +812,57 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
         self.assertEqual(countUntrackedTime, 0)
 
+    def testMultiOutOfOrderAug6(self):
+        # https://github.com/e-mission/e-mission-docs/issues/1122
+        # https://github.com/e-mission/e-mission-server/pull/1040
+        dataFile = "emission/tests/data/real_examples/multi_ooo_aug_6_2024"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+
+        raw_trips = ts.find_entries(["segmentation/raw_trip"], None)
+        self.assertEqual(len(raw_trips), 15)
+        # No trips with negative duration (start_ts > end_ts)
+        for rt in raw_trips:
+            self.assertGreaterEqual(rt["data"]["duration"], 0)
+        
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        self.assertEqual(len(confirmed_trips), 11)
+
+    def testMultiOutOfOrderAug11(self):
+        # https://github.com/e-mission/e-mission-docs/issues/1122
+        # https://github.com/e-mission/e-mission-server/pull/1040
+        dataFile = "emission/tests/data/real_examples/multi_ooo_aug_11_2024"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+
+        raw_trips = ts.find_entries(["segmentation/raw_trip"], None)
+        self.assertEqual(len(raw_trips), 4)
+        # No trips with negative duration (start_ts > end_ts)
+        for rt in raw_trips:
+            self.assertGreaterEqual(rt["data"]["duration"], 0)
+
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        self.assertEqual(len(confirmed_trips), 3)
+
+    def testMultiOutOfOrderSep9(self):
+        # https://github.com/e-mission/e-mission-docs/issues/1122
+        # https://github.com/e-mission/e-mission-server/pull/1040
+        dataFile = "emission/tests/data/real_examples/multi_ooo_sep_09_2024"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+
+        raw_trips = ts.find_entries(["segmentation/raw_trip"], None)
+        self.assertEqual(len(raw_trips), 7)
+        # No trips with negative duration (start_ts > end_ts)
+        for rt in raw_trips:
+            self.assertGreaterEqual(rt["data"]["duration"], 0)
+
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        self.assertEqual(len(confirmed_trips), 5)
+    
     def testCompositeTripIncremental(self):
         # Test for 545114feb5ac15caac4110d39935612525954b71
         dataFile_1 = "emission/tests/data/real_examples/shankari_2016-08-04"
