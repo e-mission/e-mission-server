@@ -109,11 +109,19 @@ def add_heading_change(points_df):
 def filter_current_sections(user_id):
     time_query = epq.get_time_range_for_smoothing(user_id)
     try:
+        ts = esta.TimeSeries.get_time_series(user_id)
         sections_to_process = esda.get_entries(esda.RAW_SECTION_KEY, user_id,
                                                time_query)
+        time_query.timeType = "data.ts"
+        loc_df = ts.get_data_df("background/filtered_location", time_query)
+        entries_to_insert = []
         for section in sections_to_process:
-            logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section.get_id(), user_id)) + "^" * 20)
-            filter_jumps(user_id, section.get_id())
+            logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section['_id'], user_id)) + "^" * 20)
+            smoothing_result = filter_jumps(user_id, section, loc_df)
+            if smoothing_result:
+                entries_to_insert.append(smoothing_result)
+        if entries_to_insert:
+            ts.bulk_insert(entries_to_insert, esta.EntryType.ANALYSIS_TYPE)
         if len(sections_to_process) == 0:
             # Didn't process anything new so start at the same point next time
             last_section_processed = None
@@ -124,21 +132,21 @@ def filter_current_sections(user_id):
         logging.exception("Marking smoothing as failed")
         epq.mark_smoothing_failed(user_id)
 
-def filter_jumps(user_id, section_id):
+def filter_jumps(user_id, section, loc_df):
     """
-    filters out any jumps in the points related to this section and stores a entry that lists the deleted points for
+    filters out any jumps in the points related to this section and creates a entry with the deleted points for
     this trip and this section.
     :param user_id: the user id to filter the trips for
-    :param section_id: the section_id to filter the trips for
-    :return: none. saves an entry with the filtered points into the database.
+    :param section: the Section object to filter the trips for
+    :param loc_df: a dataframe of background/filtered_location in the current range being processed
+    :return: a created analysis/smoothing entry with the filtered points, or None if no points were filtered
     """
 
-    logging.debug("filter_jumps(%s, %s) called" % (user_id, section_id))
+    logging.debug("filter_jumps(%s, %s) called" % (user_id, section.get_id()))
     outlier_algo = eaico.BoxplotOutlier()
 
-    tq = esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY, section_id)
-    ts = esta.TimeSeries.get_time_series(user_id)
-    section_points_df = ts.get_data_df("background/filtered_location", tq)
+    ts_in_section = "@section.data.start_ts <= ts <= @section.data.end_ts"
+    section_points_df = loc_df.query(ts_in_section).reset_index(drop=True)
     is_ios = section_points_df["filter"].dropna().unique().tolist() == ["distance"]
     if is_ios:
         logging.debug("Found iOS section, filling in gaps with fake data")
@@ -150,7 +158,7 @@ def filter_jumps(user_id, section_id):
     (sel_algo, points_to_ignore_df) = get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup_filtering_algo)
     if points_to_ignore_df is None:
         # There were no points to delete
-        return
+        return None
     points_to_ignore_df_filtered = points_to_ignore_df._id.dropna()
     logging.debug("after filtering ignored points, using %s, %s -> %s" %
                   (sel_algo, len(points_to_ignore_df), len(points_to_ignore_df_filtered)))
@@ -161,13 +169,12 @@ def filter_jumps(user_id, section_id):
     logging.debug("deleted %s points" % len(deleted_point_id_list))
 
     filter_result = ecws.Smoothresults()
-    filter_result.section = section_id
+    filter_result.section = section.get_id()
     filter_result.deleted_points = deleted_point_id_list
     filter_result.outlier_algo = "BoxplotOutlier"
     filter_result.filtering_algo = sel_algo.__class__.__name__.split(".")[-1]
+    return ecwe.Entry.create_entry(user_id, "analysis/smoothing", filter_result)
 
-    result_entry = ecwe.Entry.create_entry(user_id, "analysis/smoothing", filter_result)
-    ts.insert(result_entry)
 
 def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup_filtering_algo):
     """
