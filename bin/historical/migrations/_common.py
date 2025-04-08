@@ -22,7 +22,7 @@ else:
     PROD_LIST = [
         fname.split(".")[0]
         for fname in filenames
-          if fname and 'dev-' not in fname and 'stage-' not in fname
+          if fname and 'dev-' not in fname and 'stage-' not in fname and 'test.' not in fname
     ]
 print(f"PROD_LIST: {PROD_LIST}")
 
