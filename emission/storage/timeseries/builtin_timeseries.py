@@ -243,7 +243,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
             if sort_key is None:
                 ts_db_result = ts_db_cursor
             else:
-                ts_db_result = ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
+                ts_db_result = ts_db_cursor.sort([
+                    (sort_key, pymongo.ASCENDING),
+                    ('_id', pymongo.ASCENDING),
+                ])
             # We send the results from the phone in batches of 10,000
             # And we support reading upto 100 times that amount at a time, so over
             # This is more than the number of entries across all metadata types for
@@ -333,7 +336,13 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :return: a database row, or None if no match is found
         """
         find_query = self._get_query([key], time_query)
-        result_it = self.get_timeseries_db(key).find(find_query).sort(field, sort_order).limit(1)
+        result_it = self.get_timeseries_db(key) \
+                        .find(find_query) \
+                        .sort([
+                            (field, sort_order),
+                            ('_id', pymongo.ASCENDING),
+                        ]) \
+                        .limit(1)
         result_list = list(result_it)
         if len(result_list) == 0:
             return None
