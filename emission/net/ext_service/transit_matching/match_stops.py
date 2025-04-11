@@ -5,6 +5,12 @@ import attrdict as ad
 import itertools
 import os
 import time
+import hashlib
+
+import emission.analysis.config as eac
+
+# Set up Overpass API and caching configuration
+CACHE_DIR = None
 
 try:
     GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
@@ -13,19 +19,90 @@ try:
 except:
     print("overpass not configured, falling back to public overpass api")
     url = "https://lz4.overpass-api.de/"
-
-try:
-    with open('conf/net/ext_service/overpass_transit_stops_query_template', 'r', encoding='UTF-8') as query_file:
-        query_string = "".join(query_file.readlines())
-except FileNotFoundError:
-    print("transit stops query not configured, falling back to default")
-    with open('conf/net/ext_service/overpass_transit_stops_query_template.sample', 'r', encoding='UTF-8') as query_file:
-        query_string = "".join(query_file.readlines())
+    # Enable cache when using the public API
+    CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")
+    os.makedirs(CACHE_DIR, exist_ok=True)
 
 RETRY = -1
+MAX_BBOXES_PER_QUERY = 10
+
+def query_overpass(overpass_query):
+    """
+    Wrapper function that handles caching of Overpass API responses.
+    If in production mode (CACHE_DIR is None), directly uses make_request_and_catch.
+    Otherwise, tries to use cached response if available, or makes request and caches the result.
+    """
+    if CACHE_DIR is None:
+        return make_request_and_catch(overpass_query)
+    
+    # Create a unique filename based on the query hash
+    query_hash = hashlib.md5(overpass_query.encode()).hexdigest()
+    cache_file = os.path.join(CACHE_DIR, f"{query_hash}.json")
+    
+    # If the cached response exists, use it
+    if os.path.exists(cache_file):
+        logging.info(f"Using cached response from {cache_file}")
+        try:
+            with open(cache_file, 'r') as f:
+                all_results = json.load(f)
+            return all_results
+        except Exception as e:
+            logging.warning(f"Error reading cache file: {e}, falling back to API")
+    
+    # Else, make the request and cache the response before returning
+    all_results = make_request_and_catch(overpass_query)
+    
+    # Only cache successful results (not RETRY signal)
+    if all_results != RETRY and all_results:
+        try:
+            with open(cache_file, 'w') as f:
+                json.dump(all_results, f)
+            logging.info(f"Cached API response to {cache_file}")
+        except Exception as e:
+            logging.warning(f"Error caching response: {e}")
+    
+    return all_results
+
+def query_overpass(overpass_query):
+    """
+    Wrapper function that handles caching of Overpass API responses.
+    If in production mode (CACHE_DIR is None), directly uses make_request_and_catch.
+    Otherwise, tries to use cached response if available, or makes request and caches the result.
+    """
+    if CACHE_DIR is None:
+        return make_request_and_catch(overpass_query)
+    
+    # Create a unique filename based on the query hash
+    query_hash = hashlib.md5(overpass_query.encode()).hexdigest()
+    cache_file = os.path.join(CACHE_DIR, f"{query_hash}.json")
+    
+    # If the cached response exists, use it
+    if os.path.exists(cache_file):
+        logging.info(f"Using cached response from {cache_file}")
+        try:
+            with open(cache_file, 'r') as f:
+                all_results = json.load(f)
+            return all_results
+        except Exception as e:
+            logging.warning(f"Error reading cache file: {e}, falling back to API")
+    
+    # Else, make the request and cache the response before returning
+    all_results = make_request_and_catch(overpass_query)
+    
+    # Only cache successful results (not RETRY signal)
+    if all_results != RETRY and all_results:
+        try:
+            with open(cache_file, 'w') as f:
+                json.dump(all_results, f)
+            logging.info(f"Cached API response to {cache_file}")
+        except Exception as e:
+            logging.warning(f"Error caching response: {e}")
+    
+    return all_results
 
 def make_request_and_catch(overpass_query):
     try:
+        logging.info("Making API request to Overpass")
         response = requests.post(url + "api/interpreter", data=overpass_query)
     except requests.exceptions.ChunkedEncodingError as e:
         logging.info("ChunkedEncodingError while creating request %s" % (e))
@@ -67,28 +144,83 @@ def make_request_and_catch(overpass_query):
             all_results = []
     return all_results
 
-def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
-    bbox_string = "%s,%s,%s,%s" % (min_lat, min_lon, max_lat, max_lon)
-    logging.debug("bbox_string = %s" % bbox_string)
-    overpass_public_transit_query_template = query_string
-    overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
-    call_return = RETRY
-    retry_count = 0
-    while call_return == RETRY:
-        if retry_count > 0:
-            logging.info(f"call_return = {call_return}, retrying...")
-        call_return = make_request_and_catch(overpass_query)
-        logging.info(f"after retry, got {'RETRY' if call_return == RETRY else len(call_return)}...")
-        if call_return == RETRY:
-            retry_count = retry_count + 1
-            logging.info(f"after incrementing, retry_count = {retry_count}...")
 
-    logging.info(f"after all retries, retry_count = {retry_count}, call_return = {'RETRY' if call_return == RETRY else len(call_return)}...")
-    all_results = call_return
+def load_overpass_query_template():
+    # Return a static inline query template.
+    # Removed any configurability here because the code expects these specific features.
+    logging.info("Using static inline Overpass query template")
+    return '''
+    (
+        node["highway"="bus_stop"]({bbox});
+        node["railway"="station"]({bbox});
+        node["public_transport"]({bbox});
+        way["railway"="station"]({bbox});
+        relation["route"]({bbox});
+    );
+    out body;
+    out count;
+    >;
+    '''
 
-    relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
+def get_query_for_bbox(bbox):
+    bbox_string = "%s,%s,%s,%s" % bbox
+    template = load_overpass_query_template()
+    return template.format(bbox=bbox_string)
+
+
+def get_query_for_bboxes(bboxes):
+    # Retrieve the timeout from config; default to 25 if not set.
+    config = eac.get_config()
+    timeout = config.get("OVERPASS_QUERY_TIMEOUT", 25)
+    # Build the header with the configurable timeout.
+    query = f'[out:json][timeout:{timeout}];\n'
+    for bbox in bboxes:
+        query += get_query_for_bbox(bbox)
+    return query
+
+# Add limit to how many locations are in one query via chunking
+def chunk_list(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
+
+
+def get_public_transit_stops(bboxes):
+    all_stops = []
+    # Process bboxes in chunks to avoid oversized queries.
+    for bbox_chunk in chunk_list(bboxes, MAX_BBOXES_PER_QUERY):
+        overpass_query = get_query_for_bboxes(bbox_chunk)
+        call_return = RETRY
+        retry_count = 0
+        logging.debug("Using bbox chunk: %s", bbox_chunk)
+        logging.debug("Overpass query: %s", overpass_query)
+        while call_return == RETRY:
+            if retry_count > 0:
+                logging.info(f"call_return = {call_return}, retrying chunk query...")
+            call_return = query_overpass(overpass_query)
+            logging.info(f"after retry, got {'RETRY' if call_return == RETRY else len(call_return)} for chunk...")
+            if call_return == RETRY:
+                retry_count += 1
+        # Process the results from this chunk.
+        chunk_results = call_return
+        locs_results = []
+        current_loc_results = []
+        for result in chunk_results:
+            if result.get("type") == "count":
+                locs_results.append(current_loc_results)
+                current_loc_results = []
+            else:
+                current_loc_results.append(result)
+        # Append stops from this chunk.
+        stops_for_chunk = [get_stops_from_results(loc_results) for loc_results in locs_results]
+        all_stops.extend(stops_for_chunk)
+    return all_stops
+
+
+def get_stops_from_results(results):
+    relations = [ad.AttrDict(r) for r in results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
-    stops = [ad.AttrDict(r) for r in all_results if r["type"] != "relation"]
+    stops = [ad.AttrDict(r) for r in results if r["type"] != "relation"]
     logging.debug("Found %d stops" % len(stops))
     rel_map = {}
     for relation in relations:
@@ -109,22 +241,23 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
                 stop["routes"].append({"id": relation["id"], "tags": relation["tags"]})
     return stops
 
-# https://gis.stackexchange.com/a/19761
-def get_stops_near(loc, distance_in_meters):
-    COORDS = "coordinates"
+def get_stops_near(coord_pairs, distance_in_meters):
+    # https://gis.stackexchange.com/a/19761
     # 10001.965729km = 90 degrees
     # 1km = 90/10001.965729 degrees
     # 1000m = 90/10001.965729 degrees
     # 1m = 90/(10001.965729 * 1000)
     meter2deg = 90/(10001.965729 * 1000)
     bbox_delta = meter2deg * distance_in_meters
-    lon = loc[COORDS][0]
-    lat = loc[COORDS][1]
-    stops = get_public_transit_stops(lat - bbox_delta, lon - bbox_delta, lat + bbox_delta, lon + bbox_delta)
-    logging.debug("Found %d stops" % len(stops))
-    for i, stop in enumerate(stops):
-        logging.debug("STOP %d: %s" % (i, stop))
-    return stops
+    bboxes = [
+        (lat - bbox_delta, lon - bbox_delta,
+         lat + bbox_delta, lon + bbox_delta)
+        for [lon, lat] in coord_pairs
+    ]
+    locs_stops = get_public_transit_stops(bboxes)
+    for i, loc_stops in enumerate(locs_stops):
+        logging.debug(f"Found {len(loc_stops)} stops for bbox {bboxes[i]}")
+    return locs_stops
 
 def get_predicted_transit_mode(start_stops, end_stops):
     """
