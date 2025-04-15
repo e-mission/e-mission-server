@@ -115,9 +115,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
         Return the correct timeseries for the key. Analysis results go into the
         analysis timeseries and raw sensor data stays in the regular timeseries.
         """
-        ret_val = self.ts_map[key]
-        # logging.debug("Returning %s" % ret_val)
-        return ret_val
+        try:
+            ret_val = self.ts_map[key]
+            # logging.debug("Returning %s" % ret_val)
+            return ret_val
+        except KeyError:
+            # If the key is not found, raise KeyError to match the original behavior
+            # This is needed for some tests that expect a KeyError
+            logging.warning(f"Key {key} not found in ts_map")
+            raise KeyError(key)
 
     def _get_query(self, key_list = None, time_query = None, geo_query = None,
                    extra_query_list = []):

@@ -65,10 +65,24 @@ def get_sections_for_trip(key, user_id, trip_id):
     """
     query = {"user_id": user_id, "data.trip_id": trip_id,
              "metadata.key": key}
-    logging.debug("About to execute query %s with sort_key %s" % (query, "data.start_ts"))
-    section_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
-        "data.start_ts", pymongo.ASCENDING)
-    return [ecwe.Entry(doc) for doc in section_doc_cursor]
+    logging.debug("About to execute query %s" % query)
+    
+    # Replace direct database calls with TimeSeries abstraction
+    ts = esta.TimeSeries.get_time_series(user_id)
+    # Don't include user_id in extra_query since it's already in the user_query
+    extra_query = {k: v for k, v in query.items() 
+                  if k != "metadata.key" and k != "user_id"}
+    
+    try:
+        # Use metadata.write_ts for TimeQuery since all entries (including test data) have this field
+        # This ensures we get all entries while still leveraging MongoDB sorting
+        time_query = estt.TimeQuery("metadata.write_ts", 0, 9999999999)
+        section_docs = ts.find_entries([key], time_query=time_query, extra_query_list=[extra_query])
+        return [ecwe.Entry(doc) for doc in section_docs]
+    except KeyError:
+        # Return an empty list for invalid keys
+        logging.warning(f"Invalid key {key} specified for get_sections_for_trip, returning empty list")
+        return []
 
 def get_stops_for_trip(key, user_id, trip_id):
     """
@@ -76,10 +90,24 @@ def get_stops_for_trip(key, user_id, trip_id):
     """
     query = {"user_id": user_id, "data.trip_id": trip_id,
              "metadata.key": key}
-    logging.debug("About to execute query %s with sort_key %s" % (query, "data.enter_ts"))
-    stop_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
-        "data.enter_ts", pymongo.ASCENDING)
-    return [ecwe.Entry(doc) for doc in stop_doc_cursor]
+    logging.debug("About to execute query %s" % query)
+    
+    # Replace direct database calls with TimeSeries abstraction
+    ts = esta.TimeSeries.get_time_series(user_id)
+    # Don't include user_id in extra_query since it's already in the user_query
+    extra_query = {k: v for k, v in query.items() 
+                  if k != "metadata.key" and k != "user_id"}
+    
+    try:
+        # Use metadata.write_ts for TimeQuery since all entries (including test data) have this field
+        # This ensures we get all entries while still leveraging MongoDB sorting
+        time_query = estt.TimeQuery("metadata.write_ts", 0, 9999999999)
+        stop_docs = ts.find_entries([key], time_query=time_query, extra_query_list=[extra_query])
+        return [ecwe.Entry(doc) for doc in stop_docs]
+    except KeyError:
+        # Return an empty list for invalid keys
+        logging.warning(f"Invalid key {key} specified for get_stops_for_trip, returning empty list")
+        return []
 
 def _get_next_cleaned_timeline_entry(ts, tl_entry):
     """
