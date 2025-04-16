@@ -41,6 +41,11 @@ def _remove_dots(entry_doc):
             logging.info(f"Found {key=} with dot, adding to {keys_to_munge=}")
             keys_to_munge.append(key)
 
+    # Returning early avoids further processing, if there is nothing to do
+    # this will also make the logs much more streamlined
+    if len(keys_to_munge) == 0:
+        return
+
     logging.info(f"Before modifying, {keys_to_munge=}")
 
     for ktm in keys_to_munge:
@@ -71,7 +76,10 @@ def sync_phone_to_server(uuid, data_from_phone):
 
         # mongodb/documentDB don't support field names with `.`
         # let's convert them all to `_`
-        _remove_dots(data)
+        # this should only happen for stats entries since we control the
+        # structure for all other objects and can ensure that they don't have dots
+        if "stats" in data["metadata"]["key"]:
+            _remove_dots(data)
             
         # logging.debug("After updating with UUId, we get %s" % data)
         document = {'$set': data}
