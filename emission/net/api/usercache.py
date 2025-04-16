@@ -13,6 +13,7 @@ from builtins import *
 from past.utils import old_div
 import logging
 import pymongo
+import arrow
 
 # Our imports
 from emission.core.get_database import get_usercache_db
@@ -61,7 +62,12 @@ def sync_phone_to_server(uuid, data_from_phone):
     """
         Puts the blob from the phone into the cache
     """
-    usercache_db = get_usercache_db()
+
+    if len(data_from_phone) == 0:
+        logging.info(f"For {uuid}, sync_phone_to_server called with {len(data_from_phone)=}, should not happen, early return")
+        return
+
+    upsert_op_list = []
 
     last_location_entry = {"data": {"ts": -1}}
     for data in data_from_phone:
@@ -87,26 +93,23 @@ def sync_phone_to_server(uuid, data_from_phone):
                         'metadata.type': data["metadata"]["type"],
                         'metadata.write_ts': data["metadata"]["write_ts"],
                         'metadata.key': data["metadata"]["key"]}
-        try:
-            result = usercache_db.update_one(update_query,
-                                               document,
-                                               upsert=True)
-            logging.debug("Updated result for user = %s, key = %s, write_ts = %s = %s" %
-                (uuid, data["metadata"]["key"], data["metadata"]["write_ts"], result.raw_result))
+        upsert_op_list.append(pymongo.UpdateOne(update_query, document, upsert=True))
 
-            # I am not sure how to trigger a writer error to test this
-            # and whether this is the format expected from the server in the rawResult
-            if 'ok' in result.raw_result and result.raw_result['ok'] != 1.0:
-                logging.error("In sync_phone_to_server, err = %s" % result.raw_result['writeError'])
-                raise Exception()
+        if data["metadata"]["key"] == "background/location":
+            last_location_entry = data
 
-            if data["metadata"]["key"] == "background/location":
-                last_location_entry = data
+    try:
+        first_entry = data_from_phone[0]
+        last_entry = data_from_phone[-1]
+        logging.info(f"For {uuid}, about to perform bulk_write of {len(upsert_op_list)} operations from {arrow.get(first_entry['metadata']['write_ts'])}({first_entry['metadata']['write_ts']}) -> {arrow.get(last_entry['metadata']['write_ts'])}({first_entry['metadata']['write_ts']})")
+        result = get_usercache_db().bulk_write(upsert_op_list)
+        logging.debug("Updated result for user = %s, is %s" %
+            (uuid, result.bulk_api_result))
 
-        except pymongo.errors.PyMongoError as e:
-            logging.error(f"In sync_phone_to_server, while executing {update_query=} on {document=}")
-            logging.exception(e)
-            raise
+    except pymongo.errors.PyMongoError as e:
+        logging.error(f"In sync_phone_to_server, while executing {update_query=} on {document=}")
+        logging.exception(e)
+        raise
 
     earus.update_upload_timestamp(uuid, "last_location_ts", last_location_entry["data"].get("ts", -1))
     earus.update_upload_timestamp(uuid, "last_phone_data_ts", data["metadata"]["write_ts"])
