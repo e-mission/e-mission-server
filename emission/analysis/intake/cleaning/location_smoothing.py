@@ -55,36 +55,92 @@ def recalc_speed(points_df):
     Drop them and recalculate speeds from the first point onwards.
     The speed column has the speed between each point and its previous point.
     The first row has a speed of zero.
+    Uses vectorized numpy operations for better performance.
     """
+    from emission.core.common import haversine_numpy
+    
     stripped_df = points_df.drop("speed", axis=1).drop("distance", axis=1)
-    logging.debug("columns in points_df = %s" % points_df.columns)
-    point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = list(zip(point_list, point_list[1:]))
-    distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
-    distances.insert(0, 0)
-    with_speeds_df = pd.concat([stripped_df, pd.Series(distances, index=points_df.index, name="distance")], axis=1)
-    speeds = [pf.calSpeed(p1, p2) for (p1, p2) in zipped_points_list]
-    speeds.insert(0, 0)
-    with_speeds_df = pd.concat([with_speeds_df, pd.Series(speeds, index=points_df.index, name="speed")], axis=1)
+    
+    if len(stripped_df) <= 1:
+        # Handle empty or single-point dataframes
+        distances = np.zeros(len(stripped_df))
+        speeds = np.zeros(len(stripped_df))
+    else:
+        # Extract coordinates and timestamps
+        lons = stripped_df['longitude'].to_numpy()
+        lats = stripped_df['latitude'].to_numpy()
+        
+        # Calculate distance using haversine_numpy
+        distances = np.zeros(len(stripped_df))
+        distances[1:] = haversine_numpy(
+            lons[:-1], lats[:-1],
+            lons[1:], lats[1:]
+        )
+        
+        # Calculate time differences
+        timestamps = stripped_df['ts'].to_numpy()
+        time_diffs = np.zeros(len(stripped_df))
+        time_diffs[1:] = timestamps[1:] - timestamps[:-1]
+        
+        # Calculate speeds
+        speeds = np.zeros(len(stripped_df))
+        # Avoid division by zero
+        mask = time_diffs > 0
+        speeds[mask] = distances[mask] / time_diffs[mask]
+    
+    # Add calculated columns to dataframe
+    with_speeds_df = pd.concat([stripped_df, pd.Series(distances, index=stripped_df.index, name="distance")], axis=1)
+    with_speeds_df = pd.concat([with_speeds_df, pd.Series(speeds, index=stripped_df.index, name="speed")], axis=1)
+    
     return with_speeds_df
 
 def add_dist_heading_speed(points_df):
     # type: (pandas.DataFrame) -> pandas.DataFrame
     """
-    Returns a new dataframe with an added "speed" column.
-    The speed column has the speed between each point and its previous point.
-    The first row has a speed of zero.
+    Returns a new dataframe with added "distance", "speed", and "heading" columns.
+    Uses vectorized numpy operations for better performance.
+    
+    The distance, speed, and heading columns have values between each point and its previous point.
+    The first row has values of zero.
     """
-    point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = list(zip(point_list, point_list[1:]))
-
-    distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
-    distances.insert(0, 0)
-    speeds = [pf.calSpeed(p1, p2) for (p1, p2) in zipped_points_list]
-    speeds.insert(0, 0)
-    headings = [pf.calHeading(p1, p2) for (p1, p2) in zipped_points_list]
-    headings.insert(0, 0)
-
+    from emission.core.common import haversine_numpy, calHeading_numpy
+    
+    if len(points_df) <= 1:
+        # Handle empty or single-point dataframes
+        distances = np.zeros(len(points_df))
+        speeds = np.zeros(len(points_df))
+        headings = np.zeros(len(points_df))
+    else:
+        # Extract coordinates and timestamps
+        lons = points_df['longitude'].to_numpy()
+        lats = points_df['latitude'].to_numpy()
+        
+        # Calculate distance using haversine_numpy
+        distances = np.zeros(len(points_df))
+        distances[1:] = haversine_numpy(
+            lons[:-1], lats[:-1],
+            lons[1:], lats[1:]
+        )
+        
+        # Calculate time differences
+        timestamps = points_df['ts'].to_numpy()
+        time_diffs = np.zeros(len(points_df))
+        time_diffs[1:] = timestamps[1:] - timestamps[:-1]
+        
+        # Calculate speeds
+        speeds = np.zeros(len(points_df))
+        # Avoid division by zero
+        mask = time_diffs > 0
+        speeds[mask] = distances[mask] / time_diffs[mask]
+        
+        # Calculate headings
+        headings = np.zeros(len(points_df))
+        headings[1:] = calHeading_numpy(
+            lons[:-1], lats[:-1],
+            lons[1:], lats[1:]
+        )
+    
+    # Add calculated columns to dataframe
     with_distances_df = pd.concat([points_df, pd.Series(distances, name="distance")], axis=1)
     with_speeds_df = pd.concat([with_distances_df, pd.Series(speeds, name="speed")], axis=1)
     if "heading" in with_speeds_df.columns:

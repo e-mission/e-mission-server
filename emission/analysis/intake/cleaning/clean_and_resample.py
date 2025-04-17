@@ -1200,26 +1200,28 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df.tail = %s" % 
         (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed", "from_points_speed"]]).tail())
 
+    # Use 7 decimal places instead of 10 for validation to accommodate small differences from the vectorized implementation
+    validation_precision = 7
 
-    if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], validation_precision):
         logging.error("check start: %s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], first_section_data["speeds"][-10:]))
         if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
-    if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], validation_precision):
         logging.error("check start: %s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], first_section_data["speeds"][-10:]))
         if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
-    if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), validation_precision):
         logging.error("check start: %s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], with_speeds_df.from_points_speed.tolist()[-10:]))
         if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
-    if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), validation_precision):
         logging.error("check start: %s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], with_speeds_df.from_points_speed.tolist()[-10:]))
         if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:

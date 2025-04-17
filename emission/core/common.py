@@ -56,6 +56,20 @@ def haversine_numpy(lon1, lat1, lon2, lat2):
     a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
     return 2 * earth_radius * np.arcsin(np.sqrt(a))
 
+def calHeading_numpy(lon1, lat1, lon2, lat2):
+    """
+    Calculate heading angle using numpy with identical results to calHeading.
+    Points are expected to be in longitude, latitude form (WGS84)
+    :return heading in degrees, from -180 to 180
+    """
+    lat1, lat2 = np.radians(lat1), np.radians(lat2)
+    lon1, lon2 = np.radians(lon1), np.radians(lon2)
+    
+    y = np.sin(lon2 - lon1) * np.cos(lat2)
+    x = np.cos(lat1) * np.sin(lat2) - np.sin(lat1) * np.cos(lat2) * np.cos(lon2 - lon1)
+    
+    return np.degrees(np.arctan2(y, x))
+
 def calDistance(point1, point2, coordinates=False):
     """haversine distance
 
