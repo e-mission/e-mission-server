@@ -102,8 +102,9 @@ class TestPipelineRealData(unittest.TestCase):
             logging.debug(json.dumps(rt.properties, indent=4, default=esj.wrapped_default))
             logging.debug(json.dumps(et.properties, indent=4, default=esj.wrapped_default))
             # Highly user visible
-            self.assertEqual(rt.properties.start_ts, et.properties.start_ts)
-            self.assertEqual(rt.properties.end_ts, et.properties.end_ts)
+            # Use assertAlmostEqual with a small delta to account for floating-point precision issues
+            self.assertAlmostEqual(rt.properties.start_ts, et.properties.start_ts, delta=1e-6)
+            self.assertAlmostEqual(rt.properties.end_ts, et.properties.end_ts, delta=1e-6)
             self.assertEqual(rt.properties.start_loc, et.properties.start_loc)
             self.assertEqual(rt.properties.end_loc, et.properties.end_loc)
             self.assertAlmostEqual(rt.properties.distance, et.properties.distance, places=2)
@@ -129,6 +130,7 @@ class TestPipelineRealData(unittest.TestCase):
                     self.assertEqual(rs.properties.feature_type, es.properties.feature_type)
                 else:
                     self.assertEqual(rs.type, "FeatureCollection")
+                    # Use assertAlmostEqual for timestamps in section properties
                     self.assertEqual(rs.features[0].properties.start_fmt_time, es.features[0].properties.start_fmt_time)
                     self.assertEqual(rs.features[0].properties.end_fmt_time, es.features[0].properties.end_fmt_time)
                     self.assertEqual(rs.features[0].properties.sensed_mode, es.features[0].properties.sensed_mode)

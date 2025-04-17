@@ -55,42 +55,77 @@ def recalc_speed(points_df):
     Drop them and recalculate speeds from the first point onwards.
     The speed column has the speed between each point and its previous point.
     The first row has a speed of zero.
+    Uses vectorized numpy operations for better performance.
+    
+    This is a wrapper around add_dist_heading_speed for backward compatibility.
+    https://github.com/e-mission/e-mission-server/pull/1048#discussion_r2050693860
     """
+    # First, drop the existing speed and distance columns
     stripped_df = points_df.drop("speed", axis=1).drop("distance", axis=1)
-    logging.debug("columns in points_df = %s" % points_df.columns)
-    point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = list(zip(point_list, point_list[1:]))
-    distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
-    distances.insert(0, 0)
-    with_speeds_df = pd.concat([stripped_df, pd.Series(distances, index=points_df.index, name="distance")], axis=1)
-    speeds = [pf.calSpeed(p1, p2) for (p1, p2) in zipped_points_list]
-    speeds.insert(0, 0)
-    with_speeds_df = pd.concat([with_speeds_df, pd.Series(speeds, index=points_df.index, name="speed")], axis=1)
+    
+    # Call add_dist_heading_speed with add_heading=False
+    return add_dist_heading_speed(stripped_df, add_heading=False)
+
+def add_dist_heading_speed(points_df, add_heading=True):
+    # type: (pandas.DataFrame, bool) -> pandas.DataFrame
+    """
+    Returns a new dataframe with added "distance", "speed", and optionally "heading" columns.
+    Uses vectorized numpy operations for better performance.
+    
+    The distance, speed, and heading columns have values between each point and its previous point.
+    The first row has values of zero.
+    """
+    from emission.core.common import haversine_numpy, calHeading_numpy
+    
+    if len(points_df) <= 1:
+        # Handle empty or single-point dataframes
+        distances = np.zeros(len(points_df))
+        speeds = np.zeros(len(points_df))
+        headings = np.zeros(len(points_df)) if add_heading else None
+    else:
+        # Extract coordinates and timestamps
+        lons = points_df['longitude'].to_numpy()
+        lats = points_df['latitude'].to_numpy()
+        
+        # Calculate distance using haversine_numpy
+        distances = np.zeros(len(points_df))
+        distances[1:] = haversine_numpy(
+            lons[:-1], lats[:-1],
+            lons[1:], lats[1:]
+        )
+        
+        # Calculate time differences
+        timestamps = points_df['ts'].to_numpy()
+        time_diffs = np.zeros(len(points_df))
+        time_diffs[1:] = timestamps[1:] - timestamps[:-1]
+        
+        # Calculate speeds
+        speeds = np.zeros(len(points_df))
+        # Avoid division by zero
+        mask = time_diffs > 0
+        speeds[mask] = distances[mask] / time_diffs[mask]
+        
+        # Calculate headings if requested
+        if add_heading:
+            headings = np.zeros(len(points_df))
+            headings[1:] = calHeading_numpy(
+                lons[:-1], lats[:-1],
+                lons[1:], lats[1:]
+            )
+        else:
+            headings = None
+    
+    # Add calculated columns to dataframe
+    with_distances_df = pd.concat([points_df, pd.Series(distances, index=points_df.index, name="distance")], axis=1)
+    with_speeds_df = pd.concat([with_distances_df, pd.Series(speeds, index=points_df.index, name="speed")], axis=1)
+    
+    if add_heading:
+        # Add heading column
+        if "heading" in with_speeds_df.columns:
+            with_speeds_df.drop("heading", axis=1, inplace=True)
+        with_speeds_df = pd.concat([with_speeds_df, pd.Series(headings, index=points_df.index, name="heading")], axis=1)
+        
     return with_speeds_df
-
-def add_dist_heading_speed(points_df):
-    # type: (pandas.DataFrame) -> pandas.DataFrame
-    """
-    Returns a new dataframe with an added "speed" column.
-    The speed column has the speed between each point and its previous point.
-    The first row has a speed of zero.
-    """
-    point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = list(zip(point_list, point_list[1:]))
-
-    distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
-    distances.insert(0, 0)
-    speeds = [pf.calSpeed(p1, p2) for (p1, p2) in zipped_points_list]
-    speeds.insert(0, 0)
-    headings = [pf.calHeading(p1, p2) for (p1, p2) in zipped_points_list]
-    headings.insert(0, 0)
-
-    with_distances_df = pd.concat([points_df, pd.Series(distances, name="distance")], axis=1)
-    with_speeds_df = pd.concat([with_distances_df, pd.Series(speeds, name="speed")], axis=1)
-    if "heading" in with_speeds_df.columns:
-        with_speeds_df.drop("heading", axis=1, inplace=True)
-    with_headings_df = pd.concat([with_speeds_df, pd.Series(headings, name="heading")], axis=1)
-    return with_headings_df
 
 def add_heading_change(points_df):
     """

@@ -22,6 +22,7 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.modeprediction as ecwm
 import emission.storage.decorations.trip_queries as esdt
+import emission.core.common as ec
 
 from uuid import UUID 
 
@@ -53,24 +54,8 @@ def calSpeed(point1, point2):
   else:
     return None
 
-# This formula is from:
-# http://www.movable-type.co.uk/scripts/latlong.html
-# It returns the heading between two points using 
-def calHeading(point1, point2):
-    # points are in GeoJSON format, ie (lng, lat)
-    phi1 = math.radians(point1[1])
-    phi2 = math.radians(point2[1])
-    lambda1 = math.radians(point1[0])
-    lambda2 = math.radians(point2[0])
-
-    y = math.sin(lambda2-lambda1) * math.cos(phi2)
-    x = math.cos(phi1)*math.sin(phi2) - \
-        math.sin(phi1)*math.cos(phi2)*math.cos(lambda2-lambda1)
-    brng = math.degrees(math.atan2(y, x))
-    return brng
-
 def calHC(point1, point2, point3):
-    HC = calHeading(point2, point3) - calHeading(point1, point2)
+    HC = ec.calHeading(point2, point3) - ec.calHeading(point1, point2)
     return HC
 
 def calHCR(section_entry):
