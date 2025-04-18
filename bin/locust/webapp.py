@@ -15,7 +15,7 @@ def generate_random_string(length=12):
     return ''.join(secrets.choice(characters) for _ in range(length))
 
 class PhoneAppUser(HttpUser):
-    host = "http://host.docker.internal:8080"
+    host = "http://nginxrp/api"
     iteration = 0
     uuid_db_list = list(edb.get_uuid_db().find())
 
@@ -60,7 +60,3 @@ class PhoneAppUser(HttpUser):
        wrapped_json = {"user": self.opcode, "phone_to_server": entries}
        self.client.post("/usercache/put", data=esj.wrapped_dumps(wrapped_json),
                         headers={"Content-Type": "application/json"})
-    @task
-    def hello(self):
-        self.client.get("/hello")
-        
