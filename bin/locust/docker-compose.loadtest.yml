@@ -1,0 +1,55 @@
+version: "3"
+services:
+  locust:
+    image: shankari/e-mission-server:master_2025-03-13--45-18
+    entrypoint: "sleep infinity"
+    ports:
+      - "8089:8089"
+    volumes:
+      - .:/usr/src/devapp
+    networks:
+      - emission
+  nginxrp:
+    image: nginx:1.24.0
+    # In case we want to bump up the debug level for troubleshooting    
+    # command: [nginx-debug, '-g', 'daemon off;']
+    depends_on:
+      - webapp
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - emission
+  webapp:
+    image: shankari/e-mission-server:master_2025-03-13--45-18
+    # Placeholder command to keep the container running
+    entrypoint: "sleep infinity"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - WEB_SERVER_HOST=0.0.0.0
+      - CRON_MODE=
+      - STUDY_CONFIG=stage-program
+    ports:
+      # ipynb in numbers
+      - "8080:8080"
+    volumes:
+      - ../../:/usr/src/devapp
+    networks:
+      - emission
+  db:
+    image: mongo:8.0.4
+    volumes:
+      - mongo-data:/data/db
+    networks:
+       - emission
+
+# Define the custom network for inter-service communication
+networks:
+  emission:
+volumes:
+  # Persistent storage for MongoDB database data
+  mongo-data:
+
