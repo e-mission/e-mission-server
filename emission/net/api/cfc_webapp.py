@@ -355,6 +355,8 @@ def deleteUserCustomLabel():
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
+    logging.debug("Metrics call, finished querying values through skipping")
+    abort(503, "Metrics calls have been temporarily disabled to avoid overloading the server")
     _fill_aggregate_backward_compat(request)
     user_uuid = get_user_or_aggregate_auth(request)
 
@@ -375,6 +377,7 @@ def summarize_metrics(time_type):
     else:
         old_style = True
         is_return_aggregate = True
+
 
     app_config = request.json['app_config'] if 'app_config' in request.json else None
 
