@@ -37,7 +37,7 @@ class TestPipeline(unittest.TestCase):
 
     def testAnalysisResults(self):
         self.assertEqual(pipeline.get_range(self.testUUID), (None, None))
-        epi.run_intake_pipeline_for_user(self.testUUID, skip_if_no_new_data = False)
+        epi.run_intake_pipeline_for_user(self.testUUID)
         pr = pipeline.get_range(self.testUUID)
         self.assertAlmostEqual(pr[0], 1440688739.672)
         self.assertAlmostEqual(pr[1], 1440729142.709)

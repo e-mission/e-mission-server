@@ -42,7 +42,7 @@ import emission.storage.decorations.stats_queries as esds
 import emission.core.wrapper.user as ecwu
 import emission.analysis.result.user_stat as eaurs
 
-def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
+def run_intake_pipeline(process_number, uuid_list):
     """
     Run the intake pipeline with the specified process number and uuid list.
     Note that the process_number is only really used to customize the log file name
@@ -75,13 +75,32 @@ def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
             continue
 
         try:
-            run_intake_pipeline_for_user(uuid, skip_if_no_new_data)
+            run_intake_pipeline_for_user(uuid)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
                               "for user %s, skipping" % (e, uuid))
 
-def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
+def run_intake_pipeline_for_user(uuid):
+        user_profile = edb.get_profile_db().find_one({"user_id": uuid})
+        # Before this, we used to use a check of "have I moved new entries to long-term"
+        # But that fails if a pipeline has been stuck for a long time, and the user is dormant
+        # Since we added profile-level metrics to display in the admin
+        # dashboard, we can now use those for a more principled check. But in
+        # trip segmentation, we elide the last few location points since there
+        # is a delay of 5-10 minutes while detecting trip end.
+        # - if the user is dormant, we will miss any trips in the last 10 mins, which is NBD
+        # - if the user is not dormant, we will handle the locations as part of the next run
+        last_loc_ts = arrow.get(user_profile.get('last_location_ts', 0))
+        last_proc_time = user_profile.get('pipeline_range', {}).get('end_ts', None)
+        last_proc_ts = arrow.get(last_proc_time) if last_proc_time is not None else arrow.get(0)
+        fmt_string = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), pipeline has run until {last_proc_ts}({last_proc_ts.timestamp()}), difference = {last_loc_ts - last_proc_ts}({(last_loc_ts.timestamp() - last_proc_ts.timestamp())})"
+        if  (last_loc_ts.timestamp() - last_proc_ts.timestamp()) <= 10 * 60: # 10 minutes
+            print(f"{fmt_string}, skipping")
+            return
+        else:
+            logging.info(f"{fmt_string}, continuing")
+
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
 
         with ect.Timer() as uct:
@@ -91,13 +110,6 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USERCACHE.name,
                                  time.time(), uct.elapsed)
-
-        if skip_if_no_new_data and new_entry_count == 0:
-            print("No new entries, and skip_if_no_new_data = %s, skipping the rest of the pipeline" % skip_if_no_new_data)
-            return
-        else:
-            print("New entry count == %s and skip_if_no_new_data = %s, continuing" %
-                (new_entry_count, skip_if_no_new_data))
 
         with ect.Timer() as uit:
             logging.info("*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)
