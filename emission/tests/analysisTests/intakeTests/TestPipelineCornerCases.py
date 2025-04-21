@@ -12,6 +12,7 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.storage.timeseries.tcquery as estt
 import emission.core.common as ecc
 import emission.core.wrapper.pipelinestate as ewps
+import emission.core.wrapper.user as ecwu
 import emission.storage.pipeline_queries as epq
 import emission.pipeline.intake_stage as epi
 
@@ -21,6 +22,8 @@ import emission.tests.common as etc
 class TestPipelineCornerCases(unittest.TestCase):
     def setUp(self):
         self.testUUID = uuid.uuid4()
+        # this happens consistently during user creation now, and we rely on it to run the pipeline
+        print(f"Created profile {ecwu.User._createInitialProfile(self.testUUID)} for {self.testUUID=}")
         logging.info("setUp complete")
 
     def tearDown(self):
@@ -90,7 +93,12 @@ class TestPipelineCornerCases(unittest.TestCase):
         # next, we run the real pipeline, and end up with no entries
         # and we have an early return in that case
         print("-" * 10, "Running real pipeline on empty DB, expecting no change", "-" * 10)
-        epi.run_intake_pipeline_for_user(self.testUUID, True)
+        # We manually set the end ts to be after the last location (ts=3650), set in emission.test.common,
+        # so that the pipeline will be skipped
+        edb.get_profile_db().update_one({"user_id": self.testUUID},
+                                        {"$set": {"pipeline_range.end_ts": 5000}})
+        print("-" * 10, f"Before running but after update, profile is {edb.get_profile_db().find_one({'user_id': self.testUUID})}", "-" * 10)
+        epi.run_intake_pipeline_for_user(self.testUUID)
         all_pipeline_states = edb.get_pipeline_state_db().find()
         curr_user_states = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states))
@@ -99,7 +107,10 @@ class TestPipelineCornerCases(unittest.TestCase):
         # which will generate some pipeline states
         print("-" * 10, "Running test pipeline on real data, expecting states to be set", "-" * 10)
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-07-25")
-        epi.run_intake_pipeline_for_user(self.testUUID, False)
+        # we force run the pipeline by setting profile back so we will run the pipeline this time
+        edb.get_profile_db().update_one({"user_id": self.testUUID},
+                                        {"$set": {"pipeline_range.end_ts": None}})
+        epi.run_intake_pipeline_for_user(self.testUUID)
 
         all_pipeline_states_after_run = edb.get_pipeline_state_db().find()
         curr_user_states_after_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
@@ -112,7 +123,11 @@ class TestPipelineCornerCases(unittest.TestCase):
         # then we run the real pipeline again
         # We expect to see no changes between the first and the second run
         # because of the usercache skip
-        epi.run_intake_pipeline_for_user(self.testUUID, True)
+        # We manually set the end ts to be after the last location (ts=3650), set in emission.test.common,
+        # so that the pipeline will be skipped
+        edb.get_profile_db().update_one({"user_id": self.testUUID},
+                                        {"$set": {"pipeline_range.end_ts": 5000}})
+        epi.run_intake_pipeline_for_user(self.testUUID)
         all_pipeline_states_after_test_run = edb.get_pipeline_state_db().find()
         curr_user_states_after_test_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states_after_test_run))
@@ -123,10 +138,13 @@ class TestPipelineCornerCases(unittest.TestCase):
         self.assertEqual(list(map(get_last_run, curr_user_states_after_run)),
             list(map(get_last_run, curr_user_states_after_test_run)))
 
+        # we force run the pipeline by setting profile back so we will run the pipeline this time
+        edb.get_profile_db().update_one({"user_id": self.testUUID},
+                                        {"$set": {"pipeline_range.end_ts": None}})
         # then we run the real pipeline again with skip=False
         # We expect to see no changes between the first and the second run
         # because of the usercache skip
-        epi.run_intake_pipeline_for_user(self.testUUID, False)
+        epi.run_intake_pipeline_for_user(self.testUUID)
         all_pipeline_states_after_test_run = edb.get_pipeline_state_db().find()
         curr_user_states_after_test_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states_after_test_run))
