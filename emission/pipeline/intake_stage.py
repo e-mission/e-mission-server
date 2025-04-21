@@ -94,12 +94,23 @@ def run_intake_pipeline_for_user(uuid):
         last_loc_ts = arrow.get(user_profile.get('last_location_ts', 0))
         last_proc_time = user_profile.get('pipeline_range', {}).get('end_ts', None)
         last_proc_ts = arrow.get(last_proc_time) if last_proc_time is not None else arrow.get(0)
-        fmt_string = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), pipeline has run until {last_proc_ts}({last_proc_ts.timestamp()}), difference = {last_loc_ts - last_proc_ts}({(last_loc_ts.timestamp() - last_proc_ts.timestamp())})"
-        if  (last_loc_ts.timestamp() - last_proc_ts.timestamp()) <= 10 * 60: # 10 minutes
-            print(f"{fmt_string}, skipping")
+        ts_diff = last_loc_ts.timestamp() - last_proc_ts.timestamp()
+        fmt_dormant_user_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), pipeline has run until {last_proc_ts}({last_proc_ts.timestamp()}), difference = {last_loc_ts - last_proc_ts}({(ts_diff)})"
+        if  (ts_diff) <= 10 * 60: # 10 minutes
+            print(f"{fmt_dormant_user_check}, skipping")
             return
         else:
-            logging.info(f"{fmt_string}, continuing")
+            logging.info(f"{fmt_dormant_user_check}, continuing")
+
+        # the pipeline states are a list, so we can directly query for
+        in_progress_stages = edb.get_pipeline_state_db().count_documents({"user_id": uuid, "curr_run_ts": {"$ne": None}})
+        fmt_in_progress_check = f"Pipeline for {uuid} has {in_progress_stages=}"
+        if in_progress_stages > 0:
+            print(f"{fmt_in_progress_check}, skipping")
+            logging.debug(f"The states are {list(edb.get_pipeline_state_db().find({'user_id': uuid, 'curr_run_ts': {'$ne': None}}))}")
+            return
+        else:
+            logging.info(f"{fmt_in_progress_check}, continuing")
 
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
 
