@@ -135,7 +135,7 @@ def createAndFillUUID(testObj):
         logging.info("No reg email found, not registering email")
         testObj.testUUID = uuid.uuid4()
     # ensure that there is unprocessed data so that the pipeline will actually be run
-    edb.get_profile_db().update_one({"user_id": testObj.testUUID}, {"$set": {"last_location_ts": 3650, "pipeline_range": {"end_ts": None}}}, upsert=True)
+    edb.get_profile_db().update_one({"user_id": testObj.testUUID}, {"$set": {"last_location_ts": 7 * 60 * 60, "pipeline_range": {"end_ts": None}}}, upsert=True)
 
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading from %s, timeseries db size = %s" %

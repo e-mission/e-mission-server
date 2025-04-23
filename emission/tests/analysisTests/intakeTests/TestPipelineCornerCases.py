@@ -97,7 +97,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # We manually set the end ts to be after the last location (ts=3650), set in emission.test.common,
         # so that the pipeline will be skipped
         edb.get_profile_db().update_one({"user_id": self.testUUID},
-                                        {"$set": {"pipeline_range.end_ts": 5000}})
+                                        {"$set": {"pipeline_range.end_ts": 7 * 60 * 60}})
         print("-" * 10, f"Before running but after update, profile is {edb.get_profile_db().find_one({'user_id': self.testUUID})}", "-" * 10)
         epi.run_intake_pipeline_for_user(self.testUUID)
         all_pipeline_states = edb.get_pipeline_state_db().find()
@@ -127,7 +127,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # We manually set the end ts to be after the last location (ts=3650), set in emission.test.common,
         # so that the pipeline will be skipped
         edb.get_profile_db().update_one({"user_id": self.testUUID},
-                                        {"$set": {"pipeline_range.end_ts": 5000}})
+                                        {"$set": {"pipeline_range.end_ts": 7 * 60 * 60}})
         epi.run_intake_pipeline_for_user(self.testUUID)
         all_pipeline_states_after_test_run = edb.get_pipeline_state_db().find()
         curr_user_states_after_test_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
@@ -165,7 +165,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # Mocking user profile to simulate an active user
         mock_get_profile_db.return_value.find_one.return_value = {
             "user_id": "test_uuid",
-            "last_location_ts": 3600,
+            "last_location_ts": 7 * 60 * 60,
             "pipeline_range": {"end_ts": None}
         }
 
@@ -190,7 +190,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # Mock a non-dormant user so we will get to the next check
         mock_get_profile_db.return_value.find_one.return_value = {
             "user_id": "test_uuid",
-            "last_location_ts": 3600,
+            "last_location_ts": 7 * 60 * 60,
             "pipeline_range": {"end_ts": None}
         }
 

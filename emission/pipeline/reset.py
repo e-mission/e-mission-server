@@ -342,10 +342,10 @@ def get_all_resets(all_invalid_states):
 
 def auto_reset(dry_run, only_calc):
     # Only read all states that are not for `OUTPUT_GEN` since we are not going to reset that state
-    # Also only read states which have been running for more than three hours
+    # Also only read states which have been running for more than six hours
     # If we are running the pipeline every hour, then having a run_ts that is
     # more than three hours old indicates that it is likely invalid
-    three_hours_ago = arrow.utcnow().shift(hours=-3).int_timestamp
+    three_hours_ago = arrow.utcnow().shift(hours=-6).int_timestamp
     all_invalid_states = pd.json_normalize(list(edb.get_pipeline_state_db().find({"$and": [
         {"curr_run_ts": {"$lt": three_hours_ago}},
         {"pipeline_stage": {"$ne": 9}}]})))
