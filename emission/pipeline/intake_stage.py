@@ -96,7 +96,7 @@ def run_intake_pipeline_for_user(uuid):
         last_proc_ts = arrow.get(last_proc_time) if last_proc_time is not None else arrow.get(0)
         ts_diff = last_loc_ts.timestamp() - last_proc_ts.timestamp()
         fmt_dormant_user_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), pipeline has run until {last_proc_ts}({last_proc_ts.timestamp()}), difference = {last_loc_ts - last_proc_ts}({(ts_diff)})"
-        if  (ts_diff) <= 10 * 60: # 10 minutes
+        if  (ts_diff) <= 6 * 60 * 60: # 10 minutes
             print(f"{fmt_dormant_user_check}, skipping")
             return
         else:
