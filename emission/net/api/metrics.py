@@ -28,7 +28,7 @@ def summarize_by_local_date(user_id, start_ld, end_ld, freq_name, metric_list, i
 
 def summarize_by_yyyy_mm_dd(user_id, start_ymd, end_ymd, freq, metric_list, include_agg, app_config): 
     time_query = estf.FmtTimeQuery("data.start_fmt_time", start_ymd, end_ymd)
-    trips = esda.get_entries(esda.COMPOSITE_TRIP_KEY, None, time_query)
+    trips = esda.get_entries(esda.CONFIRMED_TRIP_KEY, None, time_query)
     return asyncio.run(emcms.generate_summaries(metric_list, trips, app_config))
 
 def _call_group_fn(group_fn, user_id, start_time, end_time, freq, metric_list, include_aggregate):
