@@ -134,6 +134,8 @@ def createAndFillUUID(testObj):
     else:
         logging.info("No reg email found, not registering email")
         testObj.testUUID = uuid.uuid4()
+    # ensure that there is unprocessed data so that the pipeline will actually be run
+    edb.get_profile_db().update_one({"user_id": testObj.testUUID}, {"$set": {"last_location_ts": 7 * 60 * 60, "pipeline_range": {"end_ts": None}}}, upsert=True)
 
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading from %s, timeseries db size = %s" %
@@ -195,7 +197,7 @@ def runIntakePipeline(uuid):
     import emission.analysis.intake.segmentation.section_segmentation as eaiss
     import emission.analysis.intake.cleaning.location_smoothing as eaicl
     import emission.analysis.intake.cleaning.clean_and_resample as eaicr
-    import emission.analysis.classification.inference.mode.rule_engine as eacimr
+    import emission.analysis.classification.inference.mode.pipeline as eacimp
     import emission.analysis.userinput.expectations as eaue
     import emission.analysis.classification.inference.labels.pipeline as eacilp
     import emission.analysis.plotting.composite_trip_creation as eapcc
@@ -207,7 +209,7 @@ def runIntakePipeline(uuid):
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
-    eacimr.predict_mode(uuid)
+    eacimp.predict_mode(uuid)
     eacilp.infer_labels(uuid)
     eaue.populate_expectations(uuid)
     eaum.create_confirmed_objects(uuid)
