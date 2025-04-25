@@ -90,20 +90,9 @@ app = app()
 def index():
   return static_file("index.html", WEBSERVER_STATIC_PATH)
 
-# Backward compat to handle older clients
-# Remove in 2023 after everybody has upgraded
-# We used to use the presence or absence of the "user" field
-# to determine whether this was an aggregate call or not
-# now we expect the client to fill it in
-def _fill_aggregate_backward_compat(request):
-  if 'aggregate' not in request.json:
-    # Aggregate if there is no user
-    # no aggregate if there is a user
-    request.json["aggregate"] = ('user' not in request.json)
 
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
-  _fill_aggregate_backward_compat(request)
   # Disable aggregate access for the spatio-temporal data temporarily
   # until we can figure out how to prevent malicious users from signing up for studies,
   # pulling data using automated scripts, and using repeated queries on a
@@ -133,7 +122,6 @@ def getPopRoute(time_type):
 
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
-    _fill_aggregate_backward_compat(request)
     # Disable aggregate access for the spatio-temporal data temporarily
     # until we can figure out how to prevent malicious users from signing up for studies,
     # pulling data using automated scripts, and using repeated queries on a
@@ -354,49 +342,19 @@ def deleteUserCustomLabel():
   return { 'label' : to_return }
 
 @post('/result/metrics/<time_type>')
-def summarize_metrics(time_type):
-    logging.debug("Metrics call, finished querying values through skipping")
-    abort(503, "Metrics calls have been temporarily disabled to avoid overloading the server")
-    _fill_aggregate_backward_compat(request)
+def getMetrics(time_type):
+    logging.debug("getMetrics with time_type %s and request %s" %
+                  (time_type, request.json))
+    if time_type != 'yyyy_mm_dd':
+        abort(404, "Metrics calls only supported for yyyy_mm_dd time type")
+    
     user_uuid = get_user_or_aggregate_auth(request)
-
-    start_time = request.json['start_time']
-    end_time = request.json['end_time']
-    freq_name = request.json['freq']
-    old_style = False
-    if 'metric' in request.json:
-        old_style = True
-        metric_list = [request.json['metric']]
-    else:
-        metric_list = request.json['metric_list']
-
-    logging.debug("metric_list = %s" % metric_list)
-
-    if 'is_return_aggregate' in request.json:
-        is_return_aggregate = request.json['is_return_aggregate']
-    else:
-        old_style = True
-        is_return_aggregate = True
-
-
-    app_config = request.json['app_config'] if 'app_config' in request.json else None
-
-    time_type_map = {
-        'timestamp': metrics.summarize_by_timestamp, # used by old UI
-        'local_date': metrics.summarize_by_local_date,
-        'yyyy_mm_dd': metrics.summarize_by_yyyy_mm_dd # used by new UI
-    }
-    metric_fn = time_type_map[time_type]
-    ret_val = metric_fn(user_uuid,
-              start_time, end_time,
-              freq_name, metric_list, is_return_aggregate, app_config)
-    if old_style:
-        logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
-        assert(len(metric_list) == 1)
-        if 'user_metrics' in ret_val:
-            ret_val['user_metrics'] = ret_val['user_metrics'][0]
-        ret_val['aggregate_metrics'] = ret_val['aggregate_metrics'][0]
-    return ret_val
+    start_ymd = request.json['start_time']
+    end_ymd = request.json['end_time']
+    
+    result = metrics.get_agg_metrics_from_db(start_ymd, end_ymd)
+    logging.debug("getMetrics result = %s" % result)
+    return result
 
 @post('/join.group/<group_id>')
 def habiticaJoinGroup(group_id):
@@ -536,7 +494,7 @@ def get_user_or_aggregate_auth(request):
     "user_only": lambda r: None if _get_uuid_bool_wrapper(request) else abort(403, "aggregations only available to users"),
     "never": lambda r: abort(404, "Aggregate calls not supported")
   }
-  if request.json["aggregate"] == False:
+  if "user" in request.json:
     logging.debug("User specific call, returning UUID")
     return getUUID(request)
   else:
