@@ -346,7 +346,7 @@ def getMetrics(time_type):
     logging.debug("getMetrics with time_type %s and request %s" %
                   (time_type, request.json))
     if time_type != 'yyyy_mm_dd':
-        abort(404, "Metrics calls only supported for yyyy_mm_dd time type")
+        abort(404, "Please upgrade to continue using the app dashboard")
     
     user_uuid = get_user_or_aggregate_auth(request)
     start_ymd = request.json['start_time']
