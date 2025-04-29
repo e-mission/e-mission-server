@@ -79,8 +79,8 @@ class TestSectionQueries(unittest.TestCase):
     def testCleaned2InferredSectionList(self):
 
         # Running the pipeline for the two user datasets
-        epi.run_intake_pipeline_for_user(self.testUUID1, skip_if_no_new_data = False)
-        epi.run_intake_pipeline_for_user(self.testUUID2, skip_if_no_new_data = False)
+        epi.run_intake_pipeline_for_user(self.testUUID1)
+        epi.run_intake_pipeline_for_user(self.testUUID2)
 
         # Fetching the timeseries entries containing both raw data and analysis data after running intake pipeline
         ts_agg = esta.TimeSeries.get_aggregate_time_series()
