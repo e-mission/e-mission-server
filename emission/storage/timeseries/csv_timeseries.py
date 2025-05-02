@@ -17,6 +17,8 @@ import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.metadata as ecwm
+import emission.core.wrapper.localdate as ecwld
 
 def _get_enum_map():
     return {
@@ -36,7 +38,7 @@ class CsvTimeSeries(esta.TimeSeries):
         self.analysis_timeseries_db = self._process_csv('./data/analysis_confirmed_trip.csv')
 
         #maintain only user dataframe in this version
-        self.analysis_timeseries_db = self.analysis_timeseries_db[self.analysis_timeseries_db['perno'] == self.user_id]
+        # self.analysis_timeseries_db = self.analysis_timeseries_db[self.analysis_timeseries_db['perno'] == self.user_id]
         # self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]
         # Design question: Should the stats be a separate database, or should it be part
         # of the timeseries database? Technically, it should be part of the timeseries
@@ -48,6 +50,8 @@ class CsvTimeSeries(esta.TimeSeries):
         # it separately. On the other hand, then the load/store from timeseries won't work
         # if it is a separate database. Let's do the right thing and change the storage/
         # shift to a different timeseries if we need to
+
+        # TODO: Remake this map to contain adresses to the csvs
         self.ts_map = {
                 # "background/location": self.timeseries_db,
                 # "background/filtered_location": self.timeseries_db,
@@ -125,24 +129,26 @@ class CsvTimeSeries(esta.TimeSeries):
             # Using datetime object
             local=arrow.now(row['metadata_write_local_dt_timezone']).tzinfo
             time_stamp = arrow.Arrow(row['metadata_write_local_dt_year'], row['metadata_write_local_dt_month'], row['metadata_write_local_dt_day'], tzinfo=local)
-            return time_stamp.int_timestamp
-        df['metadata_write_ts'] = df.apply(make_metadata_write_ts, axis=1)
+            return time_stamp.int_timestamp, time_stamp.isoformat()
+        df['metadata_write_fmt_time'] = df.apply(lambda x: make_metadata_write_ts(x)[1], axis=1)
+        df['metadata_write_ts'] = df.apply(lambda x: make_metadata_write_ts(x)[0], axis=1)
 
         def make_data_start_ts(row):    
             # Using datetime object
             local=arrow.now(row['data_start_local_dt_timezone']).tzinfo
             time_stamp = arrow.Arrow(row['data_start_local_dt_year'], row['data_start_local_dt_month'], row['data_start_local_dt_day'], tzinfo=local)
-            return time_stamp.int_timestamp
-        df['data_start_ts'] = df.apply(make_data_start_ts, axis=1)
+            return time_stamp.int_timestamp, time_stamp.isoformat()
+        df['data_start_fmt_time'] = df.apply(lambda x: make_data_start_ts(x)[1], axis=1)
+        df['data_start_ts'] = df.apply(lambda x: make_data_start_ts(x)[0], axis=1)
 
         def make_data_end_ts(row):    
             # Using datetime object
             local=arrow.now(row['data_end_local_dt_timezone']).tzinfo
             time_stamp = arrow.Arrow(row['data_end_local_dt_year'], row['data_end_local_dt_month'], row['data_end_local_dt_day'], tzinfo=local)
-            return time_stamp.int_timestamp
-        df['data_end_ts'] = df.apply(make_data_end_ts, axis=1)
+            return time_stamp.int_timestamp, time_stamp.isoformat()
+        df['data_end_fmt_time'] = df.apply(lambda x: make_data_end_ts(x)[1], axis=1)
+        df['data_endt_ts'] = df.apply(lambda x: make_data_end_ts(x)[0], axis=1)
 
-        #TODO: How to format time for the format time columns?
 
         return df
 
@@ -200,13 +206,13 @@ class CsvTimeSeries(esta.TimeSeries):
         return ret_query
 
     #TODO
-    def _get_sort_key(self, time_query = None):
+    def _time_query_to_col(self, time_query = None):
         if time_query is None:
-            return "metadata.write_ts"
-        elif time_query.timeType.endswith("local_dt"):
-            return time_query.timeType.replace("local_dt", "ts")
+            return "metadata_write_ts"
+        # elif time_query.timeType.endswith("local_dt"):
+        #     return time_query.timeType.replace("local_dt", "ts")
         else:
-            return time_query.timeType
+            return time_query.timeType.replace(".", "_")
 
     #TODO
     @staticmethod
@@ -237,7 +243,7 @@ class CsvTimeSeries(esta.TimeSeries):
         else:
             return ecwe.Entry(entry_doc)
 
-    #TODO
+    #TODO: No longer works
     def _split_key_list(self, key_list):
         if key_list is None:
             return (None, None)
@@ -246,93 +252,72 @@ class CsvTimeSeries(esta.TimeSeries):
         analysis_ts_db_keys = [key for key in key_list if 
             self.get_timeseries_db(key) == self.analysis_timeseries_db]
         return (orig_ts_db_keys, analysis_ts_db_keys)
+    
+    def _row_to_entry(self, key, row):
+        """
+        Converts the specified row into an entry
+        :param key: The key for the chosen csv
+        :param row: The row to be converted
+        :return: An entry for the row
+        """
+        entry_data = row.to_dict()
+
+        m = ecwm.Metadata()
+        m.key = key
+        m.platform = entry_data['metadata_platform']
+        m.write_ts = entry_data['metadata_write_ts']
+        m.time_zone = entry_data['metadata_write_local_dt_timezone']
+        m.write_local_dt = ecwld.LocalDate.get_local_date(m.write_ts, m.time_zone)
+        m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
+
+        result_entry = ecwe.Entry()
+        result_entry['_id'] = entry_data['_id']
+        result_entry.user_id = entry_data['perno']
+        result_entry.metadata = m
+        result_entry.data = entry_data #TODO: Not sure if metadata keys should be filtered
+        return result_entry
 
     #TODO
     def find_entries(self, key_list = None, time_query = None, geo_query = None,
                      extra_query_list=None):
-        sort_key = self._get_sort_key(time_query)
-        logging.debug("curr_query = %s, sort_key = %s" % 
-            (self._get_query(key_list, time_query, geo_query,
-                             extra_query_list), sort_key))
-        (orig_ts_db_keys, analysis_ts_db_keys) = self._split_key_list(key_list)
-        logging.debug("orig_ts_db_keys = %s, analysis_ts_db_keys = %s" % 
-            (orig_ts_db_keys, analysis_ts_db_keys))
+        
+        #TODO: Load in the data from the chosen csv files, 
 
-        (orig_ts_db_count, orig_ts_db_entries) = self._get_entries_for_timeseries(self.timeseries_db,
-                                                             orig_ts_db_keys,
-                                                             time_query,
-                                                             geo_query,
-                                                             extra_query_list,
-                                                             sort_key)
+        time_col = self._time_query_to_col(time_query)
+        
 
-        (analysis_ts_db_count, analysis_ts_db_entries) = self._get_entries_for_timeseries(self.analysis_timeseries_db,
-                                                                 analysis_ts_db_keys,
-                                                                 time_query,
-                                                                 geo_query,
-                                                                 extra_query_list,
-                                                                 sort_key)
-        logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
-            (orig_ts_db_count, analysis_ts_db_count))
-        return orig_ts_db_entries + analysis_ts_db_entries
+        df = self.analysis_timeseries_db[(self.analysis_timeseries_db[time_col] >= time_query.startTs) 
+                                         & (self.analysis_timeseries_db[time_col] <= time_query.endTs)].sort_values(by=[time_col])
+        #TODO: Geo query
+        
+        entry_list = []
 
-    #TODO
-    def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
-                                    extra_query_list, sort_key) -> Tuple[int, list]:
-        # workaround for https://github.com/e-mission/e-mission-server/issues/271
-        # during the migration
-        if key_list is None or len(key_list) > 0:
-            ts_query = self._get_query(key_list, time_query, geo_query,
-                                extra_query_list)
-            hint_arr =  [("metadata.key", 1)] if (sort_key is None) or ("metadata" in sort_key) else [(sort_key, -1)]
+        for _, row in df.iterrows():
+            entry_list.append(self._row_to_entry(key_list[0], row)) #TODO: Only one key is supported for now
 
-            # print(f"for query {ts_query=}, when indices are {tsdb.index_information()}, {sort_key=} so {hint_arr=}")
-            if edb.use_hints:
-                ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
-            else:
-                ts_db_cursor = tsdb.find(ts_query)
-            if sort_key is None:
-                ts_db_result = ts_db_cursor
-            else:
-                ts_db_result = ts_db_cursor.sort([
-                    (sort_key, pymongo.ASCENDING),
-                    ('_id', pymongo.ASCENDING),
-                ])
-            # We send the results from the phone in batches of 10,000
-            # And we support reading upto 100 times that amount at a time, so over
-            # This is more than the number of entries across all metadata types for
-            # normal user processing for over a year
-            # In [590]: edb.get_timeseries_db().find({"user_id": UUID('08b31565-f990-4d15-a4a7-89b3ba6b1340')}).count()
-            # Out[590]: 625272
-            #
-            # In [593]: edb.get_timeseries_db().find({"user_id": UUID('ea59084e-11d4-4076-9252-3b9a29ce35e0')}).count()
-            # Out[593]: 449869
-            ts_db_result.limit(edb.result_limit)
+        return entry_list
 
-            # This list() conversion causes the cursor to be consumed, which is memory-expensive,
-            # but faster as it allows us to get the count without having to make an additional
-            # "count_documents" DB call.
-            # In a future situation where memory is constrained or DB calls are less expensive,
-            # we could skip the list() conversion and return the cursor directly.
-            # https://github.com/e-mission/e-mission-server/pull/1032#issuecomment-2685846702
-            ts_db_entries = list(ts_db_result)
-            ts_db_count = len(ts_db_entries)
-        else:
-            ts_db_entries = []
-            ts_db_count = 0
+        """
+        https://github.com/e-mission/em-public-dashboard/blob/31b0e96476c1b8400c7761fc455925403b7b10d0/viz_scripts/scaffolding.py#L64
+scaffolding.py
+e-mission/em-public-dashboard
+ 
+in the public dashboard, we also read the entries and use get_data_df, we don't actually go from the dataframe to entries
+ 
+but we do munge the trip entries to be in the format that the footprint calculator expects, so that could be an example of how you might want to create trips
+ 
+        """
 
-        logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
-        return (ts_db_count, ts_db_entries)
 
     #TODO
     def get_entry_at_ts(self, key, ts_key, ts):
         import numpy as np
+        #TODO: Load in the data from the chosen csv files, 
 
         query_ts = float(ts) if type(ts) == np.int64 or type(ts) == np.float64 else ts
-        query = {"user_id": self.user_id, "metadata.key": key, ts_key: query_ts}
-        logging.debug("get_entry_at_ts query = %s" % query)
-        retValue = self.get_timeseries_db(key).find_one(query)
-        logging.debug("get_entry_at_ts result = %s" % retValue)
-        return retValue
+        time_col = self._time_query_to_col(ts_key)
+        
+        return self._row_to_entry(key, self.analysis_timeseries_db[(self.analysis_timeseries_db[time_col] == query_ts)].iloc[0]) 
 
     #TODO
     def get_data_df(self, key, time_query = None, geo_query = None,
@@ -350,8 +335,13 @@ class CsvTimeSeries(esta.TimeSeries):
         entry -> dict
         :return:
         """
-        entries = self.find_entries([key], time_query, geo_query, extra_query_list)
-        return self.to_data_df(key, entries, map_fn)
+        time_col = self._time_query_to_col(time_query)
+        
+        #TODO: Load in the data from the chosen csv files,
+        df = self.analysis_timeseries_db[(self.analysis_timeseries_db[time_col] >= time_query.startTs) 
+                                         & (self.analysis_timeseries_db[time_col] <= time_query.endTs)].sort_values(by=[time_col])
+        #TODO: Geo query
+        return df
 
     #TODO
     @staticmethod
@@ -389,21 +379,15 @@ class CsvTimeSeries(esta.TimeSeries):
         :param time_query: the time range in which to search the stream
         :return: a database row, or None if no match is found
         """
-        find_query = self._get_query([key], time_query)
-        result_it = self.get_timeseries_db(key) \
-                        .find(find_query) \
-                        .sort([
-                            (field, sort_order),
-                            ('_id', pymongo.ASCENDING),
-                        ]) \
-                        .limit(1)
-        result_list = list(result_it)
-        if len(result_list) == 0:
-            return None
-        else:
-            first_entry = result_list[0]
-            del first_entry['_id']
-            return first_entry
+        #TODO: Load in the data from the chosen csv files, 
+
+        time_col = self._time_query_to_col(time_query)
+        field = field.replace(".", "_")
+
+        df = self.analysis_timeseries_db[(self.analysis_timeseries_db[time_col] >= time_query.startTs) 
+                                         & (self.analysis_timeseries_db[time_col] <= time_query.endTs)]
+        df.sort_values(by=[field, '_id'], ascending=[sort_order == pymongo.ASCENDING, True])
+        return self._row_to_entry(key, df.iloc[0]) if len(df) > 0 else None
     
 
     #TODO
@@ -419,15 +403,15 @@ class CsvTimeSeries(esta.TimeSeries):
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
         """
-        retVal = self.get_first_entry(key, field, sort_order, time_query)
-        if retVal is None:
-            return -1
 
-        # extract the specified field from the entry that was found
-        field_parts = field.split(".")
-        for part in field_parts:
-            retVal = retVal[part]
-        return retVal
+        #TODO: Load in the data from the chosen csv files, 
+        time_col = self._time_query_to_col(time_query)
+        field = field.replace(".", "_")
+
+        df = self.analysis_timeseries_db[(self.analysis_timeseries_db[time_col] >= time_query.startTs) 
+                                         & (self.analysis_timeseries_db[time_col] <= time_query.endTs)]
+        df.sort_values(by=[field, '_id'], ascending=[sort_order == pymongo.ASCENDING, True])
+        return df.iloc[0][field] if len(df) > 0 else -1
 
     #TODO
     def bulk_insert(self, entries, data_type = None):
@@ -533,7 +517,7 @@ class CsvTimeSeries(esta.TimeSeries):
     def invalidate_raw_entry(self, obj_id):
         self.timeseries_db.update_one({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})
 
-    #TODO
+
     def find_entries_count(self, key_list = None, time_query = None, geo_query = None, extra_query_list = None):
         """
         Returns the total number of documents for the given key_list referring to each of the two timeseries db.
@@ -552,8 +536,6 @@ class CsvTimeSeries(esta.TimeSeries):
 
         For key_list = None or empty, total count of all documents are returned considering the matching entries from entire dataset.
         """
-        orig_tsdb = self.timeseries_db
-        analysis_tsdb = self.analysis_timeseries_db
 
         if key_list == []:
             key_list = None
@@ -561,9 +543,9 @@ class CsvTimeSeries(esta.TimeSeries):
         # Segregate orig_tsdb and analysis_tsdb keys so as to fetch counts on each dataset
         (orig_tsdb_keys, analysis_tsdb_keys) = self._split_key_list(key_list)
 
-        (orig_tsdb_count, _) = self._get_entries_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list, None)
-        (analysis_tsdb_count, _) = self._get_entries_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list, None)
+        orig_tsdb_count = len(self.find_entries(orig_tsdb_keys, time_query, geo_query, extra_query_list))
+        analysis_tsdb_count= len(self.find_entries(analysis_tsdb_keys, time_query, geo_query, extra_query_list))
 
-        total_matching_count = orig_tsdb_count + analysis_tsdb_count
+        total_matching_count = [orig_tsdb_count, analysis_tsdb_count]
         return total_matching_count
 
