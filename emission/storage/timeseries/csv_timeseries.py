@@ -88,9 +88,9 @@ class CsvTimeSeries(esta.TimeSeries):
                 # "segmentation/raw_untracked": self.analysis_timeseries_db,
                 # "analysis/smoothing": self.analysis_timeseries_db,
                 # "analysis/cleaned_trip": self.analysis_timeseries_db,
-                "analysis/cleaned_place": self.analysis_timeseries_db,
-                "analysis/cleaned_section": self.analysis_timeseries_db,
-                "analysis/cleaned_stop": self.analysis_timeseries_db,
+                "analysis/cleaned_place": './data/analysis_cleaned_place.csv',
+                "analysis/cleaned_section": './data/analysis_cleaned_section.csv',
+                "analysis/cleaned_stop": './data/analysis_cleaned_stop.csv',
                 # "analysis/cleaned_untracked": self.analysis_timeseries_db,
                 # "analysis/recreated_location": self.analysis_timeseries_db,
                 # "metrics/daily_user_count": self.analysis_timeseries_db,
@@ -108,7 +108,7 @@ class CsvTimeSeries(esta.TimeSeries):
                 # "analysis/inferred_labels": self.analysis_timeseries_db,
                 # "analysis/inferred_trip": self.analysis_timeseries_db,
                 # "analysis/expected_trip": self.analysis_timeseries_db,
-                "analysis/confirmed_trip": self.analysis_timeseries_db,
+                "analysis/confirmed_trip": './data/analysis_confirmed_trip.csv',
                 # "analysis/confirmed_section": self.analysis_timeseries_db,
                 # "analysis/confirmed_place": self.analysis_timeseries_db,
                 # "analysis/confirmed_untracked": self.analysis_timeseries_db,
@@ -151,6 +151,15 @@ class CsvTimeSeries(esta.TimeSeries):
 
 
         return df
+    
+    def _load_from_keys(self, keys):
+        """
+        Load the data from the specified keys
+        :param keys: The keys to load
+        :return: A list of dataframes with the data for the specified keys
+        """
+        #TODO: maybe check previously loaded item to cache it
+        self.analysis_timeseries_db = [self._process_csv(self.ts_map[file]) for file in keys]
 
     #TODO
     @staticmethod
@@ -282,19 +291,23 @@ class CsvTimeSeries(esta.TimeSeries):
                      extra_query_list=None):
         
         #TODO: Load in the data from the chosen csv files, 
+        self._load_from_keys(key_list)
 
         time_col = self._time_query_to_col(time_query)
         
 
-        df = self.analysis_timeseries_db[(self.analysis_timeseries_db[time_col] >= time_query.startTs) 
-                                         & (self.analysis_timeseries_db[time_col] <= time_query.endTs)].sort_values(by=[time_col])
+        dfs = [table[(table[time_col] >= time_query.startTs) #Maybe remove the sort_values if too slow
+                                         & (table[time_col] <= time_query.endTs)].sort_values(by=[time_col]) for table in self.analysis_timeseries_db]
+        
         #TODO: Geo query
         
         entry_list = []
 
-        for _, row in df.iterrows():
-            entry_list.append(self._row_to_entry(key_list[0], row)) #TODO: Only one key is supported for now
-
+        for i in range(len(dfs)):
+            df = dfs[i]
+            for _, row in df.iterrows():
+                entry_list.append(self._row_to_entry(key_list[i], row)) #TODO: Only one key is supported for now
+        entry_list.sort(key=lambda x: x.data[time_col])
         return entry_list
 
         """
