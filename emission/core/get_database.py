@@ -327,6 +327,12 @@ def get_fake_sections_db():
     FakeSections = _get_current_db().Stage_fake_sections
     return FakeSections
 
+def get_agg_metrics_db():
+    AggMetrics = _get_current_db().Stage_agg_metrics
+    AggMetrics.create_index([("date", pymongo.ASCENDING)])
+    AggMetrics.create_index([("metric", pymongo.ASCENDING)])
+    return AggMetrics
+
 # Static utility method to save entries to a mongodb collection.  Single
 # drop-in replacement for collection.save() now that it is deprecated in 
 # pymongo 3.0. 
