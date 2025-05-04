@@ -13,25 +13,22 @@ source setup/setup.sh
 ## 10/02 - Mukul
 ## - Above comments talk about manually updating cryptography to version 40
 ## - I have upgraded to 41.0.4 as per latest vulnerability fixes.
-conda install -c conda-forge cryptography=42.0.0 wheel=0.40.0
+##
+## 04/2025 - Shankari
+## - The most recent version of anaconda has the correct version so we don't
+##   need to override
+# conda install -c conda-forge cryptography=42.0.0 wheel=0.40.0
 
 ## Remove the old, unused packages to avoid tripping up the checker
-rm -rf /root/miniconda-23.1.0/pkgs/cryptography-38.0.4-py39h9ce1e76_0
-rm -rf /root/miniconda-23.1.0/pkgs/wheel-0.37.1-pyhd3eb1b0_0
-rm -rf /root/miniconda-23.5.2/pkgs/cryptography-39.0.1-py39h9ce1e76_2
-rm -rf /root/miniconda-23.5.2/pkgs/certifi-2023.5.7-py39h06a4308_0
-rm -rf /root/miniconda-23.5.2/pkgs/conda-23.5.2-py39h06a4308_0/lib/python3.9/site-packages/tests
-rm -rf /root/miniconda-23.5.2/pkgs/urllib3-1.26.16-py39h06a4308_0
-rm -rf /root/miniconda-23.5.2/pkgs/urllib3-1.26.17-pyhd8ed1ab_0
-rm -rf /root/miniconda-23.5.2/envs/emission/lib/python3.9/site-packages/urllib3-1.26.17.dist-info
-rm -rf /root/miniconda-23.5.2/lib/python3.9/site-packages/urllib3-1.26.16.dist-info
-rm -rf /root/miniconda-23.5.2/lib/python3.9/site-packages/tests
-rm -rf /root/miniconda-23.5.2/lib/python3.9/site-packages/cryptography-41.0.7.dist-info
+## This is an example in case we need to remove them again
+# rm -rf /root/miniconda-23.1.0/pkgs/cryptography-38.0.4-py39h9ce1e76_0
+rm -rf /root/miniconda-25.1.1/pkgs/conda-25.1.1-py312hca03da5_0/lib/python3.12/site-packages/tests
+rm -rf /root/miniconda-25.1.1/lib/python3.12/site-packages/tests
 
 # Clean up the conda install
 conda clean -t
 find /root/miniconda-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
-find ~/miniconda-23.5.2 -name \*tests\* -path '*/site-packages/*' | grep ".*/site-packages/tests" | xargs rm -rf
+find ~/miniconda-25.1.1 -name \*tests\* -path '*/site-packages/*' | grep ".*/site-packages/tests" | xargs rm -rf
 
 # Updating bash package to latest version manually 
 apt-get update
