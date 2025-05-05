@@ -111,6 +111,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # we force run the pipeline by setting profile back so we will run the pipeline this time
         edb.get_profile_db().update_one({"user_id": self.testUUID},
                                         {"$set": {"pipeline_range.end_ts": None}})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
         epi.run_intake_pipeline_for_user(self.testUUID)
 
         all_pipeline_states_after_run = edb.get_pipeline_state_db().find()
@@ -142,6 +143,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # we force run the pipeline by setting profile back so we will run the pipeline this time
         edb.get_profile_db().update_one({"user_id": self.testUUID},
                                         {"$set": {"pipeline_range.end_ts": None}})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
         # then we run the real pipeline again with skip=False
         # We expect to see no changes between the first and the second run
         # because of the usercache skip
@@ -171,6 +173,7 @@ class TestPipelineCornerCases(unittest.TestCase):
 
         # Mocking pipeline state to simulate no in-progress stages
         mock_get_pipeline_state_db.return_value.count_documents.return_value = 0
+        mock_get_pipeline_state_db.return_value.find_one.return_value = {}
 
         # Mocking UserCacheHandler
         mock_user_cache_handler = MagicMock()
@@ -196,6 +199,7 @@ class TestPipelineCornerCases(unittest.TestCase):
 
         # Mocking pipeline state to simulate in-progress stages
         mock_get_pipeline_state_db.return_value.count_documents.return_value = 1
+        mock_get_pipeline_state_db.return_value.find_one.return_value = {}
 
         mock_user_cache_handler = MagicMock()
         mock_get_user_cache.return_value = mock_user_cache_handler
@@ -219,6 +223,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # we force run the pipeline by setting profile back so we will run the pipeline this time
         edb.get_profile_db().update_one({"user_id": self.testUUID},
                                         {"$set": {"pipeline_range.end_ts": None}})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
         epi.run_intake_pipeline_for_user(self.testUUID)
         after_first_run = edb.get_profile_db().find_one({"user_id": self.testUUID})
         # 1469493031.0 is the number I got when running the test for the first time
@@ -231,13 +236,15 @@ class TestPipelineCornerCases(unittest.TestCase):
         # force the user to be active again
         edb.get_profile_db().update_one({"user_id": self.testUUID},
                                         {"$set": {"pipeline_range.end_ts": None}})
+        edb.get_pipeline_state_db().update_one({"user_id": self.testUUID,
+                                                "pipeline_stage": ewps.PipelineStages.CLEAN_RESAMPLING.value},
+                                               {"$set": {"last_processed_ts": 0}})
 
         # force set section segmentation's curr_run_ts
         edb.get_pipeline_state_db().update_one(
             {"user_id": self.testUUID,
             "pipeline_stage": ewps.PipelineStages.SECTION_SEGMENTATION.value},
-            {"$set": {"curr_run_ts": 3600}}
-        )
+            {"$set": {"curr_run_ts": 3600}}, upsert=True)
 
         epi.run_intake_pipeline_for_user(self.testUUID)
 

@@ -96,11 +96,23 @@ def run_intake_pipeline_for_user(uuid):
         last_proc_ts = arrow.get(last_proc_time) if last_proc_time is not None else arrow.get(0)
         ts_diff = last_loc_ts.timestamp() - last_proc_ts.timestamp()
         fmt_dormant_user_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), pipeline has run until {last_proc_ts}({last_proc_ts.timestamp()}), difference = {last_loc_ts - last_proc_ts}({(ts_diff)})"
-        if  (ts_diff) <= 6 * 60 * 60: # 10 minutes
+        if  ts_diff <= 6 * 60 * 60: # 10 minutes
             print(f"{fmt_dormant_user_check}, skipping")
             return
         else:
             logging.info(f"{fmt_dormant_user_check}, continuing")
+
+        clean_resample_stage = edb.get_pipeline_state_db().find_one(
+            {"user_id": uuid, "pipeline_stage": ecwp.PipelineStages.CLEAN_RESAMPLING.value})
+        clean_resample_stage = {} if clean_resample_stage is None else clean_resample_stage
+        last_clean_resample_processed_ts = arrow.get(clean_resample_stage.get("last_processed_ts", 0))
+        clean_resample_ts_diff = last_loc_ts.timestamp() - last_clean_resample_processed_ts.timestamp()
+        fmt_squished_trips_at_end_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), raw trips have been generated until {last_clean_resample_processed_ts}({last_clean_resample_processed_ts.timestamp()}), difference = {last_loc_ts - last_clean_resample_processed_ts}({(ts_diff)})"
+        if clean_resample_ts_diff <= 6 * 60 * 60:
+            print(f"{fmt_squished_trips_at_end_check}, skipping")
+            return
+        else:
+            logging.info(f"{fmt_squished_trips_at_end_check}, continuing")
 
         # the pipeline states are a list, so we can directly query for
         in_progress_stages = edb.get_pipeline_state_db().count_documents({"user_id": uuid, "curr_run_ts": {"$ne": None}})
