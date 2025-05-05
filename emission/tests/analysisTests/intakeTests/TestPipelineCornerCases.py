@@ -237,7 +237,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         edb.get_profile_db().update_one({"user_id": self.testUUID},
                                         {"$set": {"pipeline_range.end_ts": None}})
         edb.get_pipeline_state_db().update_one({"user_id": self.testUUID,
-                                                "pipeline_stage": ewps.PipelineStages.CLEAN_RESAMPLING.value},
+                                                "pipeline_stage": ewps.PipelineStages.TRIP_SEGMENTATION.value},
                                                {"$set": {"last_processed_ts": 0}})
 
         # force set section segmentation's curr_run_ts
