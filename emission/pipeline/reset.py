@@ -223,6 +223,9 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
             edb.get_pipeline_state_db().count_documents(reset_pipeline_query),
             user_id, reset_ts))
 
+    profile_update_query = {"$set": {"pipeline_range.end_ts": reset_ts}}
+    logging.info(f"Resetting profile copy of state with query {profile_update_query}")
+
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_pipeline_state without modifying anything")
     else:
@@ -235,6 +238,9 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
                     reset_pipeline_query, update_pipeline_query,
                     upsert=False)
         logging.debug("this is not a dry run, result of updating all other stages in reset_pipeline_state = %s" % result)
+
+        result = edb.get_profile_db().update_one({"user_id": user_id}, profile_update_query)
+        logging.debug("this is not a dry run, result of updating the profile in reset_pipeline_state = %s" % result)
 
 
 def reset_curr_run_state(user_id, is_dry_run):
@@ -275,6 +281,8 @@ def _del_entries_for_query(del_query, is_dry_run):
     logging.info("About to delete %s pipeline states" % 
             (edb.get_pipeline_state_db().count_documents(del_query)))
 
+    reset_profile_ts_update = {"$set": {"pipeline_range.start_ts": None,
+                                        "pipeline_range.end_ts": None}}
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_user_to-start without modifying anything")
     else: 
@@ -282,7 +290,7 @@ def _del_entries_for_query(del_query, is_dry_run):
         logging.info("this is not a dry run, result of removing analysis objects = %s" % result)
         result = edb.get_pipeline_state_db().delete_many(del_query)
         logging.info("this is not a dry run, result of removing pipeline states = %s" % result)
-
+        result = edb.get_profile_db().update_one(del_query,  reset_profile_ts_update)
 
 # 
 # END: reset_to_start
