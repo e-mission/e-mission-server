@@ -912,6 +912,117 @@ class TestPipelineReset(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
+    def testResetProfilePipelineRange(self):
+        """
+        Test that the pipeline_range in the profile is reset correctly.
+        
+        Before the change, the pipeline reset script would update the get_pipeline_state_db()
+        but not the cached pipeline start and end in the profile. This test verifies that
+        the profile is now also updated when resetting the pipeline.
+        """
+        # Load data for both days
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-07-22"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-07-25"
+        start_ld_1 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 22})
+        start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
+        
+        # Run both pipelines
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+        
+        # Check profile after first run
+        user_profile_1 = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIn("pipeline_range", user_profile_1, "Profile should contain pipeline_range after pipeline run")
+        self.assertIsNotNone(user_profile_1["pipeline_range"].get("end_ts"), 
+                           "Profile should have end_ts set after pipeline run")
+        first_run_end_ts = user_profile_1["pipeline_range"].get("end_ts")
+        
+        # Load and run second day
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        
+        # Check profile after second run
+        user_profile_2 = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIn("pipeline_range", user_profile_2, "Profile should contain pipeline_range after pipeline run")
+        self.assertIsNotNone(user_profile_2["pipeline_range"].get("end_ts"), 
+                           "Profile should have end_ts set after pipeline run")
+        second_run_end_ts = user_profile_2["pipeline_range"].get("end_ts")
+        
+        # Verify the end_ts changed after second run
+        self.assertNotEqual(first_run_end_ts, second_run_end_ts, 
+                          "Profile end_ts should be updated after second pipeline run")
+        
+        # Reset pipeline to July 23 (between the two days)
+        reset_ts = arrow.get("2016-07-23").int_timestamp
+        
+        # Get the last confirmed place before reset_ts to know what timestamp should be used
+        last_confirmed_place = esdp.get_last_place_before(esda.CONFIRMED_PLACE_KEY, reset_ts, self.testUUID)
+        self.assertIsNotNone(last_confirmed_place, "Should have a confirmed place before reset_ts")
+        
+        # Get the expected reset timestamp from the place's enter_ts
+        last_cleaned_place_id = last_confirmed_place["data"]["cleaned_place"]
+        last_cleaned_place = esda.get_entry(esda.CLEANED_PLACE_KEY, last_cleaned_place_id)
+        first_raw_place_id = last_cleaned_place["data"]["raw_places"][0]
+        first_raw_place = esda.get_entry(esda.RAW_PLACE_KEY, first_raw_place_id)
+        expected_reset_ts = first_raw_place.data.enter_ts
+        
+        # Now reset the pipeline
+        epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
+        
+        # Check profile after reset
+        user_profile_reset = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIn("pipeline_range", user_profile_reset, "Profile should contain pipeline_range after reset")
+        self.assertIsNotNone(user_profile_reset["pipeline_range"].get("end_ts"), 
+                           "Profile should have end_ts set after reset")
+        reset_end_ts = user_profile_reset["pipeline_range"].get("end_ts")
+        
+        # Verify that the end_ts is exactly the enter_ts of the last place
+        self.assertEqual(reset_end_ts, expected_reset_ts,
+                       "Profile end_ts should be set to the enter_ts of the last confirmed place")
+        
+        # Re-run the pipeline and verify the profile is updated again
+        etc.runIntakePipeline(self.testUUID)
+        
+        # Check profile after re-run
+        user_profile_rerun = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIn("pipeline_range", user_profile_rerun, "Profile should contain pipeline_range after re-run")
+        self.assertIsNotNone(user_profile_rerun["pipeline_range"].get("end_ts"), 
+                           "Profile should have end_ts set after re-run")
+        rerun_end_ts = user_profile_rerun["pipeline_range"].get("end_ts")
+        
+        # Verify the end_ts changed after re-run
+        self.assertNotEqual(reset_end_ts, rerun_end_ts, 
+                         "Profile end_ts should be updated after pipeline re-run")
+
+    def testResetProfilePipelineRangeToStart(self):
+        """
+        Test that the pipeline_range in the profile is reset correctly when resetting to start.
+        """
+        # Load and run data
+        dataFile = "emission/tests/data/real_examples/shankari_2016-07-22"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        
+        # Check profile after run
+        user_profile = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIn("pipeline_range", user_profile, "Profile should contain pipeline_range after pipeline run")
+        self.assertIsNotNone(user_profile["pipeline_range"].get("end_ts"), 
+                           "Profile should have end_ts set after pipeline run")
+        
+        # Reset to start
+        epr.reset_user_to_start(self.testUUID, is_dry_run=False)
+        
+        # Check profile after reset to start
+        user_profile_reset = edb.get_profile_db().find_one({"user_id": self.testUUID})
+        self.assertIn("pipeline_range", user_profile_reset, "Profile should contain pipeline_range after reset")
+        
+        # Verify profile fields are reset (pipeline_range.start_ts should be None, pipeline_range.end_ts should be None)
+        self.assertIsNone(user_profile_reset["pipeline_range"].get("start_ts"), 
+                        "Profile start_ts should be None after reset to start")
+        self.assertIsNone(user_profile_reset["pipeline_range"].get("end_ts"), 
+                        "Profile end_ts should be None after reset to start")
+
 if __name__ == '__main__':
     etc.configLogging()
     unittest.main()
