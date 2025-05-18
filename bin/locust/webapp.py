@@ -73,7 +73,8 @@ class PhoneAppUser(HttpUser):
 
     @task(2)
     def usercache_get(self):
-       self.client.post("/usercache/get", json={"user": self.opcode})
+       response = self.client.post("/usercache/get", json={"user": self.opcode})
+       print(f"Got {response.text} in response to the call")
 
     @task(2)
     def find_entries_timestamp(self):
