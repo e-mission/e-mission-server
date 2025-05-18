@@ -19,7 +19,7 @@ dependencies:
 - scipy=1.10.0
 - utm=0.7.0
 - pip:
-  - git+https://github.com/JGreenlee/e-mission-common@0.6.4
+  - git+https://github.com/e-mission/e-mission-common@0.6.4
   - pyfcm==2.0.1
   - pygeocoder==1.2.5
   - pymongo==4.3.3
