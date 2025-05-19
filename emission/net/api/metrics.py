@@ -16,24 +16,20 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
 import emission.storage.timeseries.fmt_time_query as estf
 
+import emcommon.metrics.metrics_summaries as emcmms
+
 
 def get_agg_metrics_from_db(start_ymd, end_ymd):
     logging.debug("get_agg_metrics(%s, %s)" % (start_ymd, end_ymd))
-    result = {}
     query = estf.FmtTimeQuery("date", start_ymd, end_ymd).get_query()
     metric_cursor = edb.get_agg_metrics_db().find(query)
     metric_docs = list(metric_cursor)
     logging.debug("AggMetrics DB had %d entries for %s" %
                   (len(metric_docs), query))
-    for entry in metric_docs:
-        metric_name = entry["metric"]
-        if metric_name not in result:
-            result[metric_name] = []
-        # phone expects data at the top level, not nested under "data"
-        for k, v in entry.get("data", {}).items():
-            entry[k] = v
-        result[metric_name].append(entry)
-    return result
+    # Backwards compat to get summaries into the old format that the phone expects in May 2025
+    # After phone changes and waiting a few months, we can remove this
+    metric_docs = emcmms.munge_agg_metrics(metric_docs)
+    return metric_docs
 
 def summarize_by_timestamp(user_id, start_ts, end_ts, freq, metric_list, include_aggregate, app_config=None):
     return _call_group_fn(earmt.group_by_timestamp, user_id, start_ts, end_ts,
