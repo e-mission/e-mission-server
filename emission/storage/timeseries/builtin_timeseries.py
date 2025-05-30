@@ -233,7 +233,16 @@ class BuiltinTimeSeries(esta.TimeSeries):
         if key_list is None or len(key_list) > 0:
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
-            hint_arr =  [("metadata.key", 1)] if (sort_key is None) or ("metadata" in sort_key) else [(sort_key, -1)]
+            
+            if all(k.startswith("background/") for k in key_list or []):
+                # using 'metadata.key' index for background/* entries is very slow;
+                # force using 'data.ts' index instead
+                # https://github.com/e-mission/e-mission-docs/issues/1109#issuecomment-2922807236
+                hint_arr = [("data.ts", -1)]
+            elif sort_key is None or "metadata" in sort_key:
+                hint_arr = [("metadata.key", 1)]
+            else:
+                hint_arr = [(sort_key, -1)]
 
             # print(f"for query {ts_query=}, when indices are {tsdb.index_information()}, {sort_key=} so {hint_arr=}")
             if edb.use_hints:
