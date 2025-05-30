@@ -6,6 +6,7 @@ import json
 import requests
 
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
+DOWNLOAD_URL = "https://raw.githubusercontent.com/%s/main/configs/%s.nrel-op.json"
 
 dynamic_config = None
 def get_dynamic_config():
