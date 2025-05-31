@@ -185,6 +185,14 @@ def get_usercache_db():
     UserCache.create_index([("metadata.key", pymongo.ASCENDING)])
     UserCache.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     UserCache.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    print("Creating usercache_compound_hack index in the background")
+    UserCache.create_index([
+        ("user_id", pymongo.ASCENDING),
+        ("metadata.type", pymongo.ASCENDING),
+        ("metadata.key", pymongo.ASCENDING),
+        ("metadata.write_ts", pymongo.DESCENDING),
+        ("data.ts", pymongo.DESCENDING)],
+        name="usercache_compound_hack", background=True)
     return UserCache
 
 def _migrate_sparse_to_dense(collection, geo_index):
@@ -207,6 +215,14 @@ def get_timeseries_db():
     TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
     _migrate_sparse_to_dense(TimeSeries, "data.loc_2dsphere")
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
+    TimeSeries.create_index([
+        ("user_id", pymongo.ASCENDING),
+        ("metadata.key", pymongo.ASCENDING),
+        ("metadata.write_ts", pymongo.DESCENDING),
+        ("data.ts", pymongo.DESCENDING),
+        ("data.start_ts", pymongo.DESCENDING),
+        ("data.end_ts", pymongo.DESCENDING)],
+        name="timeseries_compound_hack", background=True)
     return TimeSeries
 
 def get_timeseries_error_db():
@@ -284,6 +300,19 @@ def _create_analysis_result_indices(tscoll):
     _migrate_sparse_to_dense(tscoll, "data.loc_2dsphere")
     tscoll.create_index([("data.loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.local_dt") # recreated location
+    # TODO @JGreenlee Figure out what to do with the other indices
+    # I focused on the main timeseries queries for now
+    # start_local_dt queries are primarily used in the public dashboard, for example
+    tscoll.create_index([
+        ("user_id", pymongo.ASCENDING),
+        ("metadata.key", pymongo.ASCENDING),
+        ("metadata.write_ts", pymongo.DESCENDING),
+        ("data.ts", pymongo.DESCENDING),
+        ("data.start_ts", pymongo.DESCENDING),
+        ("data.end_ts", pymongo.DESCENDING),
+        ("data.enter_ts", pymongo.DESCENDING),
+        ("data.exit_ts", pymongo.DESCENDING)],
+        name="analysis_compound_hack", background=True)
     return tscoll
 
 def _create_local_dt_indices(time_series, key_prefix):
