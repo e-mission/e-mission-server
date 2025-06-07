@@ -345,6 +345,14 @@ def deleteUserCustomLabel():
 def getMetrics(time_type):
     logging.debug("getMetrics with time_type %s and request %s" %
                   (time_type, request.json))
+    # HACK HACK HACK
+    # Remove in 2026 after the uw-ebike data collection is complete
+    program_name = dynamic_config.get("url_abbreviation", None)
+    if program_name == "uw-ebike":
+        logging.info(f"Received metrics call for program {program_name} that doesn't want a dashboard, ignoring")
+        return
+    else:
+        logging.info(f"Received metrics call for program {program_name}, continuing")
     if time_type != 'yyyy_mm_dd':
         abort(404, "Please upgrade to continue using the app dashboard")
     
