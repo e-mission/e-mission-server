@@ -432,8 +432,7 @@ def before_request():
   request.params.start_ts = time.time()
   request.params.timer = ect.Timer()
   request.params.timer.__enter__()
-  logging.debug("START %s %s %s" % (request.method, request.path,
-        request.json.get('user', None) if request.json else None))
+  logging.debug("START %s %s" % (request.method, request.path))
 
 @app.hook('after_request')
 def after_request():
