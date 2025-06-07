@@ -14,7 +14,6 @@ License: MIT (see LICENSE for details)
 """
 
 import sys
-import logging
 
 __author__ = 'Marcel Hellkamp'
 __version__ = '0.13-dev'
@@ -471,7 +470,6 @@ class Router(object):
 
     def match(self, environ):
         """ Return a (target, url_args) tuple or raise HTTPError(400/404/405). """
-        logging.debug(f"403_CHECK: bottle just tried to match {environ['REQUEST_METHOD']} {environ['PATH_INFO']}")
         verb = environ['REQUEST_METHOD'].upper()
         path = environ['PATH_INFO'] or '/'
 
@@ -979,7 +977,6 @@ class Bottle(object):
         return tob(template(ERROR_PAGE_TEMPLATE, e=res, template_settings=dict(name='__ERROR_PAGE_TEMPLATE')))
 
     def _handle(self, environ):
-        logging.debug(f"403_CHECK: bottle just received {environ['REQUEST_METHOD']} {environ['PATH_INFO']}")
         path = environ['bottle.raw_path'] = environ['PATH_INFO']
         if py3k:
             environ['PATH_INFO'] = path.encode('latin1').decode('utf8', 'ignore')
@@ -989,26 +986,17 @@ class Bottle(object):
         response.bind()
 
         try:
-            logging.debug(f"403_CHECK: parsed body {request.json}")
-        except Exception as e:
-            print_exc()
-
-        try:
             while True: # Remove in 0.14 together with RouteReset
                 out = None
                 try:
-                    logging.debug(f"403_CHECK: bottle just called hook with {environ['REQUEST_METHOD']} {environ['PATH_INFO']}")
                     self.trigger_hook('before_request')
                     route, args = self.router.match(environ)
                     environ['route.handle'] = route
                     environ['bottle.route'] = route
                     environ['route.url_args'] = args
-                    logging.debug(f"403_CHECK: bottle just called route with {args}")
                     out = route.call(**args)
                     break
                 except HTTPResponse as E:
-                    logging.error(f"403_CHECK: exception at first level {E}")
-                    print_exc()
                     out = E
                     break
                 except RouteReset:
@@ -1018,24 +1006,16 @@ class Bottle(object):
                     route.reset()
                     continue
                 finally:
-                    if out and not isinstance(out, HTTPError) and len(out) > 40:
-                        logging.debug(f"403_CHECK: after call, truncated output {out[:20]}...{out[-20:]}")
-                    else:
-                        logging.debug(f"403_CHECK: after call, full output is {out}")
                     if isinstance(out, HTTPResponse):
                         out.apply(response)
                     try:
                         self.trigger_hook('after_request')
                     except HTTPResponse as E:
-                        logging.error(f"403_CHECK: exception while handling post-hook {E}")
-                        print_exc()
                         out = E
                         out.apply(response)
         except (KeyboardInterrupt, SystemExit, MemoryError):
-            print_exc()
             raise
         except Exception as E:
-            print_exc()
             if not self.catchall: raise
             stacktrace = format_exc()
             environ['wsgi.errors'].write(stacktrace)
