@@ -63,7 +63,7 @@ def getSubgroupFromToken(token, config):
     if "subgroups" in config.get("opcode", {}):
       if tokenParts[2] not in config['opcode']['subgroups']:
         # subpart not in config list
-        raise ValueError(f"Invalid subgroup {tokenParts[2]} not in {config.opcode.subgroups}")
+        raise ValueError(f"Invalid subgroup {tokenParts[2]} not in {config['opcode']['subgroups']}")
       else:
         logging.debug('subgroup ' + tokenParts[2] + ' found in list ' + str(config['opcode']['subgroups']))
         return tokenParts[2];

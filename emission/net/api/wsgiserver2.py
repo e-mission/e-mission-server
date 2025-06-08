@@ -590,7 +590,6 @@ class HTTPRequest(object):
 
     def parse_request(self):
         """Parse the next HTTP request start-line and message-headers."""
-        print(f"403_CHECK: wsgiserver started parsing request")
         self.rfile = SizeCheckWrapper(self.conn.rfile,
                                       self.server.max_request_header_size)
         try:
@@ -601,7 +600,6 @@ class HTTPRequest(object):
                 "allowed bytes.")
             return
         else:
-            print(f"403_CHECK: wsgiserver in else block with {success=}")
             if not success:
                 return
 
@@ -616,7 +614,6 @@ class HTTPRequest(object):
             if not success:
                 return
 
-        print(f"403_CHECK: wsgiserver ready to read request")
         self.ready = True
 
     def read_request_line(self):
@@ -628,7 +625,6 @@ class HTTPRequest(object):
         # (although your TCP stack might suffer for it: cf Apache's history
         # with FIN_WAIT_2).
         request_line = self.rfile.readline()
-        print(f"403_CHECK: wsgiserver read request line {request_line}")
 
         # Set started_request to True so communicate() knows to send 408
         # from here on out.
@@ -720,7 +716,6 @@ class HTTPRequest(object):
         """Read self.rfile into self.inheaders. Return success."""
 
         # then all the http headers
-        print(f"403_CHECK: wsgiserver reading headers {request_line}")
         try:
             read_headers(self.rfile, self.inheaders)
         except ValueError:
@@ -814,7 +809,6 @@ class HTTPRequest(object):
             segment       = *pchar *( ";" param )
             param         = *pchar
         """
-        print(f"403_CHECK: wsgiserver parsing {uri=}")
         if uri == ASTERISK:
             return None, None, uri
 
@@ -1927,7 +1921,6 @@ class HTTPServer(object):
         """Accept a new connection and put it on the Queue."""
         try:
             s, addr = self.socket.accept()
-            print(f"403_CHECK: wsgiserver accepted connection from socket")
             if self.stats['Enabled']:
                 self.stats['Accepts'] += 1
             if not self.ready:
@@ -1984,7 +1977,6 @@ class HTTPServer(object):
 
             conn.ssl_env = ssl_env
 
-            print(f"403_CHECK: wsgiserver queued new connection from {conn.remote_port=}")
             self.requests.put(conn)
         except socket.timeout:
             # The only reason for the timeout in start() is so we can
