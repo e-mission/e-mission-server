@@ -105,7 +105,9 @@ def run_intake_pipeline_for_user(uuid):
         trip_segment_stage = edb.get_pipeline_state_db().find_one(
             {"user_id": uuid, "pipeline_stage": ecwp.PipelineStages.TRIP_SEGMENTATION.value})
         trip_segment_stage = {} if trip_segment_stage is None else trip_segment_stage
-        last_trip_segment_processed_ts = arrow.get(trip_segment_stage.get("last_processed_ts", 0))
+        trip_segment_last_processed_ts = trip_segment_stage.get("last_processed_ts", 0)
+        trip_segment_last_processed_ts = trip_segment_last_processed_ts if trip_segment_last_processed_ts is not None else 0
+        last_trip_segment_processed_ts = arrow.get(trip_segment_last_processed_ts)
         trip_segment_ts_diff = last_loc_ts.timestamp() - last_trip_segment_processed_ts.timestamp()
         fmt_squished_trips_at_end_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), raw trips have been generated until {last_trip_segment_processed_ts}({last_trip_segment_processed_ts.timestamp()}), difference = {last_loc_ts - last_trip_segment_processed_ts}({(ts_diff)})"
         if trip_segment_ts_diff <= 6 * 60 * 60:
