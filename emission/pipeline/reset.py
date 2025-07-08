@@ -11,6 +11,7 @@ import arrow
 
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ecwp
+import emission.analysis.result.user_stat as earus
 import emission.storage.decorations.place_queries as esdp
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
@@ -223,7 +224,12 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
             edb.get_pipeline_state_db().count_documents(reset_pipeline_query),
             user_id, reset_ts))
 
-    profile_update_query = {"$set": {"pipeline_range.end_ts": reset_ts}}
+    profile_update_query = earus.get_pipeline_dependent_user_query(user_id, "analysis/composite_trip")
+    assert sorted(list(profile_update_query.keys())) == ["labeled_trips", "pipeline_range", "total_trips"]
+    last_trip_from_update = profile_update_query["pipeline_range"]["end_ts"]
+    if last_trip_from_update != reset_ts:
+        logging.info(f"WARNING: the computed reset timestamp is {reset_ts}({arrow.get(reset_ts)}) but the last trip is {last_trip_from_update}({arrow.get(last_trip_from_update)})")
+        profile_update_query["pipeline_range"]["end_ts"] = reset_ts
     logging.info(f"Resetting profile copy of state with query {profile_update_query}")
 
     if is_dry_run:
@@ -239,7 +245,7 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
                     upsert=False)
         logging.debug("this is not a dry run, result of updating all other stages in reset_pipeline_state = %s" % result.raw_result)
 
-        result = edb.get_profile_db().update_one({"user_id": user_id}, profile_update_query)
+        result = edb.get_profile_db().update_one({"user_id": user_id}, {"$set": profile_update_query})
         logging.debug("this is not a dry run, result of updating the profile in reset_pipeline_state = %s" % result.raw_result)
 
 
@@ -281,8 +287,14 @@ def _del_entries_for_query(del_query, is_dry_run):
     logging.info("About to delete %s pipeline states" % 
             (edb.get_pipeline_state_db().count_documents(del_query)))
 
-    reset_profile_ts_update = {"$set": {"pipeline_range.start_ts": None,
-                                        "pipeline_range.end_ts": None}}
+    reset_profile_ts_update = {"$set": {
+            "pipeline_range.start_ts": None,
+            "pipeline_range.end_ts": None,
+            "labeled_trips": 0,
+            "total_trips": 0
+        }
+    }
+
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_user_to-start without modifying anything")
     else: 
