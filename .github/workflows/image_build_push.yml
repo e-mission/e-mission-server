@@ -2,7 +2,9 @@ name: docker image
 
 on:
   push:
-    branches: [ master, gis-based-mode-detection ]
+    branches: [ master, gis-based-mode-detection, cleanup-cicd ]
+  release:
+    types: [published]
 
 #Dockerhub credentials are set as environment variables
 env:
@@ -10,54 +12,40 @@ env:
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
 
 jobs:
-  build:
+  test-with-docker:
+    uses: e-mission/e-mission-server/.github/workflows/test-with-docker.yml@master
+
+  test-with-manual-install:
+    uses: e-mission/e-mission-server/.github/workflows/test-with-manual-install.yml@master
+
+  get-branch-name:
     runs-on: ubuntu-latest
-
     outputs:
-      date: ${{ steps.date.outputs.date }}
-
+      branch_name: ${{ steps.get-branch-name.outputs.branch_name }}
     steps:
-    - uses: actions/checkout@v2
-    - name: docker login
-      run: | # log into docker hub account
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: Get branch name based on ref_type
+        id: get-branch-name
+        run: |
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            target_branch=${{ github.event.release.target_commitish }}
+            echo "branch_name=${target_branch}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.ref_type }}" == "branch" ]; then
+            echo "branch_name=${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"    
+          fi
 
-    - name: Get current date # get the date of the build
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d--%M-%S')"
-
-    #Runs a single command using the runners shell
-    - name: Run a one-line script
-      run: echo running in repo ${GITHUB_REPOSITORY#*/} branch ${GITHUB_REF##*/} on ${{ steps.date.outputs.date }}
-
-    # Runs a set of commands using the runners shell
-    - name: build docker image
-      run: |
-        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }} .
-        docker images
-
-    - name: push docker image
-      run: |
-        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
-
-    - name: Create a text file
-      run: |
-        echo ${{ steps.date.outputs.date }} > tag_file.txt
-        echo "Created tag text file"
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-image-tag
-        path: tag_file.txt
-        overwrite: true
+  build:
+    if: ${{ !contains(github.event.head_commit.author.name, 'Github Actions bot') }}
+    needs: [test-with-docker, test-with-manual-install, get-branch-name]
+    uses: e-mission/e-mission-server/.github/workflows/reusable_image_build_push.yml@master
+    with:
+      repo: ${{ github.event.repository.name }}
+      branch: ${{ needs.get-branch-name.outputs.branch_name }}
+    secrets: inherit
 
   dispatch:
-    needs: build
+    if: ${{ github.ref_type == 'tag' }}
+    needs: [build]
     runs-on: ubuntu-latest
-
-    env:
-      DOCKER_IMAGE_TAG: ${{ needs.build.outputs.date }}
 
     strategy:
       matrix:
@@ -71,7 +59,6 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Trigger workflow in admin-dash, public-dash
-      # TODO: Create Fine-grained token with "Actions: write" permissions 
       run: |
         curl -L \
           -X POST \
@@ -79,4 +66,4 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/${{ matrix.repo }}/actions/workflows/image_build_push.yml/dispatches \
-          -d '{"ref":"${{ matrix.branch }}", "inputs": {"docker_image_tag" : "${{ env.DOCKER_IMAGE_TAG }}"}}'
+          -d '{"ref":"${{ matrix.branch }}"}'
