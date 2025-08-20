@@ -9,7 +9,9 @@ import json
 import emission.storage.json_wrappers as esj
 import emission.storage.timeseries.cache_series as estcs
 import argparse
+import emission.core.get_database as edb
 import emission.core.wrapper.user as ecwu
+import bin.historical.migrations.populate_profile_summaries as migration_populate_profile_summaries
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -44,3 +46,6 @@ if __name__ == '__main__':
     (tsdb_count, ucdb_count) = estcs.insert_entries(override_uuid, munged_entries, continue_on_error=False)
     print("Finished loading %d entries into the usercache and %d entries into the timeseries" %
         (ucdb_count, tsdb_count))
+    
+    profile = edb.get_profile_db().find_one({"user_id": override_uuid})
+    migration_populate_profile_summaries.populate_profiles([profile])
