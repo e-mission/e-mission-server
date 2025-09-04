@@ -31,14 +31,6 @@ conda clean -t
 find /root/miniconda-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
 find ~/miniconda-25.1.1 -name \*tests\* -path '*/site-packages/*' | grep ".*/site-packages/tests" | xargs rm -rf
 
-# Updating bash package to latest version manually 
-apt-get update
-apt-get install bash=5.1-6ubuntu1.1
-
-if [ -d "webapp/www/" ]; then
-    cp /index.html webapp/www/index.html
-fi
-
 if [ -d "/conf" ]; then
     echo "Found configuration, overriding..."
     cp -r /conf/* conf/

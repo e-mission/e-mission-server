@@ -36,6 +36,10 @@ curl -o miniconda.sh -L https://repo.anaconda.com/miniconda/Miniconda3-py312_$EX
 bash miniconda.sh -b -p $INSTALL_PREFIX
 source $SOURCE_SCRIPT
 hash -r
+echo "About to accept TOS for 'main' and 'r'"
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+echo "About to install base and libmamba environments"
 conda install -n base conda-libmamba-solver
 conda config --set solver libmamba
 conda config --set always_yes yes

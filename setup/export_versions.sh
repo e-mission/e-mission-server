@@ -1,2 +1,2 @@
-export EXP_CONDA_VER=25.1.1
+export EXP_CONDA_VER=25.7.0
 export EXP_CONDA_VER_SUFFIX=2
