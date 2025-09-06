@@ -361,7 +361,7 @@ def get_all_resets(all_invalid_states):
     print(reset_ts)
     return reset_ts
 
-def auto_reset(dry_run, only_calc):
+def auto_reset(dry_run, only_calc, excluded_users=[]):
     # Only read all states that are not for `OUTPUT_GEN` since we are not going to reset that state
     # Also only read states which have been running for more than six hours
     # If we are running the pipeline every hour, then having a run_ts that is
@@ -374,13 +374,19 @@ def auto_reset(dry_run, only_calc):
         logging.info("No invalid states found, returning early")
         return
     reset_ts = get_all_resets(all_invalid_states)
+    print("Excluding users %s, compared to %s " %
+            (excluded_users,
+            [str(rs['user_id']) for i, rs in reset_ts.iterrows()]))
     if only_calc:
         print("finished calculating values, early return")
         return
 
     for index, invalid_state in reset_ts.iterrows():
-        print(f"Resetting {invalid_state['user_id']} to {arrow.get(invalid_state['reset_ts'])}")
-        reset_user_to_ts(invalid_state['user_id'], invalid_state['reset_ts'], dry_run)
+        if str(invalid_state['user_id']) in excluded_users:
+            print(f"Excluded {invalid_state['user_id']}, not resetting")
+        else:
+            print(f"Resetting {invalid_state['user_id']} to {arrow.get(invalid_state['reset_ts'])}")
+            reset_user_to_ts(invalid_state['user_id'], invalid_state['reset_ts'], dry_run)
 
 #
 # END: auto_reset
