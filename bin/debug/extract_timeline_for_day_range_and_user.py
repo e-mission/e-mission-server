@@ -24,6 +24,7 @@ import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.user_queries as esdu
 # only needed to read the motion_activity
 # https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
+import emission.core.wrapper.user as ecwu
 import emission.export.export as eee
 
 def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):

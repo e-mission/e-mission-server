@@ -34,9 +34,6 @@ def run_on_all_deployments(fn_to_run, *args):
       nrel-openpath-deploy-configs repo upon initialization of this module.
     """
     print(f'About to run {fn_to_run.__name__}{args} on {len(PROD_LIST)} deployments. Proceed? [y/n]')
-    if input() != 'y':
-        print("Aborting")
-        return
     for prod in PROD_LIST:
         # e-bikes-for-essentials has a typo; treat as special case
         if prod == 'e-bikes-for-essentials':

@@ -1,49 +1,31 @@
+import os
 import arrow
-import pymongo
+import json
 import emission.core.get_database as edb
-import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.json_wrappers as esj
 import bin.debug.common as common
 from _common import run_on_all_deployments
 
 NOW_SECONDS = arrow.now().timestamp()
+user_profiles = []
 
 def find_inactive_uuids(uuids_entries, threshold):
-    inactive_uuids = []
-    for u in uuids_entries:
-        print(f'Checking activity for user {u["uuid"]}')
-        profile_data = edb.get_profile_db().find_one({'user_id': u})
-        ts = esta.TimeSeries.get_time_series(u['uuid'])
+    db = os.environ['DB_HOST'].split('?')[0].split('/')[-1]
+    user_profiles = []
 
-        if profile_data:
-            last_call_ts = profile_data.get('last_call_ts')
-        else:
-            last_call_ts = ts.get_first_value_for_field(
-                key='stats/server_api_time',
-                field='data.ts',
-                sort_order=pymongo.DESCENDING
-            )
+    for i, u in enumerate(uuids_entries):
+        print(f'Checking activity for user {u["uuid"]} ({i+1}/{len(uuids_entries)})')
+        profile_data = edb.get_profile_db().find_one({'user_id': u["uuid"]})
+        user_profiles.append(profile_data)
 
-        print(f'for user {u["uuid"]}, last call was {last_call_ts}')
-        if last_call_ts > NOW_SECONDS - threshold:
-            continue
+    with open(f'/tmp/profile_dumps/{db}-{NOW_SECONDS}.json', 'w') as fd:
+        json.dump(user_profiles, fd, default=esj.wrapped_default)
 
-        if profile_data:
-            last_loc_ts = profile_data.get('last_loc_ts')
-        else:
-            last_loc_ts = ts.get_first_value_for_field(
-                key='background/location',
-                field='data.ts',
-                sort_order=pymongo.DESCENDING
-            )
-
-        print(f'for user {u["uuid"]}, last location was {last_loc_ts}')
-        if last_loc_ts > NOW_SECONDS - threshold:
-            continue
-
-        print(f'User {u["uuid"]} is inactive')
-        inactive_uuids.append(u['uuid'])
-
-    return inactive_uuids
+    return [
+        u['user_id'] for u in user_profiles
+        if (u.get('last_call_ts') or -1) <= NOW_SECONDS - threshold
+        and (u.get('last_loc_ts') or -1) <= NOW_SECONDS - threshold
+    ]
 
 def purge_users(uuids):
     print(f'About to remove {len(uuids)} users. Proceed? [y/n]')
@@ -55,12 +37,11 @@ def purge_users(uuids):
         common.purge_entries_for_user(u, True)
 
 def start_inactive(threshold_s, purge):
-    total_users = edb.get_uuid_db().count_documents({})
-    print(f'Total users: {total_users}')
-    uuids_entries = edb.get_uuid_db().find()
+    uuids_entries = [e for e in edb.get_uuid_db().find()]
+    print(f'Total users: {len(uuids_entries)}')
     print('Finding inactive users...')
     inactive_uuids = find_inactive_uuids(uuids_entries, threshold_s)
-    print(f'Of {total_users} users, found {len(inactive_uuids)} inactive users:')
+    print(f'Of {len(uuids_entries)} users, found {len(inactive_uuids)} inactive users:')
     print(inactive_uuids)
 
     if purge:

@@ -83,7 +83,7 @@ def get_recent_entry(user_id: str, key: str, name: str, timeseries_db: pymongo.c
 def fill_if_missing(profile: dict, fill_fn: cabc.Callable, field_arg_map: dict) -> dict:
     update_data = {}
     for field, fill_arg in field_arg_map.items():
-        if field not in profile:
+        if field not in profile or profile[field] == -1:
             print(f"Filling missing {field=} with {fill_arg=} ")
             try:
                 update_data[field] = fill_fn(fill_arg)
@@ -146,7 +146,9 @@ def populate_create_ts(profile: dict, timeseries_db: pymongo.collection):
             print(f"Too many retries, skipping create_ts setting in the profile DB")
 
     uuid_entry = edb.get_uuid_db().find_one({"uuid": profile["user_id"]})
-    if "create_ts" not in uuid_entry:
+    if uuid_entry is None:
+        print(f"No entry in the UUID DB found for {profile['user_id']}, ignoring...")
+    elif "create_ts" not in uuid_entry:
         # in the common case, if the profile doesn't have a create_ts, the UUID
         # entry will not either. And both of them should have the `create_ts`
         # set to the same value. So let's reuse where we can instead of
