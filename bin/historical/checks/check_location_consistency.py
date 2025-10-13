@@ -126,5 +126,5 @@ if __name__ == '__main__':
         # until that is refactored, importing this at the top will
         # have us download configs even when running against the current single
         # deployment. Importing in here lets us only "git clone" when really needed
-        from bin.historical.migrations._common import run_on_all_deployments
+        from bin.federation import run_on_all_deployments
         run_on_all_deployments(fn_to_run)

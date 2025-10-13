@@ -4,7 +4,7 @@ import json
 import emission.core.get_database as edb
 import emission.storage.json_wrappers as esj
 import bin.debug.common as common
-from _common import run_on_all_deployments
+from bin.federation import run_on_all_deployments
 
 NOW_SECONDS = arrow.now().timestamp()
 user_profiles = []

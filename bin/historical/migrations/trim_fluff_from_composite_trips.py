@@ -1,6 +1,6 @@
 import emission.core.get_database as edb
 
-from _common import run_on_all_deployments
+from bin.federation import run_on_all_deployments
 
 
 def trim_fluff_from_composite_trips():
