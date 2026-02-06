@@ -22,9 +22,8 @@ source setup/setup.sh
 ## Remove the old, unused packages to avoid tripping up the checker
 ## This is an example in case we need to remove them again
 # rm -rf /root/miniconda-23.1.0/pkgs/cryptography-38.0.4-py39h9ce1e76_0
-rm -rf /root/miniconda-25.1.1/pkgs/conda-25.1.1-py312hca03da5_0/lib/python3.12/site-packages/tests
-rm -rf /root/miniconda-25.1.1/lib/python3.12/site-packages/tests
-rm -rf /root/miniconda-25.1.1/envs/emission/lib/python3.9/ensurepip/_bundled/setuptools-58.1.0-py3-none-any.whl
+rm -rf /root/miniconda-25.11.1/pkgs/conda-25.11.1-py312hca03da5_0/lib/python3.12/site-packages/tests
+rm -rf /root/miniconda-25.11.1/lib/python3.12/site-packages/tests
 
 # Clean up the conda install
 conda clean -t
