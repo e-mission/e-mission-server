@@ -32,7 +32,9 @@ fi
 SOURCE_SCRIPT="$INSTALL_PREFIX/etc/profile.d/conda.sh"
 
 echo "Installing for version $EXP_CONDA_VER and platform $PLATFORM at $INSTALL_PREFIX"
-curl -o miniconda.sh -L https://repo.anaconda.com/miniconda/Miniconda3-py312_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-$PLATFORM.sh
+DOWNLOAD_URL=https://repo.anaconda.com/miniconda/Miniconda3-py312_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-$PLATFORM.sh
+echo "Downloading installer from URL ${DOWNLOAD_URL}"
+curl -o miniconda.sh -L ${DOWNLOAD_URL}
 bash miniconda.sh -b -p $INSTALL_PREFIX
 source $SOURCE_SCRIPT
 hash -r
