@@ -5,7 +5,7 @@ channels:
 dependencies:
 - arrow=1.2.3
 - attrdict=2.0.1
-- cheroot=9.0.0
+- cheroot=11.1.2
 - future=0.18.3
 - geojson=2.5.0
 - jsonpickle=4.0.0
