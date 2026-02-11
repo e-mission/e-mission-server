@@ -1,23 +1,15 @@
 set -e
 echo "About to start conda update, this may take some time..."
 source setup/setup_conda.sh Linux-x86_64
+## The base environment sometimes has deprecated packages.
+## Even if we upgrade the package list for the emission environment, it will not
+## modify the base environment, which will still trip up the checker.
+## Let's just upgrade the base environment to the latest everything without pinning
+## this won't cause a regression in our code since we pin the versions that we use anyway
+conda update -c conda-forge --all
+
 # now install the emission environment
 source setup/setup.sh
-
-## Only in the docker environment, force upgrade the base image
-## I tried to do this by just installing from the emission environment
-## But that doesn't update all packages (e.g. cryptography=38 stays at that
-## level instead of upgrading to cryptography=40)
-## So we just manually upgrade the failing dependencies in the base image
-## 
-## 10/02 - Mukul
-## - Above comments talk about manually updating cryptography to version 40
-## - I have upgraded to 41.0.4 as per latest vulnerability fixes.
-##
-## 04/2025 - Shankari
-## - The most recent version of anaconda has the correct version so we don't
-##   need to override
-# conda install -c conda-forge cryptography=42.0.0 wheel=0.40.0
 
 ## Remove the old, unused packages to avoid tripping up the checker
 ## This is an example in case we need to remove them again
