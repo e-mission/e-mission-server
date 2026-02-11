@@ -141,7 +141,7 @@ class WrapperBase(ad.AttrDict):
     elif key in self.local_dates:
         import emission.core.wrapper.localdate as ecwl
         return ecwl.LocalDate(obj)
-    elif isinstance(obj, coll.Mapping):
+    elif isinstance(obj, coll.abc.Mapping):
         key_class = self._get_class(key)
         # logging.debug("key_class = %s" % key_class)
         return key_class._constructor(obj, self._configuration())
