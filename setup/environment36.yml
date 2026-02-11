@@ -19,6 +19,7 @@ dependencies:
 - utm=0.7.0
 - pip:
   - git+https://github.com/e-mission/e-mission-common@0.6.5
+  - git+https://github.com/wao/AttrDict.git@e47e1bcec4d5c057478a4b5ca3c95bc1c572f8c2
   - pyfcm==2.0.1
   - pygeocoder==1.2.5
   - pymongo==4.6.3
