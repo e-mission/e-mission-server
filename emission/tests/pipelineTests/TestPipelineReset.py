@@ -42,6 +42,7 @@ import emission.tests.common as etc
 class TestPipelineReset(unittest.TestCase):
     def setUp(self):
         np.random.seed(61297777)
+        etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
 
     def tearDown(self):
         if os.environ.get("SKIP_TEARDOWN", False):
@@ -59,6 +60,7 @@ class TestPipelineReset(unittest.TestCase):
                     self.testUUID = uuid
                     logging.info("Deleting entries for %s" % self.testUUID)
                     self.clearRelatedDb()
+            etc.clear_analysis_config()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
