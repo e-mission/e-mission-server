@@ -81,16 +81,27 @@ def get_last_place_before(place_key, reset_ts, user_id):
     logging.debug("Looking for last place before %s" % reset_ts)
 
     ts = esta.TimeSeries.get_time_series(user_id)
-    all_user_places = list(edb.get_analysis_timeseries_db().find(
-        {"user_id": user_id, "metadata.key": place_key},
-        {"_id": True, "data.enter_fmt_time": True, "data.exit_fmt_time": True}))
-    logging.debug("all places for this user = %s" % all_user_places)
+    
+    # Replace direct database calls with TimeSeries abstraction
+    # Don't include user_id in extra_query since it's already in the user_query
+    place_docs = ts.find_entries([place_key])
+    user_places = [ecwe.Entry(doc) for doc in place_docs]
+    
+    logging.debug("all places for this user = %s" % 
+                 [{"_id": place.get_id(), 
+                   "enter_fmt_time": place.data.get("enter_fmt_time"),
+                   "exit_fmt_time": place.data.get("exit_fmt_time")} 
+                  for place in user_places])
+    
+    # Find place that spans the reset_ts
     ret_place_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
                                                         'metadata.key': place_key,
                                                         'data.exit_ts' : {'$gt': reset_ts},
                                                         'data.enter_ts': {'$lt': reset_ts}
                                                        })
     logging.debug("last place doc for user %s = %s" % (user_id, ret_place_doc))
+    
+    # Find trip that spans the reset_ts
     ret_trip_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
                                                         'metadata.key': trip_key_query,
                                                         'data.end_ts' : {'$gt': reset_ts},
