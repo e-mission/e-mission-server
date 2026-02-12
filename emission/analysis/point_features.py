@@ -17,7 +17,7 @@ def calDistance(point1, point2):
     return ec.calDistance([point1.longitude, point1.latitude], [point2.longitude, point2.latitude])
 
 def calHeading(point1, point2):
-    return sf.calHeading([point1.longitude, point1.latitude],
+    return ec.calHeading([point1.longitude, point1.latitude],
                     [point2.longitude, point2.latitude])
 
 def calHC(point1, point2, point3):
