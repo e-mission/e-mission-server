@@ -19,6 +19,7 @@ rm -rf /root/miniconda-25.11.1/lib/python3.12/site-packages/tests
 
 # Clean up the conda install
 conda clean -t
+conda clean -p
 find /root/miniconda-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
 find ~/miniconda-25.1.1 -name \*tests\* -path '*/site-packages/*' | grep ".*/site-packages/tests" | xargs rm -rf
 
