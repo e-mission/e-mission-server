@@ -16,8 +16,8 @@ else:
         print(f"created {tmpdirname=} to find list of configs")
         os.chdir(tmpdirname)
         proc = subprocess.run(
-              f"git clone https://github.com/e-mission/nrel-openpath-deploy-configs.git", shell=True)
-        filenames = os.listdir(f"nrel-openpath-deploy-configs/configs/")
+              f"git clone https://github.com/e-mission/op-deployment-configs.git", shell=True)
+        filenames = os.listdir(f"op-deployment-configs/configs/")
 
     PROD_LIST = [
         fname.split(".")[0]
@@ -31,7 +31,7 @@ def run_on_all_deployments(fn_to_run, *args):
     Run the given function on the database for each deployment by setting the
       DB_HOST environment variable in between each function call.
     The list of deployments (PROD_LIST) is retrieved from the
-      nrel-openpath-deploy-configs repo upon initialization of this module.
+      op-deployment-configs repo upon initialization of this module.
     """
     print(f'About to run {fn_to_run.__name__}{args} on {len(PROD_LIST)} deployments. Proceed? [y/n]')
     for prod in PROD_LIST:
