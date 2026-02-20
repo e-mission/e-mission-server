@@ -25,7 +25,7 @@ def get_upgrade_push_spec(platform):
         raise InvalidArgumentException("Found unknown platform %s, expected 'android' or 'ios'" % platform)
     push_spec = {
         "alert_type": "website",
-        "title": "Your version of the NREL OpenPATH app may have errors",
+        "title": "Your version of the NLR OpenPATH app may have errors",
         "message": "Please upgrade to the most recent version",
         "image": "icon",
         "spec": {

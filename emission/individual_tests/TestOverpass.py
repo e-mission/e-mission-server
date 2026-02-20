@@ -14,7 +14,7 @@ import logging
 #Set up query
 GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
 
-#Sample loc1 = NREL East Gate
+#Sample loc1 = NLR East Gate
 loc1 = {'coordinates': [-105.16844103184974, 39.740428870224605]}
 #Sample loc2 = Denver Union Station
 loc2 = {'coordinates': [-105.00083982302972, 39.753710532185025]}
@@ -45,6 +45,8 @@ class OverpassTest(unittest.TestCase):
     #Test utilizes the functions get_stops_near, get_public_transit_stops, and make_request_and_catch.  
     def test_get_stops_near(self):
         actual_result = enetm.get_stops_near(loc1, 150.0)[0]['routes'][0]['tags']
+        # This will probably fail once the name changes in OSM, but RTD hasn't even changed the name of the stop yet so it may be a while
+        # I say let's just let that happen - it's proof that the tests are working!
         expected_result = {'from': 'National Renewable Energy Lab', 'name': 'RTD Route 125: Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
         self.assertEqual(expected_result, actual_result)
    
