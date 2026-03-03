@@ -17,6 +17,7 @@ import logging
 import time
 
 # Our imports
+import emission.core.deployment_config as ecdc
 import emission.tests.common as etc
 import emission.net.api.cfc_webapp as enacw
 import importlib
@@ -59,25 +60,21 @@ class TestWebserver(unittest.TestCase):
     from unittest import mock
     @mock.patch.dict(os.environ, {"STUDY_CONFIG":"nrel-commute"}, clear=True)
     def test_ResolveAuthWithEnvVar(self):
-        importlib.reload(enacw)
-        enacw.dynamic_config = enacw.get_dynamic_config()
+        importlib.reload(ecdc)
         self.assertEqual(enacw.resolve_auth("dynamic"),"skip")
 
     @mock.patch.dict(os.environ, {"STUDY_CONFIG":"denver-casr"}, clear=True)
     def test_ResolveAuthWithEnvVar(self):
-        importlib.reload(enacw)
-        enacw.dynamic_config = enacw.get_dynamic_config()
+        importlib.reload(ecdc)
         self.assertEqual(enacw.resolve_auth("dynamic"),"skip")
 
     @mock.patch.dict(os.environ, {"STUDY_CONFIG":"stage-program"}, clear=True)
     def test_ResolveAuthWithEnvVar(self):
-        importlib.reload(enacw)
-        enacw.dynamic_config = enacw.get_dynamic_config()
+        importlib.reload(ecdc)
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
 
     def testResolveAuthNoEnvVar(self):
-        importlib.reload(enacw)
-        enacw.dynamic_config = enacw.get_dynamic_config()
+        importlib.reload(ecdc)
         self.assertEqual(enacw.resolve_auth("skip"),"skip")
         self.assertEqual(enacw.resolve_auth("token_list"),"token_list")
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")

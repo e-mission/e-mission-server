@@ -6,13 +6,12 @@ import os
 import requests
 import sys
 
+import emission.core.deployment_config as ecdc
 import emission.core.get_database as edb
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.user_queries as esdu
 import emission.storage.timeseries.timequery as estt
 import emission.net.ext_service.push.notify_usage as pnu
-
-STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 
 
 def users_without_recent_user_input(uuid_list, recent_user_input_threshold=None):
@@ -56,28 +55,14 @@ def bin_users_by_lang(uuid_list, langs, lang_key='phone_lang'):
 
 
 if __name__ == '__main__':
-    logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
-
-    STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-study")
-
-    download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
-    logging.debug("About to download config from %s" % download_url)
-    r = requests.get(download_url)
-    if r.status_code != 200:
-        logging.debug(f"Unable to download study config, status code: {r.status_code}")
-        sys.exit(1)
+    deployment_config = ecdc.get_deployment_config()
     
-    dynamic_config = json.loads(r.text)
-    logging.info(f"Successfully downloaded config with version {dynamic_config['version']} "\
-        f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
-        f"and data collection URL {dynamic_config['server']['connectUrl']}")
-    
-    if "reminderSchemes" in dynamic_config:
+    if "reminderSchemes" in deployment_config:
         logging.info("Found flexible notification configuration, skipping server-side push")
         sys.exit(0)
 
-    # get push notification config (if not present in dynamic_config, use default)
-    push_config = dynamic_config.get('push_notifications', {
+    # get push notification config (if not present in deployment_config, use default)
+    push_config = deployment_config.get('push_notifications', {
         "title": {
             "en": "Trip labels requested",
             "es": "Etiquetas de viaje solicitadas",

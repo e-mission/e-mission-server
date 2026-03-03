@@ -10,7 +10,7 @@ from builtins import object
 import logging
 
 # Our imports
-import emission.analysis.configs.dynamic_config as eadc
+import emission.core.deployment_config as ecdc
 import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
@@ -160,9 +160,9 @@ def segment_trip_into_sections(ts, trip_entry, distance_from_place, trip_source,
         # For now, we are going to rely on the current segmentation implementation and then fill in
         # ble_sensed_mode by looking at scans within the timestamp range of the section.
         # Later, we may want to actually use BLE sensor data as part of the basis for segmentation
-        dynamic_config = eadc.get_dynamic_config()
+        deployment_config = ecdc.get_deployment_config()
         ble_sensed_mode = emcble.get_ble_sensed_vehicle_for_section(
-            trip_ble_list, start_loc.ts, end_loc.ts, dynamic_config
+            trip_ble_list, start_loc.ts, end_loc.ts, deployment_config
         )
 
         fill_section(section, start_loc, end_loc, sensed_mode, ble_sensed_mode)
