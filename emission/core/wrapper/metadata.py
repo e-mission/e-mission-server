@@ -17,6 +17,7 @@ class Metadata(ecwb.WrapperBase):
            "platform": ecwb.WrapperBase.Access.WORM,
            "type": ecwb.WrapperBase.Access.WORM,
            "write_ts": ecwb.WrapperBase.Access.WORM,
+           "last_updated_ts": ecwb.WrapperBase.Access.RW,
            "write_local_dt": ecwb.WrapperBase.Access.WORM,
            "time_zone": ecwb.WrapperBase.Access.WORM,
            "write_fmt_time": ecwb.WrapperBase.Access.WORM,
