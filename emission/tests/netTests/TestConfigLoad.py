@@ -24,7 +24,7 @@ class TestConfigLoad(unittest.TestCase):
 
     def test_load_label_options_uses_dynamic_labels(self):
         dynamic_labels = {"purpose": ["work", "school"]}
-        base_config = {"label_options": "https://example.com/labels.json", "loaded": {}}
+        base_config = {"label_options": "https://example.com/labels.json"}
 
         async def fake_fetch_url(url):
             self.assertEqual(url, "https://example.com/labels.json")
@@ -32,55 +32,52 @@ class TestConfigLoad(unittest.TestCase):
 
         with patch.object(dc.emcu, "fetch_url", new=fake_fetch_url):
             asyncio.run(dc._load_label_options(base_config, "test-study"))
-            self.assertEqual(base_config["loaded"]["label_options"], dynamic_labels)
+            self.assertEqual(base_config["label_options"], dynamic_labels)
 
     def test_load_label_options_falls_back_to_default(self):
         default_labels = {"replaced_mode": ["bus", "train"]}
-        base_config = {"loaded": {}}
+        base_config = {}
 
         async def fake_load_default_label_options():
             return default_labels
 
         with patch.object(dc, "_load_default_label_options", new=fake_load_default_label_options):
             asyncio.run(dc._load_label_options(base_config, "test-study"))
-            self.assertEqual(base_config["loaded"]["label_options"], default_labels)
+            self.assertEqual(base_config["label_options"], default_labels)
 
     def test_load_label_options_handles_nonexistent_dynamic_url(self):
         """Test that failed dynamic-label fetch stores empty labels without raising."""
         base_config = {
-            "loaded": {},
             "label_options": "https://example.com/labels.json"
         }
 
         with patch.object(dc.emcu, "fetch_url", side_effect=ConnectionError("mock network error")):
             asyncio.run(dc._load_label_options(base_config, "test-study"))
-            self.assertEqual(base_config["loaded"]["label_options"], {})
+            self.assertEqual(base_config["label_options"], {})
 
     def test_load_supplemental_files_waits_for_tasks(self):
-        base_config = {"loaded": {}}
+        base_config = {}
         called = {"value": False}
 
         async def fake_load_label_options(base_config_arg, study_config_arg):
             called["value"] = True
-            base_config_arg["loaded"]["label_options"] = {"ok": True}
+            base_config_arg["label_options"] = {"ok": True}
 
         with patch.object(dc, "_load_label_options", new=fake_load_label_options):
             asyncio.run(dc._load_supplemental_files(base_config, "test-study", "https://configs/"))
 
         self.assertTrue(called["value"])
-        self.assertEqual(base_config["loaded"]["label_options"], {"ok": True})
+        self.assertEqual(base_config["label_options"], {"ok": True})
 
     def test_cache_respect_different_study_configs_after_reset(self):
         """Test that different study configs do not return wrong cached result."""
         config1 = {
             "version": "1.0",
-            "name": "config1",
-            "loaded": {}
+            "name": "config1"
         }
         config2 = {
             "version": "2.0",
-            "name": "config2",
-            "loaded": {}
+            "name": "config2"
         }
 
         def fake_get_base_config(study_config, configs_url, default):
@@ -91,7 +88,7 @@ class TestConfigLoad(unittest.TestCase):
             return default
 
         async def fake_load_supplemental_files(base_config, study_config, configs_url):
-            base_config["loaded"]["label_options"] = {"ok": True}
+            base_config["label_options"] = {"ok": True}
 
         with patch.object(dc, "_get_base_config", new=fake_get_base_config):
             with patch.object(dc, "_load_supplemental_files", new=fake_load_supplemental_files):
@@ -113,8 +110,7 @@ class TestConfigLoad(unittest.TestCase):
         """Test that deployment config is cached and not re-fetched on second call."""
         base_config = {
             "version": "1.0",
-            "name": "cached-config",
-            "loaded": {}
+            "name": "cached-config"
         }
 
         call_counts = {"get_base_config": 0, "load_supplemental": 0}
@@ -125,7 +121,7 @@ class TestConfigLoad(unittest.TestCase):
 
         async def fake_load_supplemental_files(base_config_arg, study_config, configs_url):
             call_counts["load_supplemental"] += 1
-            base_config_arg["loaded"]["label_options"] = {"ok": True}
+            base_config_arg["label_options"] = {"ok": True}
 
         with patch.object(dc, "_get_base_config", new=fake_get_base_config):
             with patch.object(dc, "_load_supplemental_files", new=fake_load_supplemental_files):

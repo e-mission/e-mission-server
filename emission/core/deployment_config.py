@@ -39,24 +39,21 @@ async def _load_label_options(base_config, study_config):
             labels = json.loads(req.text)
             logging.info(
                 "Dynamic labels download was successful for op-deployment-configs: %s",
-                study_config,
+                dynamic_labels_url,
             )
         except Exception as err:
-            logging.warning("Unable to download dynamic_labels_url for %s at %s: %s",
-                study_config, dynamic_labels_url, err)
+            logging.warning("Unable to download dynamic_labels_url from %s: %s",
+                dynamic_labels_url, err)
     else:
         # load default labels from e-mission-common
         # https://raw.githubusercontent.com/e-mission/e-mission-common/refs/heads/master/src/emcommon/resources/label-options.default.json
         labels = await _load_default_label_options()
         if not labels:
-            logging.error("Unable to load labels for: %s", study_config)
+            logging.error("Unable to load default labels while processing: %s", study_config)
         else:
-            logging.info(
-                "Default labels loading was successful for op-deployment-configs: %s",
-                study_config,
-            )
+            logging.info("Using successfully loaded default labels for %s", study_config)
 
-    base_config["loaded"]["label_options"] = labels
+    base_config["label_options"] = labels
 
 async def _load_supplemental_files(base_config, study_config, configs_url):
     tasks = []
@@ -81,11 +78,11 @@ def get_deployment_config(study_config=STUDY_CONFIG, configs_url=CONFIGS_URL, de
         logging.debug("Returning cached deployment config for %s at version %s" % (study_config, deployment_config['version']))
         return deployment_config
     logging.debug("No cached deployment config for %s, downloading from server" % study_config)
-    base_config = _get_base_config(study_config, configs_url, default)
-    if base_config is None:
-        return base_config
-    deployment_config = base_config
-    deployment_config["loaded"] = {}
+    deployment_config = _get_base_config(study_config, configs_url, default)
+    if deployment_config is None:
+        # the default will not have any supplemental file overrides
+        # and we don't want to try to read keys from a None value anyway
+        return deployment_config
     # Load supplemental files (labels, surveys, etc.) asynchronously
     asyncio.run(_load_supplemental_files(deployment_config, study_config, configs_url))
     return deployment_config
