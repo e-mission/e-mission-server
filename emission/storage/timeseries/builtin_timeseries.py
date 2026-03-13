@@ -6,6 +6,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import logging
+import time
 import pandas as pd
 import pymongo
 import itertools
@@ -451,12 +452,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
     @staticmethod
     def update(entry):
         """
-        Save the specified entry. In general, our entries are read-only, so
-        this should only be called under very rare conditions. Once we identify
-        what these conditions are, we should consider replacing them with
-        versioned objects
+        Save the specified entry. In general, our entries are read-only, so this
+        only happens in specific cases for entry types that we designate as mutable.
+        Updates the last_updated_ts field in the metadata to the current time.
         """
         logging.debug("update called")
+        if entry.metadata.key not in ecwe.MUTABLE_KEYS:
+            raise AttributeError("Entry with key %s is not mutable, cannot update" % entry.metadata.key)
+        entry.metadata.last_updated_ts = time.time()
         ts = esta.TimeSeries.get_time_series(entry.user_id)
         logging.debug("Saving entry %s into timeseries" % entry)
         edb.save(ts.get_timeseries_db(entry.metadata.key), entry)
@@ -464,18 +467,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
     @staticmethod
     def update_data(user_id, key, obj_id, data):
         """
-        Save the specified entry. In general, our entries are read-only, so
-        this should only be called under very rare conditions. Once we identify
-        what these conditions are, we should consider replacing them with
-        versioned objects
+        Save the specified entry. In general, our entries are read-only, so this
+        only happens in specific cases for entry types that we designate as mutable.
+        Updates the last_updated_ts field in the metadata to the current time.
         """
         logging.debug("update_data called")
-        ts = esta.TimeSeries.get_time_series(user_id)
         new_entry = ecwe.Entry.create_entry(user_id, key, data)
         # Make sure that we update the existing entry instead of creating a new one
         new_entry['_id'] = obj_id
-        logging.debug("updating entry %s into timeseries" % new_entry)
-        edb.save(ts.get_timeseries_db(key), new_entry)
+        BuiltinTimeSeries.update(new_entry)
 
     def invalidate_raw_entry(self, obj_id):
         self.timeseries_db.update_one({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})

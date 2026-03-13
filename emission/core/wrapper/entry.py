@@ -11,6 +11,159 @@ import bson.objectid as boi
 import emission.core.wrapper.wrapperbase as ecwb
 import emission.core.wrapper.metadata as ecwm
 
+KEYS_WRAPPERS_MAP = {
+    ### BEGIN: incoming data types ###
+    # all location points from the phone
+    "background/location": "location",
+    # "valid" location points from the phone, after removing low-accuracy points
+    "background/filtered_location": "location",
+    # "motionactivity" results from the phone, indicating walk/bike or "motorized"
+    "background/motion_activity": "motionactivity",
+    # battery readings, to determine power drain empirically
+    "background/battery": "battery",
+    # BLE events, including enter, exiting and ranging beacons
+    "background/bluetooth_ble": "bluetoothble",
+    # transition events for the tracking finite state machine on the phone
+    "statemachine/transition": "transition",
+    # phone sensing configuration (e.g. sensing frequency, geofencing,...)
+    "config/sensor_config": "sensorconfig",
+    # phone sync configuration (sync interval,...)
+    "config/sync_config": "syncconfig",
+    # user consent time + protocol version
+    "config/consent": "consentconfig",
+    # phone ui configuration, applied by scanning a QR code
+    "config/app_ui_config": "appuiconfig",
+    # webapp API call time, measured on the server
+    "stats/server_api_time": "statsevent",
+    # intended to log the occurrence of errors in the webapp
+    "stats/server_api_error": "statsevent",
+    # pipeline stage time, measured on the server
+    "stats/pipeline_time": "statsevent",
+    # dashboard time, measured on the server
+    "stats/dashboard_time": "statsevent",
+    # intended to log the occurrence of errors in the pipeline
+    "stats/pipeline_error": "statsevent",
+    # intended to log the occurrence of errors in the dashboard
+    "stats/dashboard_error": "statsevent",
+    # time for various client operations, measured on the client
+    # comparison with the server_api_time can help debug networking issues
+    "stats/client_time": "statsevent",
+    # events, such as button presses, on the client
+    "stats/client_nav_event": "statsevent",
+    # errors detected on the client. Again, can be correlated with
+    # server calls to debug networking issues
+    "stats/client_error": "statsevent",
+    # incidents (smiley/frownie) reported by the user from the phone
+    "manual/incident": "incident",
+    # user confirmation of the travel mode, potentially selected from a
+    # rich set of travel modes that cannot be detected using sensors
+    "manual/mode_confirm": "userlabel",
+    # user confirmation of the travel purpose
+    "manual/purpose_confirm": "userlabel",
+    # user confirmation of the replaced mode
+    "manual/replaced_mode": "userlabel",
+    # user input for the trip; in one entry instead of being split up
+    "manual/trip_user_input": "tripuserinput",
+    # user input for the place (no use case for this yet)
+    "manual/place_user_input": "placeuserinput",
+    # trip-level additions/splits: currently only used for the time-use survey
+    "manual/trip_addition_input": "tripuserinput",
+    # place-level additions/splits: currently only used for the
+    # time-use survey, and potentially 'trip not taken'
+    "manual/place_addition_input": "placeuserinput",
+    # user confirmation of the destination (unsure how this will
+    # interact with purpose
+    "manual/destination_confirm": "userlabel",
+    # demographic survey
+    "manual/demographic_survey": "onetimesurvey",
+    ### END: incoming data types ###
+    ### BEGIN: analysis result data types ###
+    ### ** BEGIN: objects generated after the initial segmentation step **
+    # trips from one place to another
+    "segmentation/raw_trip": "rawtrip",
+    # places between trips
+    "segmentation/raw_place": "rawplace",
+    # sections within a trip (e.g. walk -> bus -> walk has 3 sections)
+    "segmentation/raw_section": "section",
+    # stops between sections
+    "segmentation/raw_stop": "stop",
+    # untracked time (e.g. when phone was out of battery)
+    "segmentation/raw_untracked": "untrackedtime",
+    ### ** END: objects generated after the initial segmentation step **
+    # object indicating which points need to be removed from the trajectory
+    # because they represent zig-zags
+    "analysis/smoothing": "smoothresults",
+    ### ** BEGIN: objects generated after the second cleaned segmentation step
+    ### same explanations as the corresponding segmentation/* objects
+    "analysis/cleaned_trip": "cleanedtrip",
+    "analysis/cleaned_place": "cleanedplace",
+    "analysis/cleaned_section": "cleanedsection",
+    "analysis/cleaned_stop": "stop",
+    "analysis/cleaned_untracked": "untrackedtime",
+    # Resampled locations to ensure that the point density is
+    # consistent across operating systems and sampling frequencies
+    "analysis/recreated_location": "recreatedlocation",
+    ### ** END: objects generated after the second cleaned segmentation step
+    ### ** BEGIN: metric outputs. These are not currently stored
+    ### they are generated on demand instead
+    "metrics/daily_user_count": "modestattimesummary",
+    "metrics/daily_mean_count": "modestattimesummary",
+    "metrics/daily_user_distance": "modestattimesummary",
+    "metrics/daily_mean_distance": "modestattimesummary",
+    "metrics/daily_user_duration": "modestattimesummary",
+    "metrics/daily_mean_duration": "modestattimesummary",
+    "metrics/daily_user_median_speed": "modestattimesummary",
+    "metrics/daily_mean_median_speed": "modestattimesummary",
+    ### ** END: metric outputs.
+    ### ** BEGIN: prediction objects
+    # the generated model for the random forest based mode inference
+    # saved so that it can be used for prediction without retraining
+    "mode_inference/model": "modeinfermodel",
+    # the predicted mode for a particular section (one entry per algorithm)
+    "inference/prediction": "modeprediction",
+    # the predicted labels for a particular trip (one entry per algorithm)
+    "inference/labels": "labelprediction",
+    # the serialized trip model for user label prediction
+    "inference/trip_model": "tripmodel",
+    # equivalent of cleaned_section, but with the mode set to the 
+    # inferred mode instead of just walk/bike/motorized
+    # used for consistency and to make the client work whether or not we were
+    # the final inferred section mode (possibly an ensemble result)
+    "analysis/inferred_section": "inferredsection",
+    # the final inferred label data structure (possibly an ensemble result)
+    "analysis/inferred_labels": "labelprediction",
+    ### ** END: prediction objects
+    ### ** BEGIN: confirmed objects which combine inferred and user input values
+    "analysis/inferred_trip": "inferredtrip",
+    "analysis/expected_trip": "expectedtrip",
+    "analysis/confirmed_trip": "confirmedtrip",
+    "analysis/confirmed_section": "confirmedsection",
+    "analysis/confirmed_place": "confirmedplace",
+    # later, we should change this to untrackedwithlabels or something
+    "analysis/confirmed_untracked": "untrackedtime",
+    ### ** END: confirmed objects which combine inferred and user input values
+    # the composite trip structure for the presentation layer, which includes
+    # the confirmed trip, its confirmed end place, and its trajectory
+    "analysis/composite_trip": "compositetrip",
+}
+
+MUTABLE_KEYS = {
+    "segmentation/raw_place",
+    "segmentation/raw_stop",
+    "analysis/smoothing",
+    "analysis/cleaned_place",
+    "analysis/cleaned_section",
+    "analysis/recreated_location",
+    "analysis/inferred_section",
+    "analysis/inferred_trip",
+    "analysis/expected_trip",
+    "analysis/confirmed_trip",
+    "analysis/confirmed_section",
+    "analysis/confirmed_place",
+    "analysis/confirmed_untracked",
+    "analysis/composite_trip",
+}
+
 class Entry(ecwb.WrapperBase):
   props = {"metadata": ecwb.WrapperBase.Access.WORM,
            "data": ecwb.WrapperBase.Access.WORM,
@@ -32,141 +185,7 @@ class Entry(ecwb.WrapperBase):
 
   @staticmethod
   def _getData2Wrapper():
-    return {
-            ### BEGIN: incoming data types ###
-            # all location points from the phone
-            "background/location": "location",
-            # "valid" location points from the phone, after removing low-accuracy points
-            "background/filtered_location": "location",
-            # "motionactivity" results from the phone, indicating walk/bike or "motorized"
-            "background/motion_activity": "motionactivity",
-            # battery readings, to determine power drain empirically
-            "background/battery": "battery",
-            # BLE events, including enter, exiting and ranging beacons
-            "background/bluetooth_ble": "bluetoothble",
-            # transition events for the tracking finite state machine on the phone
-            "statemachine/transition": "transition",
-            # phone sensing configuration (e.g. sensing frequency, geofencing,...)
-            "config/sensor_config": "sensorconfig",
-            # phone sync configuration (sync interval,...)
-            "config/sync_config": "syncconfig",
-            # user consent time + protocol version
-            "config/consent": "consentconfig",
-            # phone ui configuration, applied by scanning a QR code
-            "config/app_ui_config": "appuiconfig",
-            # webapp API call time, measured on the server
-            "stats/server_api_time": "statsevent",
-            # intended to log the occurrence of errors in the webapp
-            "stats/server_api_error": "statsevent",
-            # pipeline stage time, measured on the server
-            "stats/pipeline_time": "statsevent",
-            # dashboard time, measured on the server
-            "stats/dashboard_time": "statsevent",
-            # intended to log the occurrence of errors in the pipeline
-            "stats/pipeline_error": "statsevent",
-            # intended to log the occurrence of errors in the dashboard
-            "stats/dashboard_error": "statsevent",
-            # time for various client operations, measured on the client
-            # comparison with the server_api_time can help debug networking issues
-            "stats/client_time": "statsevent",
-            # events, such as button presses, on the client
-            "stats/client_nav_event": "statsevent",
-            # errors detected on the client. Again, can be correlated with
-            # server calls to debug networking issues
-            "stats/client_error": "statsevent",
-            # incidents (smiley/frownie) reported by the user from the phone
-            "manual/incident": "incident",
-            # user confirmation of the travel mode, potentially selected from a
-            # rich set of travel modes that cannot be detected using sensors
-            "manual/mode_confirm": "userlabel",
-            # user confirmation of the travel purpose
-            "manual/purpose_confirm": "userlabel",
-            # user confirmation of the replaced mode
-            "manual/replaced_mode": "userlabel",
-            # user input for the trip; in one entry instead of being split up
-            "manual/trip_user_input": "tripuserinput",
-            # user input for the place (no use case for this yet)
-            "manual/place_user_input": "placeuserinput",
-            # trip-level additions/splits: currently only used for the time-use survey
-            "manual/trip_addition_input": "tripuserinput",
-            # place-level additions/splits: currently only used for the
-            # time-use survey, and potentially 'trip not taken'
-            "manual/place_addition_input": "placeuserinput",
-            # user confirmation of the destination (unsure how this will
-            # interact with purpose
-            "manual/destination_confirm": "userlabel",
-            # demographic survey
-            "manual/demographic_survey": "onetimesurvey",
-            ### END: incoming data types ###
-            ### BEGIN: analysis result data types ###
-            ### ** BEGIN: objects generated after the initial segmentation step **
-            # trips from one place to another
-            "segmentation/raw_trip": "rawtrip",
-            # places between trips
-            "segmentation/raw_place": "rawplace",
-            # sections within a trip (e.g. walk -> bus -> walk has 3 sections)
-            "segmentation/raw_section": "section",
-            # stops between sections
-            "segmentation/raw_stop": "stop",
-            # untracked time (e.g. when phone was out of battery)
-            "segmentation/raw_untracked": "untrackedtime",
-            ### ** END: objects generated after the initial segmentation step **
-            # object indicating which points need to be removed from the trajectory
-            # because they represent zig-zags
-            "analysis/smoothing": "smoothresults",
-            ### ** BEGIN: objects generated after the second cleaned segmentation step
-            ### same explanations as the corresponding segmentation/* objects
-            "analysis/cleaned_trip": "cleanedtrip",
-            "analysis/cleaned_place": "cleanedplace",
-            "analysis/cleaned_section": "cleanedsection",
-            "analysis/cleaned_stop": "stop",
-            "analysis/cleaned_untracked": "untrackedtime",
-            # Resampled locations to ensure that the point density is
-            # consistent across operating systems and sampling frequencies
-            "analysis/recreated_location": "recreatedlocation",
-            ### ** END: objects generated after the second cleaned segmentation step
-            ### ** BEGIN: metric outputs. These are not currently stored
-            ### they are generated on demand instead
-            "metrics/daily_user_count": "modestattimesummary",
-            "metrics/daily_mean_count": "modestattimesummary",
-            "metrics/daily_user_distance": "modestattimesummary",
-            "metrics/daily_mean_distance": "modestattimesummary",
-            "metrics/daily_user_duration": "modestattimesummary",
-            "metrics/daily_mean_duration": "modestattimesummary",
-            "metrics/daily_user_median_speed": "modestattimesummary",
-            "metrics/daily_mean_median_speed": "modestattimesummary",
-            ### ** END: metric outputs.
-            ### ** BEGIN: prediction objects
-            # the generated model for the random forest based mode inference
-            # saved so that it can be used for prediction without retraining
-            "mode_inference/model": "modeinfermodel",
-            # the predicted mode for a particular section (one entry per algorithm)
-            "inference/prediction": "modeprediction",
-            # the predicted labels for a particular trip (one entry per algorithm)
-            "inference/labels": "labelprediction",
-            # the serialized trip model for user label prediction
-            "inference/trip_model": "tripmodel",
-            # equivalent of cleaned_section, but with the mode set to the 
-            # inferred mode instead of just walk/bike/motorized
-            # used for consistency and to make the client work whether or not we were
-            # the final inferred section mode (possibly an ensemble result)
-            "analysis/inferred_section": "inferredsection",
-            # the final inferred label data structure (possibly an ensemble result)
-            "analysis/inferred_labels": "labelprediction",
-            ### ** END: prediction objects
-            ### ** BEGIN: confirmed objects which combine inferred and user input values
-            "analysis/inferred_trip": "inferredtrip",
-            "analysis/expected_trip": "expectedtrip",
-            "analysis/confirmed_trip": "confirmedtrip",
-            "analysis/confirmed_section": "confirmedsection",
-            "analysis/confirmed_place": "confirmedplace",
-            # later, we should change this to untrackedwithlabels or something
-            "analysis/confirmed_untracked": "untrackedtime",
-            ### ** END: confirmed objects which combine inferred and user input values
-            # the composite trip structure for the presentation layer, which includes
-            # the confirmed trip, its confirmed end place, and its trajectory
-            "analysis/composite_trip": "compositetrip"
-            }
+    return KEYS_WRAPPERS_MAP
 
   @staticmethod
   def create_entry(user_id, key, data, create_id = False):
