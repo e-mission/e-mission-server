@@ -6,10 +6,10 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 from builtins import object
-import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import logging
-import json
 import os
+import requests
 
 from emission.core.wrapper.trip_old import Coordinate
 try:
@@ -42,10 +42,9 @@ class Geocoder(object):
 
     @classmethod
     def get_json_geo(cls, address):
-        request = urllib.request.Request(cls.make_url_geo(address))
-        response = urllib.request.urlopen(request)
-        jsn = json.loads(response.read())
-        return jsn
+        response = requests.get(cls.make_url_geo(address))
+        response.raise_for_status()
+        return response.json()
 
     @classmethod
     def geocode(cls, address):
@@ -69,9 +68,9 @@ class Geocoder(object):
 
     @classmethod
     def get_json_reverse(cls, lat, lng):
-        request = urllib.request.Request(cls.make_url_reverse(lat, lng))
-        response = urllib.request.urlopen(request)
-        parsed_response = json.loads(response.read())
+        response = requests.get(cls.make_url_reverse(lat, lng))
+        response.raise_for_status()
+        parsed_response = response.json()
         logging.debug("parsed_response = %s" % parsed_response)
         return parsed_response
 
