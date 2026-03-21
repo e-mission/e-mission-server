@@ -11,6 +11,10 @@ import logging
 import os
 import requests
 
+# Nominatim usage policy requires a descriptive User-Agent; the default
+# requests User-Agent is explicitly rejected and returns HTTP 403.
+_HEADERS = {"User-Agent": "e-mission-server/1.0 (https://github.com/e-mission/e-mission-server)"}
+
 from emission.core.wrapper.trip_old import Coordinate
 try:
     NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
@@ -42,7 +46,7 @@ class Geocoder(object):
 
     @classmethod
     def get_json_geo(cls, address):
-        response = requests.get(cls.make_url_geo(address))
+        response = requests.get(cls.make_url_geo(address), headers=_HEADERS)
         response.raise_for_status()
         return response.json()
 
@@ -68,7 +72,7 @@ class Geocoder(object):
 
     @classmethod
     def get_json_reverse(cls, lat, lng):
-        response = requests.get(cls.make_url_reverse(lat, lng))
+        response = requests.get(cls.make_url_reverse(lat, lng), headers=_HEADERS)
         response.raise_for_status()
         parsed_response = response.json()
         logging.debug("parsed_response = %s" % parsed_response)
