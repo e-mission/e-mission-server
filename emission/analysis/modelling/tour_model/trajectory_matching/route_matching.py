@@ -1,7 +1,6 @@
 # Standard imports
 from builtins import range
 from builtins import *
-from past.utils import old_div
 import numpy as np
 import urllib.request, urllib.parse, urllib.error,json,csv
 import xml.etree.cElementTree as ET
@@ -49,7 +48,7 @@ def cal_matching_score(lst1,lst2,radius):
         # print(lst2[int(i/max_len*len2)])
         if ec.Is_place_2(lst1[int(i/max_len*len1)],lst2[int(i/max_len*len2)],radius):
             count+=1
-    score=old_div(count,max_len)
+    score = count / max_len
     return score
 
 def route_matching(lst1,lst2,step,radius,len_match,min_score):
@@ -65,7 +64,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
     lst1_extended=[]
     for i in range(len(lst1)-1):
         dis=ec.calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
-        num_inter=int(round(old_div(dis,step)))
+        num_inter = int(round(dis / step))
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
@@ -77,7 +76,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
     lst2_extended=[]
     for i in range(len(lst2)-1):
         dis=ec.calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
-        num_inter=int(round(old_div(dis,step)))
+        num_inter = int(round(dis / step))
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
@@ -105,7 +104,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         print("start of case 1")
         for near_s in near_start2:
             for near_e in near_end2:
-                if old_div(min(abs(near_e-near_s)+1,len(lst2_extended)),max(abs(near_e-near_s)+1,len(lst2_extended)))>=len_match:
+                if min(abs(near_e-near_s)+1, len(lst2_extended)) / max(abs(near_e-near_s)+1, len(lst2_extended)) >= len_match:
                     print("possible near_s is %s" % near_s)
                     print("possible near_e is %s" % near_e)
 
@@ -130,7 +129,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         print("start of case 2")
         for near_s in near_start1:
             for near_e in near_end1:
-                if old_div(min(abs(near_e-near_s)+1,len(lst1_extended)),max(abs(near_e-near_s)+1,len(lst1_extended)))>=len_match:
+                if min(abs(near_e-near_s)+1, len(lst1_extended)) / max(abs(near_e-near_s)+1, len(lst1_extended)) >= len_match:
                     if near_e>near_s:
                         print("start index is %d" % near_s)
                         print("end index is %d" % near_e)
@@ -161,7 +160,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     lst1_extended=[]
     for i in range(len(lst1)-1):
         dis=ec.calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
-        num_inter=int(round(old_div(dis,step)))
+        num_inter = int(round(dis / step))
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
@@ -173,7 +172,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     lst2_extended=[]
     for i in range(len(lst2)-1):
         dis=ec.calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
-        num_inter=int(round(old_div(dis,step)))
+        num_inter = int(round(dis / step))
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
@@ -190,12 +189,12 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     for point2 in lst2:
         if ec.Include_place_2(lst1_extended,point2['track_location']['coordinates'],radius):
             score_2_in_1+=1
-    best_score.append(old_div(score_2_in_1,len(lst2)))
+    best_score.append(score_2_in_1 / len(lst2))
     score_1_in_2=0
     for point1 in lst1:
         if ec.Include_place_2(lst2_extended,point1['track_location']['coordinates'],radius):
             score_1_in_2+=1
-    best_score.append(old_div(score_1_in_2,len(lst1)))
+    best_score.append(score_1_in_2 / len(lst1))
     print(best_score)
     if max(best_score)>min_score:
         return True
@@ -218,7 +217,7 @@ def refineRoute(lst1,step):
     lst1_extended=[]
     for i in range(len(lst1)-1):
         dis=ec.calDistance(lst1[i],lst1[i+1])
-        num_inter=int(round(old_div(dis,step)))
+        num_inter = int(round(dis / step))
         if num_inter==0:
             lst1_extended.append(lst1[i])
         else:
