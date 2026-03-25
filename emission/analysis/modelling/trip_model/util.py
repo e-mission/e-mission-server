@@ -1,5 +1,4 @@
 from typing import List, Tuple
-from past.utils import old_div
 import numpy
 from numpy.linalg import norm
 
@@ -32,7 +31,7 @@ def find_knee_point(values: List[float]) -> Tuple[float, int]:
     new_y = []
     for i in range(0, N):
         p = numpy.array([x[i], values[i]])
-        dist = old_div(norm(numpy.cross(p - a, p - b)), n)
+        dist = norm(numpy.cross(p - a, p - b)) / n
         new_y.append(dist)
         if dist > max:
             max = dist
