@@ -1,7 +1,4 @@
 # Standard imports
-from builtins import str
-from builtins import *
-from past.utils import old_div
 import json
 from random import randrange
 from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response, error, redirect
@@ -440,7 +437,7 @@ def after_request():
   duration = msTimeNow - request.params.start_ts
   new_duration = request.params.timer.elapsed
   earus.update_last_call_timestamp(request.params.user_uuid, request.path)
-  if round(old_div((duration - new_duration), new_duration) > 100) > 0:
+  if round(((duration - new_duration) / new_duration) > 100) > 0:
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
                                  (request.method, request.path), msTimeNow, duration - new_duration)

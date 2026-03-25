@@ -1,5 +1,3 @@
-from builtins import *
-from past.utils import old_div
 import logging
 # It is not clear if we need to copy here, given that we are almost
 # immdediately going to save to the database. Let us assume that we don't.

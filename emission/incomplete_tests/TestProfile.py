@@ -1,6 +1,5 @@
 # Standard imports
 from builtins import *
-from past.utils import old_div
 import unittest
 import mock
 import json
@@ -35,7 +34,7 @@ class TestProfile(unittest.TestCase):
 
     self.walkExpect = 1057.2524056424411
     self.busExpect = 2162.668467546699
-    self.busCarbon = old_div(267.0,1609)
+    self.busCarbon = 267.0 / 1609
 
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
