@@ -3,7 +3,6 @@ from builtins import str
 from builtins import range
 from builtins import *
 from builtins import object
-from past.utils import old_div
 import logging
 import emission.net.ext_service.geocoder.nominatim as eco
 
@@ -58,9 +57,9 @@ class Commute(object):
         ## Based on a 40 mph guess
         dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
-        time = old_div(miles,float(40))
-        if time < old_div(1.0,2.0):
-            time = old_div(1.0,2.0)   ## Pushes the random walk forward
+        time = miles / float(40)
+        if time < (1.0 / 2.0):
+            time = 1.0 / 2.0   ## Pushes the random walk forward
         return datetime.timedelta(hours=time)
 
     def get_distance(self):
