@@ -1,4 +1,3 @@
-from __future__ import annotations
 from enum import Enum
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.similarity.od_similarity as eamso
