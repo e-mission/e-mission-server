@@ -60,7 +60,7 @@ def getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap):
   modeFootprintMap = {}
   for modeName in modeDistanceMap:
     # logging.debug("Consider mode with name %s" % modeName)
-    carbonForMode = float(carbonFootprintMap[modeName] * modeDistanceMap[modeName]) / 1000
+    carbonForMode = (carbonFootprintMap[modeName] * modeDistanceMap[modeName]) / 1000
     # logging.debug("carbonForMode %s = %s from %s * %s" % 
     #     (modeName, carbonForMode, carbonFootprintMap[modeName], modeDistanceMap[modeName]))
     modeFootprintMap[modeName] = carbonForMode
@@ -220,11 +220,11 @@ def getSummaryAllTrips(start,end):
         totalShortLongModeShareDistance,
         optimalCarbonFootprintForMode)
   return {
-        "current": float(sumModeCarbonFootprint) / nUsers,
-        "optimal": float(sumOptimalCarbonFootprint) / nUsers,
-        "current no air": float(sum(totalModeCarbonFootprintNoLongMotorized.values())) / nUsers,
-        "optimal no air": float(sum(totalOptimalCarbonFootprintNoLongMotorized.values())) / nUsers,
-        "all drive": float((sumModeShareDistance * carbonFootprintForMode['car_short'])) / nUsers,
+      "current": sumModeCarbonFootprint / nUsers,
+      "optimal": sumOptimalCarbonFootprint / nUsers,
+      "current no air": sum(totalModeCarbonFootprintNoLongMotorized.values()) / nUsers,
+      "optimal no air": sum(totalOptimalCarbonFootprintNoLongMotorized.values()) / nUsers,
+      "all drive": (sumModeShareDistance * carbonFootprintForMode['car_short']) / nUsers,
           "SB375 mandate for 2035": 40.142892,
           "EO 2050 goal (80% below 1990)": 8.28565
          }

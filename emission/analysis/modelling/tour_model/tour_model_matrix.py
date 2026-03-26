@@ -57,7 +57,7 @@ class Commute(object):
         ## Based on a 40 mph guess
         dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
-        time = miles / float(40)
+        time = miles / 40
         if time < (1.0 / 2.0):
             time = 1.0 / 2.0   ## Pushes the random walk forward
         return datetime.timedelta(hours=time)

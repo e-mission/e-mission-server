@@ -276,7 +276,7 @@ class TestBuiltinUserCache(unittest.TestCase):
     ]
 
     # sleep() expects an argument in seconds. We want to sleep for 5 ms.
-    time.sleep(float(5) / 1000)
+    time.sleep(5 / 1000)
 
     second_ts = time.time()
     background_data_from_phone_2 = [
@@ -315,7 +315,7 @@ class TestBuiltinUserCache(unittest.TestCase):
 
     end_ts = time.time()
 
-    time.sleep(float(5) / 1000)
+    time.sleep(5 / 1000)
 
     third_ts = time.time()
     background_data_from_phone_3 = [

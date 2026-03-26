@@ -146,5 +146,5 @@ class featurization(object):
                 end_lat = self.points[i][3]
                 end_lon = self.points[i][2]
                 path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i]) / self.clusters)))
+                mymap2.addpath(path, matcol.rgb2hex(colormap(self.labels[i] / self.clusters)))
             mymap2.draw('./mylabels.html')

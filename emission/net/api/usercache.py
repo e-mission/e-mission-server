@@ -68,10 +68,10 @@ def sync_phone_to_server(uuid, data_from_phone):
         data.update({"user_id": uuid})
         # Hack to deal with milliseconds until we have moved everything over
         if ecc.isMillisecs(data["metadata"]["write_ts"]):
-            data["metadata"]["write_ts"] = float(data["metadata"]["write_ts"]) / 1000
+            data["metadata"]["write_ts"] = data["metadata"]["write_ts"] / 1000
 
         if "ts" in data["data"] and ecc.isMillisecs(data["data"]["ts"]):
-            data["data"]["ts"] = float(data["data"]["ts"]) / 1000
+            data["data"]["ts"] = data["data"]["ts"] / 1000
 
         # mongodb/documentDB don't support field names with `.`
         # let's convert them all to `_`

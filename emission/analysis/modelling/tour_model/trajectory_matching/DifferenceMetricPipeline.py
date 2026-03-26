@@ -88,7 +88,7 @@ def CCR(testClusters, medoids, groundTruthClusters):
             if currCount > maxcount:
                 maxcount = currCount
         count+= maxcount
-    return float(count) / float(N)
+    return count / N
 
 
 if __name__ == '__main__':

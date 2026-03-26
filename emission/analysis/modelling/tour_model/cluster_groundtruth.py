@@ -65,7 +65,7 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
     rand = []
     clusters = len(set(labels))
     for i in range(len(labels)):
-        rand.append(r[labels[i]] / float(clusters))
+        rand.append(r[labels[i]] / clusters)
     if map_individuals:
         for color in set(colors):
             first = True
@@ -91,7 +91,7 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
         end_lat = data[i].trip_end_location.lat
         end_lon = data[i].trip_end_location.lon
         path = [(start_lat, start_lon), (end_lat, end_lon)]
-        mymap.addpath(path, matcol.rgb2hex(colormap(float(colors[i]) / len(set(colors)))))
+        mymap.addpath(path, matcol.rgb2hex(colormap(colors[i] / len(set(colors)))))
     mymap.draw('./mymap.html')
 
 def main(colors):
