@@ -1,7 +1,6 @@
 from builtins import next
 from builtins import range
 from builtins import *
-from past.utils import old_div
 import unittest
 import time
 import logging
@@ -20,7 +19,7 @@ class RepresentativesTests(unittest.TestCase):
 
     def setUp(self):
         etatc._setup(self)
-        n = old_div(len(self.data),5)
+        n = len(self.data) // 5
         self.labels = feat.featurization(self.data).cluster(min_clusters=n, max_clusters=n)
 
     def tearDown(self):

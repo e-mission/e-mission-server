@@ -1,6 +1,4 @@
 # Standard imports
-from builtins import *
-from past.utils import old_div
 import unittest
 import sys
 import os
@@ -41,16 +39,22 @@ class TestUser(unittest.TestCase):
                           'running' : 0,
                           'cycling' : 0,
                             'mixed' : 0,
-                        'bus_short' : old_div(267.0,1609),
-                         'bus_long' : old_div(267.0,1609),
-                      'train_short' : old_div(92.0,1609),
-                       'train_long' : old_div(92.0,1609),
-                        'car_short' : (old_div(1,(42*1.6093)))*8.91,
-                         'car_long' : (old_div(1,(42*1.6093)))*8.91,
-                        'air_short' : old_div(217.0,1609),
-                         'air_long' : old_div(217.0,1609)
+                        'bus_short' : 267.0 / 1609,
+                         'bus_long' : 267.0 / 1609,
+                      'train_short' : 92.0 / 1609,
+                       'train_long' : 92.0 / 1609,
+                        'car_short' : (1 / (42 * 1.6093)) * 8.91,
+                         'car_long' : (1 / (42 * 1.6093)) * 8.91,
+                        'air_short' : 217.0 / 1609,
+                         'air_long' : 217.0 / 1609
                       }
     self.assertEqual(user.getCarbonFootprintForMode(), correctCarbonFootprintForMode)
+
+  def testDivisionSemanticsForCarbonConstants(self):
+    # Explicitly guard Python3 true-division behavior used by footprint constants.
+    self.assertAlmostEqual(267.0 / 1609, 0.1659415786202604)
+    self.assertAlmostEqual(92.0 / 1609, 0.057178371659416)
+    self.assertAlmostEqual(217.0 / 1609, 0.1348663766314481)
 
   def testMergeDict(self):
     dict1 = {'a': 'a1', 'b': 'b1', 'c': 'c1'}

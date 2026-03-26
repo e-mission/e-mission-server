@@ -1,7 +1,6 @@
 # Standard imports
 from builtins import str
 from builtins import *
-from past.utils import old_div
 import logging
 import os, sys
 import math
@@ -97,7 +96,7 @@ def get_user_clusters(user, method, nClusters, is_ground_truth=False):
         routes_user = user_route_data(user,edb.get_section_db())
 
     if nClusters == -1:
-        nClusters = int(math.ceil(old_div(len(routes_user),8)) + 1)
+        nClusters = int(math.ceil(len(routes_user) / 8) + 1)
     clusters_user = emkm.kmedoids(routes_user,nClusters,user,method=method)
     #update_user_routeClusters(user,clusters_user[2],method=method)
     return clusters_user

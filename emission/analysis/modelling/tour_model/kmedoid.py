@@ -1,7 +1,6 @@
 # standard imports
 from builtins import range
 from builtins import *
-from past.utils import old_div
 import random
 import sys
 import numpy
@@ -113,6 +112,6 @@ def dist(a,b, data):
     sum = 0
     for i in range(len(dim_a)):
         sum += abs(dim_a[i] - dim_b[i])**4
-    return sum**(old_div(1,4.0))
+    return sum**(1 / 4.0)
 
 

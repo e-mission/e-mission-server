@@ -2,7 +2,6 @@
 from builtins import str
 from builtins import range
 from builtins import *
-from past.utils import old_div
 import logging
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
 import numpy 
@@ -66,7 +65,7 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
     rand = []
     clusters = len(set(labels))
     for i in range(len(labels)):
-        rand.append(old_div(r[labels[i]],float(clusters)))
+        rand.append(r[labels[i]] / clusters)
     if map_individuals:
         for color in set(colors):
             first = True
@@ -92,7 +91,7 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
         end_lat = data[i].trip_end_location.lat
         end_lon = data[i].trip_end_location.lon
         path = [(start_lat, start_lon), (end_lat, end_lon)]
-        mymap.addpath(path, matcol.rgb2hex(colormap(old_div(float(colors[i]),len(set(colors))))))
+        mymap.addpath(path, matcol.rgb2hex(colormap(colors[i] / len(set(colors)))))
     mymap.draw('./mymap.html')
 
 def main(colors):

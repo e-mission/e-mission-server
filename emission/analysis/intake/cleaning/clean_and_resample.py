@@ -11,7 +11,6 @@
 # General imports
 from builtins import zip
 from builtins import *
-from past.utils import old_div
 import logging
 import numpy as np
 import pandas as pd
@@ -516,9 +515,9 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     if is_air_section(filtered_section_data, with_speeds_df):
         return ecwm.MotionTypes.AIR_OR_HSR
 
-    overall_speed = old_div(end_to_end_distance, end_to_end_time)
-    TEN_KMPH = old_div(float(10 * 1000), (60 * 60)) # m/s
-    TWENTY_KMPH = old_div(float(20 * 1000), (60 * 60)) # m/s
+    overall_speed = end_to_end_distance / end_to_end_time
+    TEN_KMPH = (10 * 1000) / (60 * 60) # m/s
+    TWENTY_KMPH = (20 * 1000) / (60 * 60) # m/s
     logging.debug("end_to_end_distance = %s, end_to_end_time = %s, overall_speed = %s" %
                   (end_to_end_distance, end_to_end_time, overall_speed))
 
@@ -539,11 +538,11 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     return None
 
 def is_air_section(filtered_section_data,with_speeds_df):
-    HUNDRED_KMPH = old_div(float(100 * 1000), (60 * 60)) # m/s
-    ONE_FIFTY_KMPH = old_div(float(150 * 1000), (60 * 60)) # m/s
+    HUNDRED_KMPH = (100 * 1000) / (60 * 60) # m/s
+    ONE_FIFTY_KMPH = (150 * 1000) / (60 * 60) # m/s
     end_to_end_distance = filtered_section_data.distance
     end_to_end_time = filtered_section_data.duration
-    end_to_end_speed = old_div(end_to_end_distance, end_to_end_time)
+    end_to_end_speed = end_to_end_distance / end_to_end_time
     logging.debug("air check: end_to_end_distance = %s, end_to_end_time = %s, so end_to_end_speed = %s" %
                   (end_to_end_distance, end_to_end_time, end_to_end_speed))
     if end_to_end_speed > ONE_FIFTY_KMPH:
@@ -645,7 +644,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode, loc_df):
                              (raw_start_place.get_id(), ending_trip_entry.get_id()))
             new_start_ts = raw_start_place.data.enter_ts
         else:
-            new_start_ts = min(raw_start_place.data.enter_ts + old_div(raw_start_place.data.duration, 2),
+            new_start_ts = min(raw_start_place.data.enter_ts + (raw_start_place.data.duration / 2),
                                   raw_start_place.data.enter_ts + 3 * 60)
 
         logging.debug("changed new_start_ts to %s" % (new_start_ts))
@@ -1114,7 +1113,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     # [0.0, 0.45757476285455007, 0.4575750402006284, -> [0.0, distance_delta/30, 0.45757476285455007, 0.4575750402006284,
     speed_list = first_section_data["speeds"]
     logging.debug("fix_squished_place: before inserting, speeds = %s" % speed_list[:10])
-    speed_list.insert(1, old_div(float(distance_delta),30))
+    speed_list.insert(1, distance_delta / 30)
     logging.debug("fix_squished_place: after inserting, speeds = %s" % speed_list[:10])
     first_section_data["distances"] = distances_list
     first_section_data["speeds"] = speed_list
@@ -1152,7 +1151,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     curr_first_loc_data = curr_first_loc.data
     logging.debug("fix_squished_place: before updating, old first location data = %s" % loc_row)
     curr_first_loc_data["distance"] = distance_delta
-    curr_first_loc_data["speed"] = old_div(float(distance_delta), 30)
+    curr_first_loc_data["speed"] = distance_delta / 30
     curr_first_loc["data"] = curr_first_loc_data
     logging.debug("fix_squished_place: after updating, old first location data = %s" % curr_first_loc)
     ts.update(curr_first_loc)

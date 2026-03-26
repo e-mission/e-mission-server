@@ -1,7 +1,6 @@
 # Standard imports
 from builtins import str
 from builtins import *
-from past.utils import old_div
 from pymongo import MongoClient
 from uuid import UUID
 import time
@@ -89,7 +88,7 @@ def CCR(testClusters, medoids, groundTruthClusters):
             if currCount > maxcount:
                 maxcount = currCount
         count+= maxcount
-    return old_div(float(count),float(N))
+    return count / N
 
 
 if __name__ == '__main__':

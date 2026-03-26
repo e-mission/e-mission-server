@@ -1,5 +1,4 @@
 from builtins import *
-from past.utils import old_div
 import logging
 import datetime as pydt
 import pandas as pd
@@ -22,7 +21,7 @@ def get_plottable_df(user_id, loc_filter, start_dt, end_dt):
         tempSection.end_ts = time.mktime(end_dt.timetuple()) * 1000
     return get_points_for_section(tempSection)
 
-from_micros = lambda x: pydt.datetime.fromtimestamp(old_div(x,1000))
+from_micros = lambda x: pydt.datetime.fromtimestamp(x / 1000)
 
 def get_activities_for_section(section):
     query = {"user_id": section.user_id,
