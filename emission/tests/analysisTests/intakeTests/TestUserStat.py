@@ -1,4 +1,3 @@
-from __future__ import unicode_literals, print_function, division, absolute_import
 import unittest
 import uuid
 import logging
@@ -9,8 +8,6 @@ import pandas as pd
 import arrow
 
 from builtins import *
-from future import standard_library
-standard_library.install_aliases()
 
 # Standard imports
 import emission.storage.json_wrappers as esj

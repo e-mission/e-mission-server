@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # This test compares the output of the intake pipeline
 # with known ground truth output.
 # The way to add a new test is:
@@ -25,8 +21,6 @@ from __future__ import absolute_import
 # Copy it back and add the test to this file
 # $ mv /tmp/iphone_2016-02-22.ground_truth emission/tests/data/real_examples
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
 import unittest

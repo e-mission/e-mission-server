@@ -1,6 +1,3 @@
-from __future__ import division, unicode_literals, print_function, absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str, range, zip
 from past.utils import old_div
 import logging

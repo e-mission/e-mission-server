@@ -1,14 +1,8 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # This is the interface that syncs the usercache to the phone using the REST API.
 # Since other services that we are planning to support (like couchdb or Azure) don't 
 # need to use the REST services on our server to sync, this is not in the generic interface
 
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 from past.utils import old_div
 import logging

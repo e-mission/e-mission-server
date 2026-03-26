@@ -1,7 +1,3 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # We need to decide whether the functions will return the cleaned entries or
 # just save them directly. Returning makes it easier to test, saving makes it
 # easier to code because you can work locally and just save the results.
@@ -13,8 +9,6 @@ from __future__ import absolute_import
 # TODO: We can revisit once we see what the structures look like.
 
 # General imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
 from past.utils import old_div
