@@ -87,7 +87,11 @@ def getUUID(request, authMethod, inHeader=False, dynamicConfig = None):
   # non-dynamic config. Check with community on who's using it and what they need.
   if dynamicConfig is not None:
     subgroup = getSubgroupFromToken(userToken, dynamicConfig)
-    return {"subgroup": subgroup, "user_id": retUUID}
+    return {
+       "user_id": retUUID,
+       "token": userToken,
+       "subgroup": subgroup,
+    }
   else:
     # if the authmethod is "skip" or "token_list", the token can be in any format
     return retUUID
