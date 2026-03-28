@@ -223,8 +223,9 @@ def getFromCache():
 def putIntoCache():
   logging.debug("Called userCache.put")
   user_context=getUUID(request, return_context=True)
-  logging.debug("user_uuid %s" % user_context)
-  suspended_subgroups = ecdc.get_deployment_config().get("opcode", {}).get("suspended_subgroups", [])
+  logging.debug("user_context %s" % user_context)
+  deployment_config = ecdc.get_deployment_config()
+  suspended_subgroups = deployment_config.get("opcode", {}).get("suspended_subgroups", [])
   logging.debug(f"{suspended_subgroups=}")
   curr_subgroup = user_context.get('subgroup', None)
   if curr_subgroup in suspended_subgroups:
@@ -232,6 +233,16 @@ def putIntoCache():
   else:
       from_phone = request.json['phone_to_server']
       usercache.sync_phone_to_server(user_context['user_id'], from_phone)
+
+      # Respond with deployment config if phone's version is outdated,
+      # otherwise no response
+      logging.debug("Usercache sync finished; checking config versions...")
+      phone_config_version = request.json.get('deployment_config_version')
+      phone_app_version = request.json.get('app_version')
+      if ecdc.is_phone_config_outdated(user_context['token'], phone_config_version, phone_app_version):
+          logging.debug("Phone config is outdated, responding with current deployment config")
+          return { "deployment_config": deployment_config }
+
 
 @post('/usercache/putone')
 def putIntoOneEntry():
