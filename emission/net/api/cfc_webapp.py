@@ -58,7 +58,7 @@ server_port = config.get("WEBSERVER_PORT", 8080)
 socket_timeout = config.get("WEBSERVER_TIMEOUT", 3600)
 auth_method = config.get("WEBSERVER_AUTH", "skip")
 aggregate_call_auth = config.get("WEBSERVER_AGGREGATE_CALL_AUTH", "no_auth")
-not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nrel.gov/openpath")
+not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nlr.gov/openpath")
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -86,7 +86,7 @@ def getPopRoute(time_type):
   # pulling data using automated scripts, and using repeated queries on a
   # sparse dataset to reconstruct trajectories
   # re-enable when we add heatmaps back
-  # https://github.nrel.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
+  # https://github.nlr.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
   user_uuid = getUUID(request)
 
   if 'from_local_date' in request.json and 'to_local_date' in request.json:
@@ -115,7 +115,7 @@ def getStressMap(time_type):
     # pulling data using automated scripts, and using repeated queries on a
     # sparse dataset to reconstruct trajectories
     # re-enable when we add heatmaps back
-    # https://github.nrel.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
+    # https://github.nlr.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
     user_uuid = getUUID(request)
 
     # modes = request.json['modes']
