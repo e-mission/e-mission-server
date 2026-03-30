@@ -46,7 +46,7 @@ def backoff_wait_time(self):
 uuid_db_list = list(edb.get_uuid_db().find())
 
 class PhoneAppUser(HttpUser):
-    # host = "https://openpath-stage.nrel.gov/api"
+    # host = "https://openpath-stage.nlr.gov/api"
     host = "http://nginxrp/api"
     iteration = 0
 

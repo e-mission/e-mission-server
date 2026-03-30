@@ -16,7 +16,7 @@ def get_uuid_list_for_platform(platform):
 
 def get_upgrade_push_spec(platform):
     android_url = "https://play.google.com/store/apps/details?id=gov.nrel.cims.openpath"
-    ios_url = "https://apps.apple.com/us/app/nrel-openpath/id1628058068"
+    ios_url = "https://apps.apple.com/us/app/nlr-openpath/id1628058068"
     if platform == "android":
         platform_url = android_url
     elif platform == "ios":
