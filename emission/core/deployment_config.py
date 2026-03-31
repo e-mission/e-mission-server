@@ -4,6 +4,7 @@ import json
 import requests
 import asyncio
 import emcommon.util as emcu
+import packaging.version
 
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 CONFIGS_URL = os.getenv('CONFIGS_URL', "https://raw.githubusercontent.com/e-mission/op-deployment-configs/main/configs/")
