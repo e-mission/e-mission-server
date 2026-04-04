@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 #
 # In the current iteration, there is a client object that can be loaded from
 # the filesystem into the database and its settings loaded from the database.
@@ -13,8 +9,6 @@ from __future__ import absolute_import
 # Ah but this assumes that the settings file is in `emission/clients/` and we
 # just deleted that entire directory. Changing this to conf for now...
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import *
 from builtins import object

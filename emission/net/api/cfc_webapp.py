@@ -1,13 +1,4 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import unicode_literals
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import *
-from past.utils import old_div
 import json
 from random import randrange
 from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response, error, redirect
@@ -50,10 +41,10 @@ import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
-import emission.core.get_database as edb
+import emission.core.deployment_config as ecdc
 import emission.core.backwards_compat_config as ecbc
 
-STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
+import emission.analysis.result.user_stat as earus
 
 # Constants that we don't read from the configuration
 WEBSERVER_STATIC_PATH="webapp/www"
@@ -67,7 +58,7 @@ server_port = config.get("WEBSERVER_PORT", 8080)
 socket_timeout = config.get("WEBSERVER_TIMEOUT", 3600)
 auth_method = config.get("WEBSERVER_AUTH", "skip")
 aggregate_call_auth = config.get("WEBSERVER_AGGREGATE_CALL_AUTH", "no_auth")
-not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nrel.gov/openpath")
+not_found_redirect = config.get("WEBSERVER_NOT_FOUND_REDIRECT", "https://nlr.gov/openpath")
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -87,26 +78,15 @@ app = app()
 def index():
   return static_file("index.html", WEBSERVER_STATIC_PATH)
 
-# Backward compat to handle older clients
-# Remove in 2023 after everybody has upgraded
-# We used to use the presence or absence of the "user" field
-# to determine whether this was an aggregate call or not
-# now we expect the client to fill it in
-def _fill_aggregate_backward_compat(request):
-  if 'aggregate' not in request.json:
-    # Aggregate if there is no user
-    # no aggregate if there is a user
-    request.json["aggregate"] = ('user' not in request.json)
 
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
-  _fill_aggregate_backward_compat(request)
   # Disable aggregate access for the spatio-temporal data temporarily
   # until we can figure out how to prevent malicious users from signing up for studies,
   # pulling data using automated scripts, and using repeated queries on a
   # sparse dataset to reconstruct trajectories
   # re-enable when we add heatmaps back
-  # https://github.nrel.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
+  # https://github.nlr.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
   user_uuid = getUUID(request)
 
   if 'from_local_date' in request.json and 'to_local_date' in request.json:
@@ -130,13 +110,12 @@ def getPopRoute(time_type):
 
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
-    _fill_aggregate_backward_compat(request)
     # Disable aggregate access for the spatio-temporal data temporarily
     # until we can figure out how to prevent malicious users from signing up for studies,
     # pulling data using automated scripts, and using repeated queries on a
     # sparse dataset to reconstruct trajectories
     # re-enable when we add heatmaps back
-    # https://github.nrel.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
+    # https://github.nlr.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
     user_uuid = getUUID(request)
 
     # modes = request.json['modes']
@@ -243,10 +222,27 @@ def getFromCache():
 @post('/usercache/put')
 def putIntoCache():
   logging.debug("Called userCache.put")
-  user_uuid=getUUID(request)
-  logging.debug("user_uuid %s" % user_uuid)
-  from_phone = request.json['phone_to_server']
-  return usercache.sync_phone_to_server(user_uuid, from_phone)
+  user_context=getUUID(request, return_context=True)
+  logging.debug("user_context %s" % user_context)
+  deployment_config = ecdc.get_deployment_config()
+  suspended_subgroups = deployment_config.get("opcode", {}).get("suspended_subgroups", [])
+  logging.debug(f"{suspended_subgroups=}")
+  curr_subgroup = user_context.get('subgroup', None)
+  if curr_subgroup in suspended_subgroups:
+      logging.info(f"Received put message for subgroup {curr_subgroup} in {suspended_subgroups=}, ignoring")
+  else:
+      from_phone = request.json['phone_to_server']
+      usercache.sync_phone_to_server(user_context['user_id'], from_phone)
+
+      # Respond with deployment config if phone's version is outdated,
+      # otherwise no response
+      logging.debug("Usercache sync finished; checking config versions...")
+      phone_config_version = request.json.get('deployment_config_version')
+      phone_app_version = request.json.get('app_version')
+      if ecdc.is_phone_config_outdated(user_context['token'], phone_config_version, phone_app_version):
+          logging.debug("Phone config is outdated, responding with current deployment config")
+          return { "deployment_config": deployment_config }
+
 
 @post('/usercache/putone')
 def putIntoOneEntry():
@@ -345,46 +341,27 @@ def deleteUserCustomLabel():
   return { 'label' : to_return }
 
 @post('/result/metrics/<time_type>')
-def summarize_metrics(time_type):
-    _fill_aggregate_backward_compat(request)
+def getMetrics(time_type):
+    logging.debug("getMetrics with time_type %s and request %s" %
+                  (time_type, request.json))
+    # HACK HACK HACK
+    # Remove in 2026 after the uw-ebike data collection is complete
+    program_name = ecdc.get_deployment_config().get("url_abbreviation", None)
+    if program_name == "uw-ebike":
+        logging.info(f"Received metrics call for program {program_name} that doesn't want a dashboard, ignoring")
+        return
+    else:
+        logging.info(f"Received metrics call for program {program_name}, continuing")
+    if time_type != 'yyyy_mm_dd':
+        abort(404, "Please upgrade to continue using the app dashboard")
+    
     user_uuid = get_user_or_aggregate_auth(request)
-
-    start_time = request.json['start_time']
-    end_time = request.json['end_time']
-    freq_name = request.json['freq']
-    old_style = False
-    if 'metric' in request.json:
-        old_style = True
-        metric_list = [request.json['metric']]
-    else:
-        metric_list = request.json['metric_list']
-
-    logging.debug("metric_list = %s" % metric_list)
-
-    if 'is_return_aggregate' in request.json:
-        is_return_aggregate = request.json['is_return_aggregate']
-    else:
-        old_style = True
-        is_return_aggregate = True
-
-    app_config = request.json['app_config'] if 'app_config' in request.json else None
-
-    time_type_map = {
-        'timestamp': metrics.summarize_by_timestamp, # used by old UI
-        'local_date': metrics.summarize_by_local_date,
-        'yyyy_mm_dd': metrics.summarize_by_yyyy_mm_dd # used by new UI
-    }
-    metric_fn = time_type_map[time_type]
-    ret_val = metric_fn(user_uuid,
-              start_time, end_time,
-              freq_name, metric_list, is_return_aggregate, app_config)
-    if old_style:
-        logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
-        assert(len(metric_list) == 1)
-        if 'user_metrics' in ret_val:
-            ret_val['user_metrics'] = ret_val['user_metrics'][0]
-        ret_val['aggregate_metrics'] = ret_val['aggregate_metrics'][0]
-    return ret_val
+    start_ymd = request.json['start_time']
+    end_ymd = request.json['end_time']
+    
+    result = metrics.get_agg_metrics_from_db(start_ymd, end_ymd)
+    logging.debug("getMetrics result = %s" % result)
+    return result
 
 @post('/join.group/<group_id>')
 def habiticaJoinGroup(group_id):
@@ -470,7 +447,8 @@ def after_request():
   request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
   new_duration = request.params.timer.elapsed
-  if round(old_div((duration - new_duration), new_duration) > 100) > 0:
+  earus.update_last_call_timestamp(request.params.user_uuid, request.path)
+  if round(((duration - new_duration) / new_duration) > 100) > 0:
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
                                  (request.method, request.path), msTimeNow, duration - new_duration)
@@ -504,43 +482,39 @@ def get_user_or_aggregate_auth(request):
     "user_only": lambda r: None if _get_uuid_bool_wrapper(request) else abort(403, "aggregations only available to users"),
     "never": lambda r: abort(404, "Aggregate calls not supported")
   }
-  if request.json["aggregate"] == False:
+  if "user" in request.json:
     logging.debug("User specific call, returning UUID")
     return getUUID(request)
   else:
     logging.debug(f"Aggregate call, checking {aggregate_call_auth} policy")
     return aggregate_call_map[aggregate_call_auth](request)
 
-def getUUID(request, inHeader=False):
+def getUUID(request, inHeader=False, return_context=False):
     try:
-        retUUID = enaa.getUUID(request, auth_method, inHeader)
-        logging.debug("retUUID = %s" % retUUID)
-        if retUUID is None:
+        deployment_config = ecdc.get_deployment_config()
+        retContext = enaa.getUUID(request, auth_method, inHeader, deployment_config)
+        logging.debug("retUUID = %s" % retContext)
+        if retContext is None:
            raise HTTPError(403, "token is valid, but no account found for user")
-        return retUUID
+
+        if return_context:
+            return retContext
+        else:
+            return retContext['user_id']
     except ValueError as e:
         traceback.print_exc()
         abort(403, e)
 
 def resolve_auth(auth_method):
     if auth_method == "dynamic":
-        logging.debug("auth_method is dynamic")
-        logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
-        download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
-        logging.debug("About to download config from %s" % download_url)
-        r = requests.get(download_url)
-        if r.status_code != 200:
-            logging.debug(f"Unable to download study config, status code: {r.status_code}")
+        logging.debug("auth_method is dynamic, using deployment config to find the actual auth method")
+        deployment_config = ecdc.get_deployment_config()
+        if deployment_config is None:
             sys.exit(1)
         else:
-            dynamic_config = json.loads(r.text)
-            logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
-                f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
-                f"and data collection URL {dynamic_config['server']['connectUrl']}")
-
-            if "opcode" in dynamic_config:
+            if "opcode" in deployment_config:
                 # New style config
-                if dynamic_config["opcode"]["autogen"] == True:
+                if deployment_config["opcode"]["autogen"] == True:
                     logging.debug("opcodes are autogenerated, set auth_method to skip")
                     return "skip"
                 else:
@@ -548,7 +522,7 @@ def resolve_auth(auth_method):
                     return "token_list"
 
             # old style config, remove at the end of 2024 when all old style configs have ended
-            if dynamic_config["intro"]["program_or_study"] == "program":
+            if deployment_config["intro"]["program_or_study"] == "program":
                 logging.debug("is a program set auth_method to token_list")
                 return "token_list"
             else:

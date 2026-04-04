@@ -1,11 +1,5 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Initial attempt at a task definition. This is the data structure -
 # the parsing and interpreting code is elsewhere
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import enum
 import logging

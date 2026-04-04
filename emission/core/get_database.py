@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 from pymongo import MongoClient
 import pymongo
@@ -16,14 +10,26 @@ config = ecbc.get_config('conf/storage/db.conf',
     {"DB_HOST": "timeseries.url", "DB_RESULT_LIMIT": "timeseries.result_limit"})
 
 db_config = {}
-for key in ["DB_HOST", "DB_RESULT_LIMIT"]:
+for key in ["DB_HOST", "DB_RESULT_LIMIT", "USE_HINTS", "MONITOR_DB"]:
     if key in config:
         db_config[key] = config.get(key)
     else:
         db_config[key] = None
 print("Retrieved config: %s" % db_config)
 url = config.get("DB_HOST", "localhost")
-result_limit = config.get("DB_RESULT_LIMIT", 250000)
+try:
+    result_limit = int(config.get("DB_RESULT_LIMIT", 250000))
+except ValueError:
+    result_limit = 250000
+
+try:
+    use_hints = bool(config.get("USE_HINTS", False))
+except ValueError:
+    use_hints = False
+
+if db_config.get("MONITOR_DB"):
+    import emission.storage.timeseries.db_query_monitor as estd
+    estd.register_db_query_monitor()
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
@@ -173,6 +179,14 @@ def get_usercache_db():
     UserCache.create_index([("metadata.key", pymongo.ASCENDING)])
     UserCache.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     UserCache.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    print("Creating usercache_compound_hack index in the background")
+    UserCache.create_index([
+        ("user_id", pymongo.ASCENDING),
+        ("metadata.type", pymongo.ASCENDING),
+        ("metadata.key", pymongo.ASCENDING),
+        ("metadata.write_ts", pymongo.DESCENDING),
+        ("data.ts", pymongo.DESCENDING)],
+        name="usercache_compound_hack", background=True)
     return UserCache
 
 def _migrate_sparse_to_dense(collection, geo_index):
@@ -192,8 +206,17 @@ def get_timeseries_db():
     TimeSeries.create_index([("metadata.key", pymongo.ASCENDING)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
     _migrate_sparse_to_dense(TimeSeries, "data.loc_2dsphere")
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
+    TimeSeries.create_index([
+        ("user_id", pymongo.ASCENDING),
+        ("metadata.key", pymongo.ASCENDING),
+        ("metadata.write_ts", pymongo.DESCENDING),
+        ("data.ts", pymongo.DESCENDING),
+        ("data.start_ts", pymongo.DESCENDING),
+        ("data.end_ts", pymongo.DESCENDING)],
+        name="timeseries_compound_hack", background=True)
     return TimeSeries
 
 def get_timeseries_error_db():
@@ -271,6 +294,19 @@ def _create_analysis_result_indices(tscoll):
     _migrate_sparse_to_dense(tscoll, "data.loc_2dsphere")
     tscoll.create_index([("data.loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.local_dt") # recreated location
+    # TODO @JGreenlee Figure out what to do with the other indices
+    # I focused on the main timeseries queries for now
+    # start_local_dt queries are primarily used in the public dashboard, for example
+    tscoll.create_index([
+        ("user_id", pymongo.ASCENDING),
+        ("metadata.key", pymongo.ASCENDING),
+        ("metadata.write_ts", pymongo.DESCENDING),
+        ("data.ts", pymongo.DESCENDING),
+        ("data.start_ts", pymongo.DESCENDING),
+        ("data.end_ts", pymongo.DESCENDING),
+        ("data.enter_ts", pymongo.DESCENDING),
+        ("data.exit_ts", pymongo.DESCENDING)],
+        name="analysis_compound_hack", background=True)
     return tscoll
 
 def _create_local_dt_indices(time_series, key_prefix):
@@ -313,6 +349,12 @@ def get_fake_sections_db():
     #current_db = MongoClient().Stage_database
     FakeSections = _get_current_db().Stage_fake_sections
     return FakeSections
+
+def get_agg_metrics_db():
+    AggMetrics = _get_current_db().Stage_agg_metrics
+    AggMetrics.create_index([("date", pymongo.ASCENDING)])
+    AggMetrics.create_index([("metric", pymongo.ASCENDING)])
+    return AggMetrics
 
 # Static utility method to save entries to a mongodb collection.  Single
 # drop-in replacement for collection.save() now that it is deprecated in 

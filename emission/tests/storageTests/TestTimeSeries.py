@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import unittest
 import datetime as pydt
@@ -50,13 +44,13 @@ class TestTimeSeries(unittest.TestCase):
     def testGetEntries(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
-        self.assertEqual(len(list(ts.find_entries(time_query=tq))), len(self.entries))
+        self.assertEqual(len(ts.find_entries(time_query=tq)), len(self.entries))
 
     def testComponentQuery(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         tq = esttc.TimeComponentQuery("metadata.write_local_dt",
             ecwl.LocalDate({"hour": 8}), ecwl.LocalDate({"hour":9}))
-        self.assertEqual(len(list(ts.find_entries(time_query=tq))), 490)
+        self.assertEqual(len(ts.find_entries(time_query=tq)), 490)
 
     def testGetEntryAtTs(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
@@ -83,7 +77,7 @@ class TestTimeSeries(unittest.TestCase):
         ignored_phones = {"user_id": {"$nin": [self.testUUID]}}
         # user_id is in both the extra query and the base query
         with self.assertRaises(AttributeError):
-            list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))
+            ts.find_entries(time_query=tq, extra_query_list=[ignored_phones])
 
     def testFindEntriesCount(self):
         '''

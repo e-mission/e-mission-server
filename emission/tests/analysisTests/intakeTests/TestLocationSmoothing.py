@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import *
 import unittest
@@ -268,7 +262,11 @@ class TestLocationSmoothing(unittest.TestCase):
             for j, section_entry in enumerate(curr_sections):
                 logging.debug("-" * 20 + "Considering section %s: %s" %
                               (j, section_entry.data.start_fmt_time) + "-" * 20)
-                eaicl.filter_jumps(self.testUUID, section_entry.get_id())
+                loc_df = self.ts.get_data_df("background/filtered_location",
+                        esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                          section_entry.get_id()))
+                entry_to_store = eaicl.filter_jumps(self.testUUID, section_entry, loc_df)
+                self.ts.insert(entry_to_store)
                 # TODO: Figure out how to make collections work for the wrappers and then change this to an Entry
                 filtered_points_entry = ad.AttrDict(self.ts.get_entry_at_ts(
                     "analysis/smoothing", "data.section", section_entry.get_id()))

@@ -1,11 +1,5 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import sys
 import logging
@@ -24,6 +18,7 @@ import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.user_queries as esdu
 # only needed to read the motion_activity
 # https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
+import emission.core.wrapper.user as ecwu
 import emission.export.export as eee
 
 def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):

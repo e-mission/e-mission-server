@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import unittest
 import datetime as pydt
@@ -79,15 +73,15 @@ class TestSectionQueries(unittest.TestCase):
     def testCleaned2InferredSectionList(self):
 
         # Running the pipeline for the two user datasets
-        epi.run_intake_pipeline_for_user(self.testUUID1, skip_if_no_new_data = False)
-        epi.run_intake_pipeline_for_user(self.testUUID2, skip_if_no_new_data = False)
+        epi.run_intake_pipeline_for_user(self.testUUID1)
+        epi.run_intake_pipeline_for_user(self.testUUID2)
 
         # Fetching the timeseries entries containing both raw data and analysis data after running intake pipeline
         ts_agg = esta.TimeSeries.get_aggregate_time_series()
         
         # Preparing section_user_list of sections and user_ids dictionary to be passed as function parameter
-        doc_cursor = ts_agg.find_entries([esda.CLEANED_SECTION_KEY])
-        sections_entries = [ecwe.Entry(doc) for doc in doc_cursor]
+        sections = ts_agg.find_entries([esda.CLEANED_SECTION_KEY])
+        sections_entries = [ecwe.Entry(s) for s in sections]
         section_user_list = []
         for i, section in enumerate(sections_entries):
             section_id = section.get_id()

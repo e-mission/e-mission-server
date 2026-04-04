@@ -52,7 +52,7 @@ def match_incoming_inputs(user_id, timerange):
                 assert False, "Found weird key {ui.metadata.key} that was not in the search list"
             update_confirmed_and_composite(ts, confirmed_obj)
         else:
-            logging.warn("No match found for single user input %s, moving forward anyway" % ui)
+            logging.info("No match found for single user input %s, moving forward anyway" % ui)
         lastInputProcessed = ui
 
     return lastInputProcessed

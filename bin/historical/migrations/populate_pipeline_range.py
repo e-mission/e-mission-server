@@ -39,5 +39,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     split_lists = eps.get_split_uuid_lists(args.n_workers)
     logging.info("Finished generating split lists %s" % split_lists)
-    eps.dispatch(split_lists, skip_if_no_new_data=False, target_fn=add_pipeline_range)
+    eps.dispatch(split_lists, target_fn=add_pipeline_range)
 

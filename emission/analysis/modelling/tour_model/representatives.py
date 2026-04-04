@@ -1,14 +1,7 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import range
 from builtins import *
 from builtins import object
-from past.utils import old_div
 import logging
 import numpy
 import math
@@ -226,7 +219,7 @@ class representatives(object):
         rlat2 = math.radians(lat2)
         lon = math.radians(lon2 - lon1);
         lat = math.radians(lat2-lat1);
-        a = math.sin(old_div(lat,2.0))**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(old_div(lon,2.0))**2
+        a = math.sin(lat / 2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon / 2.0)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = R * c
         return d

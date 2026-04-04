@@ -1,26 +1,22 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 import pandas as pd
 import pymongo
 import itertools
+from typing import Tuple
 
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
 
-ts_enum_map = {
-    esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
-    esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
-}
+def _get_enum_map():
+    return {
+        esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
+        esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+    }
 
-INVALID_QUERY = {'metadata.key': 'invalid'}
+ts_enum_map = _get_enum_map()
 
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
@@ -54,6 +50,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "stats/server_api_time": self.timeseries_db,
                 "stats/server_api_error": self.timeseries_db,
                 "stats/pipeline_time": self.timeseries_db,
+                "stats/dashboard_time": self.timeseries_db,
+                "stats/dashboard_error": self.timeseries_db,
                 "stats/pipeline_error": self.timeseries_db,
                 "stats/client_time": self.timeseries_db,
                 "stats/client_nav_event": self.timeseries_db,
@@ -205,14 +203,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("orig_ts_db_keys = %s, analysis_ts_db_keys = %s" % 
             (orig_ts_db_keys, analysis_ts_db_keys))
 
-        (orig_ts_db_count, orig_ts_db_result) = self._get_entries_for_timeseries(self.timeseries_db,
+        (orig_ts_db_count, orig_ts_db_entries) = self._get_entries_for_timeseries(self.timeseries_db,
                                                              orig_ts_db_keys,
                                                              time_query,
                                                              geo_query,
                                                              extra_query_list,
                                                              sort_key)
 
-        (analysis_ts_db_count, analysis_ts_db_result) = self._get_entries_for_timeseries(self.analysis_timeseries_db,
+        (analysis_ts_db_count, analysis_ts_db_entries) = self._get_entries_for_timeseries(self.analysis_timeseries_db,
                                                                  analysis_ts_db_keys,
                                                                  time_query,
                                                                  geo_query,
@@ -220,21 +218,38 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                                  sort_key)
         logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
             (orig_ts_db_count, analysis_ts_db_count))
-        return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
+        return orig_ts_db_entries + analysis_ts_db_entries
 
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
-                                    extra_query_list, sort_key):
+                                    extra_query_list, sort_key) -> Tuple[int, list]:
         # workaround for https://github.com/e-mission/e-mission-server/issues/271
         # during the migration
         if key_list is None or len(key_list) > 0:
             ts_query = self._get_query(key_list, time_query, geo_query,
                                 extra_query_list)
-            ts_db_cursor = tsdb.find(ts_query)
-            ts_db_count = tsdb.count_documents(ts_query)
+            
+            if all(k.startswith("background/") for k in key_list or []):
+                # using 'metadata.key' index for background/* entries is very slow;
+                # force using 'data.ts' index instead
+                # https://github.com/e-mission/e-mission-docs/issues/1109#issuecomment-2922807236
+                hint_arr = [("data.ts", -1)]
+            elif sort_key is None or "metadata" in sort_key:
+                hint_arr = [("metadata.key", 1)]
+            else:
+                hint_arr = [(sort_key, -1)]
+
+            # print(f"for query {ts_query=}, when indices are {tsdb.index_information()}, {sort_key=} so {hint_arr=}")
+            if edb.use_hints:
+                ts_db_cursor = tsdb.find(ts_query).hint(hint_arr)
+            else:
+                ts_db_cursor = tsdb.find(ts_query)
             if sort_key is None:
                 ts_db_result = ts_db_cursor
             else:
-                ts_db_result = ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
+                ts_db_result = ts_db_cursor.sort([
+                    (sort_key, pymongo.ASCENDING),
+                    ('_id', pymongo.ASCENDING),
+                ])
             # We send the results from the phone in batches of 10,000
             # And we support reading upto 100 times that amount at a time, so over
             # This is more than the number of entries across all metadata types for
@@ -245,12 +260,21 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # In [593]: edb.get_timeseries_db().find({"user_id": UUID('ea59084e-11d4-4076-9252-3b9a29ce35e0')}).count()
             # Out[593]: 449869
             ts_db_result.limit(edb.result_limit)
+
+            # This list() conversion causes the cursor to be consumed, which is memory-expensive,
+            # but faster as it allows us to get the count without having to make an additional
+            # "count_documents" DB call.
+            # In a future situation where memory is constrained or DB calls are less expensive,
+            # we could skip the list() conversion and return the cursor directly.
+            # https://github.com/e-mission/e-mission-server/pull/1032#issuecomment-2685846702
+            ts_db_entries = list(ts_db_result)
+            ts_db_count = len(ts_db_entries)
         else:
-            ts_db_result = tsdb.find(INVALID_QUERY)
+            ts_db_entries = []
             ts_db_count = 0
 
         logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
-        return (ts_db_count, ts_db_result)
+        return (ts_db_count, ts_db_entries)
 
     def get_entry_at_ts(self, key, ts_key, ts):
         import numpy as np
@@ -277,11 +301,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         entry -> dict
         :return:
         """
-        result_it = self.find_entries([key], time_query, geo_query, extra_query_list)
-        return self.to_data_df(key, result_it, map_fn)
+        entries = self.find_entries([key], time_query, geo_query, extra_query_list)
+        return self.to_data_df(key, entries, map_fn)
 
     @staticmethod
-    def to_data_df(key, entry_it, map_fn = None):
+    def to_data_df(key, entries, map_fn = None):
         """
         Converts the specified iterator into a dataframe
         :param key: The key whose entries are in the iterator
@@ -291,7 +315,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         if map_fn is None:
             map_fn = BuiltinTimeSeries._to_df_entry
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
-        df = pd.DataFrame([map_fn(e) for e in entry_it])
+        df = pd.DataFrame([map_fn(e) for e in entries])
         logging.debug("Found %s results" % len(df))
         if len(df) > 0:
             dedup_check_list = [item for item in ecwe.Entry.get_dedup_list(key)
@@ -315,7 +339,13 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :return: a database row, or None if no match is found
         """
         find_query = self._get_query([key], time_query)
-        result_it = self.get_timeseries_db(key).find(find_query).sort(field, sort_order).limit(1)
+        result_it = self.get_timeseries_db(key) \
+                        .find(find_query) \
+                        .sort([
+                            (field, sort_order),
+                            ('_id', pymongo.ASCENDING),
+                        ]) \
+                        .limit(1)
         result_list = list(result_it)
         if len(result_list) == 0:
             return None
@@ -471,8 +501,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
         # Segregate orig_tsdb and analysis_tsdb keys so as to fetch counts on each dataset
         (orig_tsdb_keys, analysis_tsdb_keys) = self._split_key_list(key_list)
 
-        orig_tsdb_count = self._get_entries_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list, None)[0]
-        analysis_tsdb_count = self._get_entries_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list, None)[0]
+        (orig_tsdb_count, _) = self._get_entries_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list, None)
+        (analysis_tsdb_count, _) = self._get_entries_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list, None)
 
         total_matching_count = orig_tsdb_count + analysis_tsdb_count
         return total_matching_count

@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 import bson.objectid as boi
@@ -60,8 +54,12 @@ class Entry(ecwb.WrapperBase):
             "stats/server_api_error": "statsevent",
             # pipeline stage time, measured on the server
             "stats/pipeline_time": "statsevent",
+            # dashboard time, measured on the server
+            "stats/dashboard_time": "statsevent",
             # intended to log the occurrence of errors in the pipeline
             "stats/pipeline_error": "statsevent",
+            # intended to log the occurrence of errors in the dashboard
+            "stats/dashboard_error": "statsevent",
             # time for various client operations, measured on the client
             # comparison with the server_api_time can help debug networking issues
             "stats/client_time": "statsevent",
