@@ -40,7 +40,7 @@ services:
     networks:
       - emission
   db:
-    image: mongo:8.0.4
+    image: mongo:8.0.19
     volumes:
       - mongo-data:/data/db
     networks:

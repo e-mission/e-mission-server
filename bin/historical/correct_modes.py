@@ -1,7 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 # This script allows us to correct misclassified user confirmed trips.
 # We suspect that the user misclassified them because they were inaccurately
 # classified high confidence trips.
@@ -9,8 +5,6 @@ from __future__ import absolute_import
 # this script.  All corrections should happen through the script, and the
 # associated correction file should be checked in for further reference
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import next
 from builtins import *
 from builtins import object

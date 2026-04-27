@@ -1,14 +1,8 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 # Exports all data for the particular group of users for the particular day range
 # Exports them as geojson using the `emission.analysis.plotting.geojson.geojson_feature_converter` method
 # Note that you probably want to edit `conf/analysis/debug.conf.json.sample` to
 # turn off `output.conversion.validityAssertions` to avoid running into asserts
 # while generating the geojson files
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import sys
 import logging

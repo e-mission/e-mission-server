@@ -1,13 +1,6 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
-from past.utils import old_div
 import numpy as np
 import json
 import logging
@@ -287,8 +280,8 @@ def _ios_fill_fake_data(locs_df):
         dist_fill = np.random.uniform(low=0, high=100, size=len(ts_fill))
         angle_fill = np.random.uniform(low=0, high=2 * np.pi, size=len(ts_fill))
         # Formula from http://gis.stackexchange.com/questions/5821/calculating-latitude-longitude-x-miles-from-point
-        lat_fill = locs_df.latitude[end] + np.multiply(dist_fill, old_div(np.sin(
-            angle_fill), 111111))
+        lat_fill = locs_df.latitude[end] + np.multiply(dist_fill, np.sin(
+            angle_fill) / 111111)
         cl = np.cos(locs_df.latitude[end])
         lng_fill = locs_df.longitude[end] + np.multiply(dist_fill, np.cos(
             angle_fill) / cl / 111111)

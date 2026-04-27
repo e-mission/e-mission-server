@@ -4,6 +4,7 @@ import json
 import requests
 import asyncio
 import emcommon.util as emcu
+import packaging.version
 
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 CONFIGS_URL = os.getenv('CONFIGS_URL', "https://raw.githubusercontent.com/e-mission/op-deployment-configs/main/configs/")
@@ -86,3 +87,41 @@ def get_deployment_config(study_config=STUDY_CONFIG, configs_url=CONFIGS_URL, de
     # Load supplemental files (labels, surveys, etc.) asynchronously
     asyncio.run(_load_supplemental_files(deployment_config, study_config, configs_url))
     return deployment_config
+
+
+def is_phone_config_outdated(user_token: str, phone_config_version: int | None, phone_app_version: str | None) -> bool | None:
+    """
+    Return True if the phone's deployment config version is older than the server's, False if up to date,
+    or None if the version check cannot be performed.
+    """
+    # If the server's STUDY_CONFIG doesn't match the opcode, skip the version check.
+    # This happen on stage where the server is on stage-program but some opcodes are stage-study or stage-timeuse.
+    # This is not an issue on prod since 1 deployment has 1 config.
+    if STUDY_CONFIG not in user_token:
+        logging.warning(
+            "Opcode %s does not use config %s, skipping config version check",
+            user_token,
+            STUDY_CONFIG,
+        )
+        return None
+
+    deployment_config = get_deployment_config()
+    server_config_version = deployment_config.get('version')
+    server_config_min_app_version = deployment_config.get('min_app_version', '0.0.0')
+
+    logging.debug(f"Phone config @ {phone_config_version}, server config @ {server_config_version}; phone app @ {phone_app_version}")
+    if server_config_version is None:
+        logging.error("Server config missing version, skipping config version check")
+        return None
+    
+    if not phone_config_version or phone_config_version >= server_config_version:
+        logging.debug("Phone config is up to date")
+        return False
+    
+    if server_config_min_app_version and phone_app_version \
+        and packaging.version.parse(phone_app_version) < packaging.version.parse(server_config_min_app_version):
+        logging.debug(f"Phone app version is below min_app_version {server_config_min_app_version}, skipping config update")
+        return False
+
+    logging.debug("Phone config is outdated")
+    return True

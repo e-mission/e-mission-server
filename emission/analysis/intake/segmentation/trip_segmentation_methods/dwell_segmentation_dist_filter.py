@@ -1,8 +1,3 @@
-from __future__ import division, unicode_literals, print_function, absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str, range, zip
-from past.utils import old_div
 import logging
 import attrdict as ad
 import numpy as np
@@ -99,7 +94,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
 
         # --- Define thresholds for segmentation ---
         # For a candidate segmentation, if the speed is below this threshold, then the phone may be stationary.
-        speed_threshold = float(self.distance_threshold * 2) / (self.time_threshold / 2)
+        speed_threshold = (self.distance_threshold * 2) / (self.time_threshold / 2)
 
         with ect.Timer() as t_loop:
             # --- Identify candidate segmentation points ---

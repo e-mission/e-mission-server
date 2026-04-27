@@ -1,7 +1,3 @@
-from __future__ import print_function
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import absolute_import
 # Techniques to smooth jumps in location tracking. Each of these returns a
 # boolean mask of inliers and outliers. We assume that the incoming dataframe
 # has a column called "speed" that represents the speed at each point. The
@@ -9,11 +5,8 @@ from __future__ import absolute_import
 # The result is in the inlier_mask field of the appropriate object
 
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
-from past.utils import old_div
 from builtins import object
 import logging
 import math
