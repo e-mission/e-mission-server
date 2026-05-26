@@ -1,7 +1,6 @@
 name: emission
 channels:
 - conda-forge
-- defaults
 dependencies:
 - arrow=1.2.3
 - attrdict=2.0.1
