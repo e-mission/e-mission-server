@@ -89,7 +89,22 @@ class TestUserInput(unittest.TestCase):
             if "inferred_section_summary" in rt.data:
                 self.assertEqual(rt.data["inferred_section_summary"], et.data["inferred_section_summary"])
             if "cleaned_section_summary" in et.data:
-                self.assertEqual(rt.data["cleaned_section_summary"], et.data["cleaned_section_summary"])
+                # Check keys match
+                self.assertEqual(rt.data["cleaned_section_summary"].keys(), et.data["cleaned_section_summary"].keys())
+                
+                # Handle distance values with assertAlmostEqual for floating point comparison
+                if "distance" in rt.data["cleaned_section_summary"]:
+                    self.assertEqual(rt.data["cleaned_section_summary"]["distance"].keys(), 
+                                    et.data["cleaned_section_summary"]["distance"].keys())
+                    for mode in rt.data["cleaned_section_summary"]["distance"]:
+                        self.assertAlmostEqual(rt.data["cleaned_section_summary"]["distance"][mode],
+                                              et.data["cleaned_section_summary"]["distance"][mode],
+                                              delta=1e-5)
+                
+                # For all other keys, use exact comparison
+                for key in [k for k in rt.data["cleaned_section_summary"].keys() if k != "distance"]:
+                    self.assertEqual(rt.data["cleaned_section_summary"][key], et.data["cleaned_section_summary"][key])
+            
             if 'ble_sensed_summary' in et.data:
                 self.assertEqual(rt.data["ble_sensed_summary"], et.data["ble_sensed_summary"])
             logging.debug(20 * "=")
