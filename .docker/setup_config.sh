@@ -8,6 +8,9 @@ source setup/setup_conda.sh Linux-x86_64
 ## this won't cause a regression in our code since we pin the versions that we use anyway
 conda update -c conda-forge --all
 
+# Remove rattler because we don't need it, and it is tripping up openssl checks
+conda uninstall conda-rattler-solver
+
 # now install the emission environment
 source setup/setup.sh
 
