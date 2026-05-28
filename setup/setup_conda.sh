@@ -20,10 +20,15 @@ INSTALL_PREFIX=$2
 
 if [[ -z $PLATFORM ]]; then
     echo "Usage: setup_conda.sh <platform> [install_prefix]"
-    echo "   Platform options are Linux-x86_64, MacOSX-x86_64, MacOSX-arm64"
+    echo "   Platform options are Linux-x86_64, Linux-aarch64, Linux-arm64, MacOSX-x86_64, MacOSX-arm64"
     WINDOWS_INSTALLER_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-Windows-x86_64.exe"
     echo "   For Windows, manually download and install $WINDOWS_INSTALLER_URL"
     exit 2
+fi
+
+# Miniconda installer names use Linux-aarch64 for ARM Linux.
+if [[ $PLATFORM == "Linux-arm64" ]]; then
+    PLATFORM="Linux-aarch64"
 fi
 
 if [[ -z $INSTALL_PREFIX ]]; then
