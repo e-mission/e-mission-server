@@ -38,7 +38,7 @@ jobs:
     - name: Install miniconda
       shell: bash -l {0}
       run: |
-        source setup/setup_conda.sh ${{ matrix.PLATFORM }}
+        source setup/setup_conda.sh
 
     - name: Check whether the environment is setup properly
       shell: bash -l {0}

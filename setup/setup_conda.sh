@@ -15,21 +15,38 @@ if [[ -z $EXP_CONDA_VER ]]; then
     exit 1
 fi
 
-PLATFORM=$1
-INSTALL_PREFIX=$2
+INSTALL_PREFIX=$1
+PLATFORM=""
 
-if [[ -z $PLATFORM ]]; then
-    echo "Usage: setup_conda.sh <platform> [install_prefix]"
-    echo "   Platform options are Linux-x86_64, Linux-aarch64, Linux-arm64, MacOSX-x86_64, MacOSX-arm64"
-    WINDOWS_INSTALLER_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-Windows-x86_64.exe"
-    echo "   For Windows, manually download and install $WINDOWS_INSTALLER_URL"
-    exit 2
+if [[ $INSTALL_PREFIX == "-h" || $INSTALL_PREFIX == "--help" ]]; then
+    echo "Usage: setup_conda.sh [install_prefix]"
+    echo "   Platform is inferred automatically from uname"
+    exit 0
 fi
 
-# Miniconda installer names use Linux-aarch64 for ARM Linux.
-if [[ $PLATFORM == "Linux-arm64" ]]; then
-    PLATFORM="Linux-aarch64"
-fi
+UNAME_S=$(uname -s)
+UNAME_M=$(uname -m)
+case "$UNAME_S:$UNAME_M" in
+    Linux:x86_64)
+        PLATFORM="Linux-x86_64"
+        ;;
+    Linux:aarch64|Linux:arm64)
+        PLATFORM="Linux-aarch64"
+        ;;
+    Darwin:x86_64)
+        PLATFORM="MacOSX-x86_64"
+        ;;
+    Darwin:arm64|Darwin:aarch64)
+        PLATFORM="MacOSX-arm64"
+        ;;
+    *)
+        echo "Error: Unsupported platform $UNAME_S/$UNAME_M"
+        echo "Supported platform mappings are Linux-x86_64, Linux-aarch64, MacOSX-x86_64, MacOSX-arm64"
+        WINDOWS_INSTALLER_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-Windows-x86_64.exe"
+        echo "For Windows, manually download and install $WINDOWS_INSTALLER_URL"
+        exit 2
+        ;;
+esac
 
 if [[ -z $INSTALL_PREFIX ]]; then
     INSTALL_PREFIX=$HOME/miniconda-$EXP_CONDA_VER
