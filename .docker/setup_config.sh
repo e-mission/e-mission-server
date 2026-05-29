@@ -1,6 +1,6 @@
 set -e
 echo "About to start conda update, this may take some time..."
-source setup/setup_conda.sh Linux-x86_64
+source setup/setup_conda.sh
 ## The base environment sometimes has deprecated packages.
 ## Even if we upgrade the package list for the emission environment, it will not
 ## modify the base environment, which will still trip up the checker.
