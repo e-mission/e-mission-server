@@ -38,7 +38,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        platforms: linux/amd64
+        platforms: linux/amd64,linux/arm64/v8
         push: true
         tags: ${{ secrets.DOCKER_USER }}/${{ github.event.repository.name }}:${{ github.ref_name }}_${{ steps.date.outputs.date }}
 
