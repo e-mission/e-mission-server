@@ -79,6 +79,10 @@ def get_profile_db():
     Profiles=_get_current_db().Stage_Profiles
     return Profiles
 
+def get_vehicle_db():
+    Vehicles=_get_current_db().Stage_Vehicles
+    return Vehicles
+
 def get_prediction_db():
     Predictions=_get_current_db().Stage_Predictions
     return Predictions
