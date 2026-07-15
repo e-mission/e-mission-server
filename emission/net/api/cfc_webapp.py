@@ -29,6 +29,7 @@ import emission.net.api.usercache as usercache
 import emission.net.api.timeline as timeline
 import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
+import emission.net.api.vehicle_library as vehicle_library
 
 import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
@@ -399,6 +400,31 @@ def getCustomURL(route):
   return {'redirect': 'success'}
 
 # Small utilities to make client software easier END
+
+# ============================================================================
+# Vehicle library endpoints START
+# ============================================================================
+
+@get('/library/stations')
+def get_bikeshare_stations():
+    return vehicle_library.stations()
+
+@post('/library/reserve')
+def bikeshare_checkout():
+    user_uuid = getUUID(request)
+    return vehicle_library.reserve_vehicle(user_uuid)
+
+@post('/library/checkout')
+def bikeshare_unlock():
+    user_uuid = getUUID(request)
+    return vehicle_library.checkout_vehicle(user_uuid)
+
+@post('/library/checkin')
+def bikeshare_return():
+    user_uuid = getUUID(request)
+    return vehicle_library.check_in_vehicle(user_uuid)
+
+# Vehicle library endpoints END
 
 @post('/habiticaRegister')
 def habiticaRegister():
