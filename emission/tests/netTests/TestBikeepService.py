@@ -1,10 +1,8 @@
 """
-Integration tests for the Bikeep service.
+Tests for the Bikeep service.
 
-These tests call the real Bikeep API and are intended to verify that the
-service functions correctly against the live system.
-
-Assumed initial state of the test device is UNLOCKED with no booking status.
+Bikeep HTTP calls are mocked so this suite runs reliably in CI without
+external API access or credentials.
 """
 
 # Standard imports
@@ -12,11 +10,8 @@ from builtins import *
 import unittest
 import os
 import time
-import json
 import logging
-import functools
-import requests
-import urllib3
+from unittest import mock
 
 # Module under test
 import emission.net.ext_service.bikeep.bikeep_service as bikeep
@@ -24,53 +19,86 @@ import emission.net.ext_service.bikeep.bikeep_service as bikeep
 logger = logging.getLogger(__name__)
 
 
-TEST_DEVICE_ID = os.environ.get("BIKEEP_TEST_DEVICE_ID", None)
-TEST_CAMERA_DEVICE_ID = os.environ.get("BIKEEP_TEST_CAMERA_DEVICE_ID", None)
-
-SKIP_IF_NO_TEST_DEVICE = unittest.skipIf(
-    TEST_DEVICE_ID is None,
-    "TEST_DEVICE_ID is not set — set the environment variable BIKEEP_TEST_DEVICE_ID to a real dock ID to run device tests"
-)
-
-SKIP_IF_NO_CAMERA = unittest.skipIf(
-    TEST_CAMERA_DEVICE_ID is None,
-    "TEST_CAMERA_DEVICE_ID is not set — set the environment variable BIKEEP_TEST_CAMERA_DEVICE_ID to a real camera-capable device ID to run photo tests"
-)
+TEST_DEVICE_ID = os.environ.get("BIKEEP_TEST_DEVICE_ID", "mock-dock-1")
+TEST_CAMERA_DEVICE_ID = os.environ.get("BIKEEP_TEST_CAMERA_DEVICE_ID", "mock-camera-1")
 
 
-class TestBikeepServiceIntegration(unittest.TestCase):
+class _MockResponse:
+    def __init__(self, payload, status_code=200):
+        self._payload = payload
+        self.status_code = status_code
+
+    def json(self):
+        return self._payload
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise Exception(f"HTTP {self.status_code}")
+
+
+class TestBikeepServiceMocked(unittest.TestCase):
     """
-    Integration tests that call the real Bikeep API.
-
-    Tests are skipped automatically when credentials are absent so the suite
-    stays green in CI environments that don't have API access.
+    Fast Bikeep service tests that mock external Bikeep calls.
     """
 
     def setUp(self):
-        # Suppress the InsecureRequestWarning that fires when verify=False.
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        bikeep._TOKEN_CACHE["access_token"] = "mock-token"
+        bikeep._TOKEN_CACHE["expires_at"] = time.time() + 3600
 
-        # Wrap requests.get/post so every call in the service goes out with
-        # verify=False — avoids SSL errors against self-signed certs in local
-        # dev without modifying production code.
-        _real_get = requests.get
-        _real_post = requests.post
-        requests.get  = functools.partial(_real_get,  verify=False)
-        requests.post = functools.partial(_real_post, verify=False)
-        self._real_get  = _real_get
-        self._real_post = _real_post
+        self._credentials_patcher = mock.patch.object(
+            bikeep,
+            "_get_api_credentials",
+            return_value={
+                "BIKEEP_CLIENT_ID": "mock-client-id",
+                "BIKEEP_CLIENT_SECRET": "mock-client-secret",
+            },
+        )
+        self._mock_get_patcher = mock.patch.object(bikeep.requests, "get")
+        self._mock_post_patcher = mock.patch.object(bikeep.requests, "post")
 
-        # Clear the token cache before each test so we exercise the full
-        # auth flow at least once per run.
-        bikeep._TOKEN_CACHE["access_token"] = None
-        bikeep._TOKEN_CACHE["expires_at"] = 0
+        self._credentials_patcher.start()
+        self.mock_get = self._mock_get_patcher.start()
+        self.mock_post = self._mock_post_patcher.start()
+
+        self.mock_get.side_effect = self._mocked_get
+        self.mock_post.side_effect = self._mocked_post
 
     def tearDown(self):
-        # Restore original request functions
-        requests.get  = self._real_get
-        requests.post = self._real_post
+        self._mock_get_patcher.stop()
+        self._mock_post_patcher.stop()
+        self._credentials_patcher.stop()
         bikeep._TOKEN_CACHE["access_token"] = None
         bikeep._TOKEN_CACHE["expires_at"] = 0
+
+    def _mocked_get(self, url, headers=None, timeout=10):
+        if url.endswith("/location/v1/locations"):
+            return _MockResponse(
+                {
+                    "data": [
+                        {
+                            "station_id": "station-1",
+                            "name": "Mock Station 1",
+                            "devices": {"total": 4},
+                        },
+                        {
+                            "station_id": "station-2",
+                            "name": "Mock Station 2",
+                            "devices": {"total": 3},
+                        },
+                    ]
+                }
+            )
+        return _MockResponse({}, status_code=404)
+
+    def _mocked_post(self, url, headers=None, json=None, data=None, timeout=10):
+        if url == bikeep.BIKEEP_AUTH_URL:
+            return _MockResponse({"access_token": "mock-token", "expires_in": 3600})
+
+        if "/device/v1/devices/" in url and url.endswith("/commands"):
+            command = (json or {}).get("command", "unknown")
+            return _MockResponse({"status": "ok", "command": command})
+
+        return _MockResponse({}, status_code=404)
 
     # ------------------------------------------------------------------
     # List locations (locations)
@@ -108,10 +136,8 @@ class TestBikeepServiceIntegration(unittest.TestCase):
     # ------------------------------------------------------------------
     # Take photo test device
     # ------------------------------------------------------------------
-    @SKIP_IF_NO_CAMERA
     def test_take_photo_device(self):
-        """take_photo() succeeds against the real API for TEST_CAMERA_DEVICE_ID."""
-        time.sleep(1)
+        """take_photo() succeeds with mocked Bikeep API."""
         result = bikeep.take_photo(TEST_CAMERA_DEVICE_ID)
 
         logger.info(f"Take photo result: {result}")
@@ -120,15 +146,12 @@ class TestBikeepServiceIntegration(unittest.TestCase):
     # ------------------------------------------------------------------
     # Lock then unlock (round-trip)
     # ------------------------------------------------------------------
-    @SKIP_IF_NO_TEST_DEVICE
     def test_lock_then_unlock_device(self):
-        """Lock followed immediately by unlock against the real API."""
-        time.sleep(1)
+        """Lock followed immediately by unlock against mocked Bikeep API."""
         lock_result = bikeep.lock_dock(TEST_DEVICE_ID)
         logger.info(f"Lock result: {lock_result}")
         self.assertIsInstance(lock_result, dict)
 
-        time.sleep(1)
         unlock_result = bikeep.unlock_dock(TEST_DEVICE_ID)
         logger.info(f"Unlock result: {unlock_result}")
         self.assertIsInstance(unlock_result, dict)
@@ -136,15 +159,12 @@ class TestBikeepServiceIntegration(unittest.TestCase):
     # ------------------------------------------------------------------
     # Book then cancel booking (round-trip)
     # ------------------------------------------------------------------
-    @SKIP_IF_NO_TEST_DEVICE
     def test_book_then_cancel_booking_device(self):
-        """Book followed by cancel-booking against the real API."""
-        time.sleep(1)
+        """Book followed by cancel-booking against mocked Bikeep API."""
         book_result = bikeep.book_dock(TEST_DEVICE_ID)
         logger.info(f"Book result: {book_result}")
         self.assertIsInstance(book_result, dict)
 
-        time.sleep(1)
         cancel_result = bikeep.cancel_booking_dock(TEST_DEVICE_ID)
         logger.info(f"Cancel booking result: {cancel_result}")
         self.assertIsInstance(cancel_result, dict)
