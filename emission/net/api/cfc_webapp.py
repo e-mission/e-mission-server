@@ -409,6 +409,40 @@ def getCustomURL(route):
 def get_bikeshare_stations():
     return vehicle_library.stations()
 
+@post('/library/setup/create')
+def bikeshare_setup_user():
+    user_uuid = getUUID(request)
+    import emission.net.ext_service.stripe.stripe_service as ss
+    return ss.create_setup_checkout_session(user_uuid)
+
+@post('/library/setup/status')
+def bikeshare_setup_status():
+    user_uuid = getUUID(request)
+    import emission.net.ext_service.stripe.stripe_service as ss
+    raw_session = ss.get_setup_checkout_session_status(user_uuid)
+    logging.debug(f"DEBUG: Retrieved setup checkout session status for user {user_uuid}: {raw_session=}")
+    if raw_session is None:
+        logging.warning(f"WARN: Retrieved setup checkout session status for user {user_uuid}: {raw_session=}")
+        return None
+    # Convert the raw session to a dict so that we can return it as JSON
+    session_dict = {
+        "id": raw_session.id,
+        "setup_intent": {
+            "id": raw_session.setup_intent.id,
+            "status": raw_session.setup_intent.status,
+            "customer": raw_session.setup_intent.customer,
+            "payment_method": raw_session.setup_intent.payment_method
+        },
+        "status": raw_session.status,
+    }
+    return session_dict
+
+@post('/library/setup/finalize')
+def bikeshare_finalize_setup():
+    user_uuid = getUUID(request)
+    import emission.net.ext_service.stripe.stripe_service as ss
+    return ss.setup_checkout_session_resolved(user_uuid)
+
 @post('/library/reserve')
 def bikeshare_checkout():
     user_uuid = getUUID(request)

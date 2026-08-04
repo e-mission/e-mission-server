@@ -79,6 +79,9 @@ def get_profile_db():
     Profiles=_get_current_db().Stage_Profiles
     return Profiles
 
+# List of vehicles (for a shared vehicle/MAAS scenario).
+# Mapping between users and vehicles will be stored in the state DB since it is user state
+# It is in a modifiable collection since the mapping will change as the user checks vehicles out and in
 def get_vehicle_db():
     Vehicles=_get_current_db().Stage_Vehicles
     return Vehicles
