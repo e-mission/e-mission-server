@@ -29,7 +29,7 @@ class TestModelStorage(unittest.TestCase):
     '''
     def setUp(self):
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-        level=logging.DEBUG)
+            level=logging.DEBUG)
 
         # configuration for randomly-generated test data
         self.user_id = user_id = 'TestRunGreedyModel-TestData'

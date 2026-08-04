@@ -264,6 +264,18 @@ def get_model_db():
     ModelDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     return ModelDB
 
+
+def get_state_db():
+    """
+    " Stores modifiable state documents keyed by state type for each user.
+    " This follows the same write-and-replace pattern as the model database.
+    """
+    StateDB = _get_current_db().Stage_updateable_states
+    StateDB.create_index([("user_id", pymongo.ASCENDING)])
+    StateDB.create_index([("metadata.key", pymongo.ASCENDING)])
+    StateDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    return StateDB
+
 def _create_analysis_result_indices(tscoll):
     tscoll.create_index([("metadata.key", pymongo.ASCENDING)])
 
