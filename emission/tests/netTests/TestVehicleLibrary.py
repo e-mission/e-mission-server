@@ -29,18 +29,22 @@ class TestVehicleLibrary(unittest.TestCase):
     """
 
     def setUp(self):
-        """Set up test vehicle in MongoDB."""
+        """Set up test vehicles in MongoDB."""
         self.test_uuid = uuid.uuid4()
         self.mock_db = edb.get_vehicle_db()
-        
+        self.profile_db = edb.get_profile_db()
+
         # Clean up any previous test data
+
         self.mock_db.delete_many({'vehicle_id': VEHICLE_ID})
         self.mock_db.delete_many({'location': str(self.test_uuid)})
+        self.profile_db.delete_many({'user_id': self.test_uuid})
 
     def tearDown(self):
         """Clean up test data from MongoDB."""
         self.mock_db.delete_many({'vehicle_id': VEHICLE_ID})
         self.mock_db.delete_many({'location': str(self.test_uuid)})
+        self.profile_db.delete_many({'user_id': self.test_uuid})
 
     # ------------------------------------------------------------------
     # Helpers
