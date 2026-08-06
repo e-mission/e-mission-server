@@ -18,11 +18,13 @@ jobs:
     - name: Workflow test
       run: echo Good morning!
       
-      # Runs TestOverpass.py to check for API functionality
-    - name: Test Overpass
+      # Runs Bikeep integration tests against the live API
+    - name: Test Bikeep
       env:
-        GEOFABRIK_OVERPASS_KEY: '${{ secrets.GEOFABRIK_OVERPASS_KEY }}'
+        BIKEEP_CLIENT_SECRET: '${{ secrets.BIKEEP_CLIENT_SECRET }}'
+        BIKEEP_CLIENT_ID: '${{ secrets.BIKEEP_CLIENT_ID }}'
+        RUN_BIKEEP_LIVE_TESTS: 1
       run: |
-        echo Testing overpass!
+        echo Testing Bikeep integration...
         chmod +x emission/individual_tests/setup_and_test_integration.sh
-        ./emission/individual_tests/setup_and_test_integration.sh emission/individual_tests/TestOverpass.py
+        ./emission/individual_tests/setup_and_test_integration.sh emission/tests/netTests/TestBikeepServiceIntegration.py
