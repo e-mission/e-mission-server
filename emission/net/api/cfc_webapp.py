@@ -412,23 +412,17 @@ def get_bikeshare_stations():
 @post('/library/setup/create')
 def bikeshare_setup_user():
     user_uuid = getUUID(request)
-    logging.debug(f"About to import the stripe_service module ")
-    import emission.net.ext_service.stripe.stripe_service as ss
-    session_obj= ss.create_setup_checkout_session(user_uuid)
-    logging.debug(f"create_setup_checkout_session for {user_uuid=} returned {session_obj=}")
-    return session_obj
+    return vehicle_library.initiate_user_setup(user_uuid)
 
-@post('/library/setup/status')
+@post('/library/setup/get_status')
 def bikeshare_setup_status():
     user_uuid = getUUID(request)
-    import emission.net.ext_service.stripe.stripe_service as ss
-    return ss.invoke_get_checkout_session_status_api(user_uuid)
+    return vehicle_library.get_user_setup_status(user_uuid)
 
-@post('/library/setup/finalize')
+@post('/library/setup/check_and_get_status')
 def bikeshare_finalize_setup():
     user_uuid = getUUID(request)
-    import emission.net.ext_service.stripe.stripe_service as ss
-    return ss.setup_checkout_session_resolved(user_uuid)
+    return vehicle_library.check_and_get_pending_setup_status(user_uuid)
 
 @post('/library/reserve')
 def bikeshare_checkout():

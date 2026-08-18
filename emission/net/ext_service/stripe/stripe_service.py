@@ -5,8 +5,6 @@ import stripe
 import emission.storage.modifiable.abstract_state_storage as esas
 import emission.core.wrapper.payment as ecwp
 
-logging.debug(f"About to configure the stripe service")
-
 # BEGIN DO NOT REFACTOR: I do not want to wrap these accesses
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 APP_URL_PREFIX = os.environ.get("APP_URL_PREFIX")
@@ -22,8 +20,6 @@ logging.debug("About to configure stripe with STRIPE_SECRET_KEY=%s,\
 ))
 stripe.api_key = STRIPE_SECRET_KEY
 stripe.api_base = STRIPE_API_BASE
-
-logging.debug(f"Finished configuring the stripe service with {STRIPE_SUCCESS_URL=}")
 
 # BEGIN: Setup flow; checkout session with a "setup" mode, and a hosted URL.
 # This requires a call to set up the session, which returns the hosted URL to the phone
@@ -112,36 +108,61 @@ def invoke_get_checkout_session_status_api(uuid):
         )
         return json.loads(str(expanded_session))
 
-def setup_checkout_session_resolved(uuid):
+def check_pending_setup_status(uuid):
     """
     Polling call to check if the setup checkout session has been completed. This is a trigger
     to retrieve the reusable payment method from the checkout session and store it in the database.
     """
     payment_db = esas.StateStorage.get_state_storage(uuid)
     payment_info = payment_db.get_current_state(esas.StateName.PAYMENT)
-    if payment_info is None or payment_info.get("pending_setup_session") is None:
-        raise ValueError("No pending setup session found for user %s" % uuid)
-    if payment_info.payment_setup_status != ecwp.PaymentSetupStatus.WAITING_FOR_USER:
-        raise ValueError("Setup checkout session is not in WAITING_FOR_USER state for user %s" % uuid)
+    if payment_info is None:
+        payment_info = ecwp.Payment()
+    if payment_info.payment_setup_status is None:
+        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.NOT_STARTED
 
-    # We cannot use our cached value because it may be stale.
+    # There is nothing pending, so nothing that we need to read from the server
+    if payment_info.payment_setup_status == ecwp.PaymentSetupStatus.SUCCEEDED \
+        or payment_info.payment_setup_status == ecwp.PaymentSetupStatus.FAILED:
+        return payment_info.payment_setup_status
+
+    assert payment_info.payment_setup_status in [ecwp.PaymentSetupStatus.WAITING_FOR_USER,
+                                                 ecwp.PaymentSetupStatus.EXPIRED,
+                                                 ecwp.PaymentSetupStatus.NOT_STARTED], \
+        f"Unexpected payment setup status: {payment_info.payment_setup_status}"
+
+    # User has asked us to sync the value to the server.
     # We need to call the API to get the current status of the session.
     setup_checkout_session_status = invoke_get_checkout_session_status_api(uuid)
-    if setup_checkout_session_status is None or setup_checkout_session_status.get("setup_intent") is None:
-        raise ValueError(f"For {uuid=}, checkout session is not valid, {setup_checkout_session_status=} and {setup_checkout_session_status.get('setup_intent')=}")
-    
-    if setup_checkout_session_status.get("setup_intent", {}).get("status") != "succeeded":
-        raise ValueError(f"For {uuid=}, setup checkout session has not succeeded yet; current status: {setup_checkout_session_status.get('setup_intent').get('status')}")
+    if setup_checkout_session_status is None:
+        logging.debug(f"saved state is {payment_info.payment_setup_status}, but no session status found on server; resetting state")
+        payment_info = ecwp.Payment()
+        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.NOT_STARTED
 
-    if setup_checkout_session_status.get("setup_intent", {}).get("payment_method") is None:
-        raise ValueError(f"For {uuid=}, setup checkout session has succeeded but no payment method was set; this should not happen")
+    if setup_checkout_session_status.get("status") == "open":
+        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.WAITING_FOR_USER
 
-    # At this point, we should have a valid setup checkout session and can use it freely
-    payment_info.payment_setup = setup_checkout_session_status.get("setup_intent")
-    payment_info.payment_setup_status = ecwp.PaymentSetupStatus.SUCCEEDED
-    del payment_info.pending_setup_session
-    logging.debug(f"About to save the updated payment info for {uuid=}: {payment_info}")
+    if setup_checkout_session_status.get("status") == "expired":
+        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.EXPIRED
 
+    assert setup_checkout_session_status.get("status") == "complete", \
+        f"Session exists and status is not open or expired, so must be complete, but got {setup_checkout_session_status.get('status')}"
+
+    if setup_checkout_session_status.get("setup_intent") is None or \
+       setup_checkout_session_status.get("setup_intent", {}).get("payment_method") is None:
+        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.FAILED
+    else:
+        # At this point, we should have a valid setup checkout session and can use it freely
+        payment_info.payment_setup = setup_checkout_session_status.get("setup_intent")
+        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.SUCCEEDED
+        del payment_info.pending_setup_session
+        logging.debug(f"About to save the updated payment info for {uuid=}: {payment_info}")
+
+    logging.debug(f"DEBUG: About to save the updated payment info for user {uuid}: {payment_info}")
     esas.StateStorage.get_state_storage(uuid).upsert_state(esas.StateName.PAYMENT, payment_info)
-    logging.debug(f"DEBUG: Returning from setup_checkout_session_resolved for user {uuid}")
-    return setup_checkout_session_status
+    logging.debug(f"DEBUG: Returning from check_pending_setup_status for user {uuid}")
+    return payment_info.payment_setup_status
+
+def get_current_payment_state(uuid):
+    payment_db = esas.StateStorage.get_state_storage(uuid)
+    payment_info = payment_db.get_current_state(esas.StateName.PAYMENT)
+    return payment_info if payment_info is not None else {}

@@ -10,7 +10,9 @@ import emission.core.wrapper.wrapperbase as ecwb
 class PaymentSetupStatus(enum.Enum):
     NOT_STARTED = 0
     WAITING_FOR_USER = 1
-    SUCCEEDED = 2
+    EXPIRED = 2
+    SUCCEEDED = 3
+    FAILED = 4
 
 class Payment(ecwb.WrapperBase):
     props = {

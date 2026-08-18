@@ -5,9 +5,10 @@ import datetime
 from emission.net.api.bottle import request, HTTPError
 import emission.core.get_database as edb
 import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
+import emission.net.ext_service.stripe.stripe_service as ss
+import emission.core.wrapper.payment as ecwp
 
 logger = logging.getLogger(__name__)
-
 
 def stations():
     """
@@ -153,3 +154,49 @@ def check_in_vehicle(user_uuid):
 
     logger.info("Checked in vehicle %s to dock %s for user %s" % (vehicle_id, dock_id, user_uuid))
     return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_id}
+
+## BEGIN: Stripe integration
+## This module is the bridge between stripe internals and the communication with the client.
+## This insulates the client from changes to the stripe API, and also avoids sending unncessary information
+## to the client.
+
+def initiate_user_setup(user_uuid):
+    """
+    Initiate the setup process for a user to enable payment and reservations.
+
+    - Creates a Stripe setup checkout session for the user.
+    - Stores the pending setup session in the user's Payment state.
+    - Returns the session ID and URL to the client for redirection.
+    """
+    full_setup_obj = ss.create_setup_checkout_session(user_uuid)
+    return {'id': full_setup_obj['id'], 'url': full_setup_obj['url']}
+
+# Note that both check_pending_setup_status and get_user_setup_status return the
+# same values; the current status of the setup process for a user.  The
+# difference is that check_pending_setup_status will attempt to finalize the
+# setup process by syncing with the server-side status, while
+# get_user_setup_status will simply return the current status without attempting
+# to finalize it. In general, we should use check_pending_setup_status only until the 
+# status is SUCCEEDED or FAILED, and then use get_user_setup_status for subsequent checks.
+
+def check_and_get_pending_setup_status(user_uuid):
+    """
+    Attempt to finalize the setup process by syncing with the server-side status
+    Potential responses are defined in the PaymentSetupStatus enum in emission/core/wrapper/payment.py.
+    """
+    check_setup_status_result = ss.check_pending_setup_status(user_uuid)
+    return {"payment_setup_status": str(check_setup_status_result).split(".")[-1]}  # Convert enum to string representation
+
+def get_user_setup_status(user_uuid):
+    """
+    Retrieve the current setup status for a user.
+    Potential responses are defined in the PaymentSetupStatus enum in emission/core/wrapper/payment.py.
+
+    - Checks the user's Payment state for any pending setup session.
+    - If a pending session exists, polls the Stripe API for its status.
+    - Returns the current status of the setup process to the client.
+    """
+    current_payment_state = ss.get_current_payment_state(user_uuid)
+    if current_payment_state is None:
+        current_payment_state = ecwp.PaymentStatus.NOT_STARTED
+    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentStatus.NOT_STARTED)).split(".")[-1]}
