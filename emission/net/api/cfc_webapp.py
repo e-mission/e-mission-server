@@ -412,30 +412,17 @@ def get_bikeshare_stations():
 @post('/library/setup/create')
 def bikeshare_setup_user():
     user_uuid = getUUID(request)
+    logging.debug(f"About to import the stripe_service module ")
     import emission.net.ext_service.stripe.stripe_service as ss
-    return ss.create_setup_checkout_session(user_uuid)
+    session_obj= ss.create_setup_checkout_session(user_uuid)
+    logging.debug(f"create_setup_checkout_session for {user_uuid=} returned {session_obj=}")
+    return session_obj
 
 @post('/library/setup/status')
 def bikeshare_setup_status():
     user_uuid = getUUID(request)
     import emission.net.ext_service.stripe.stripe_service as ss
-    raw_session = ss.get_setup_checkout_session_status(user_uuid)
-    logging.debug(f"DEBUG: Retrieved setup checkout session status for user {user_uuid}: {raw_session=}")
-    if raw_session is None:
-        logging.warning(f"WARN: Retrieved setup checkout session status for user {user_uuid}: {raw_session=}")
-        return None
-    # Convert the raw session to a dict so that we can return it as JSON
-    session_dict = {
-        "id": raw_session.id,
-        "setup_intent": {
-            "id": raw_session.setup_intent.id,
-            "status": raw_session.setup_intent.status,
-            "customer": raw_session.setup_intent.customer,
-            "payment_method": raw_session.setup_intent.payment_method
-        },
-        "status": raw_session.status,
-    }
-    return session_dict
+    return ss.invoke_get_checkout_session_status_api(user_uuid)
 
 @post('/library/setup/finalize')
 def bikeshare_finalize_setup():
