@@ -427,12 +427,27 @@ def bikeshare_finalize_setup():
 @post('/library/checkout')
 def bikeshare_checkout():
     user_uuid = getUUID(request)
-    return vehicle_library.checkout_vehicle(user_uuid)
+    vehicle_id = request.json.get('vehicle_id')
+    if not vehicle_id:
+        abort(400, "vehicle_id is required")
+    hold_amount_cents = request.json.get('hold_amount_cents')
+    if hold_amount_cents is None:
+        abort(400, "hold_amount_cents is required")
+    try:
+        return vehicle_library.checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents)
+    except ValueError as e:
+        abort(e.args[0], e.args[1])
 
 @post('/library/checkin')
 def bikeshare_return():
     user_uuid = getUUID(request)
-    return vehicle_library.check_in_vehicle(user_uuid)
+    dock_id = request.json.get('dock_id')
+    if not dock_id:
+        abort(400, "dock_id is required")
+    try:
+        return vehicle_library.check_in_vehicle(user_uuid, dock_id)
+    except ValueError as e:
+        abort(e.args[0], e.args[1])
 
 # Vehicle library endpoints END
 

@@ -4,7 +4,7 @@ import unittest
 import uuid
 import time
 import logging
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 # Our imports
 import emission.core.get_database as edb
@@ -67,12 +67,6 @@ class TestVehicleLibrary(unittest.TestCase):
         self.mock_db.insert_one(doc)
         return doc
 
-    def _make_request_mock(self, body):
-        """Mock bottle.request with the given JSON body."""
-        req = MagicMock()
-        req.json = body
-        return req
-
     def _insert_active_rental(self, payment_hold_info=None, rental_start_ts=None):
         """Insert an active rental mapping into the user's state DB."""
         start_ts = rental_start_ts if rental_start_ts is not None else _now()
@@ -91,6 +85,10 @@ class TestVehicleLibrary(unittest.TestCase):
             rental_state,
         )
         return rental_state
+
+    def _checkout_vehicle(self, hold_amount_cents=vl.DEFAULT_HOLD_AMOUNT_CENTS):
+        """Call checkout_vehicle with the current explicit signature."""
+        return vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, hold_amount_cents)
 
     # ------------------------------------------------------------------
     # stations()
@@ -114,31 +112,27 @@ class TestVehicleLibrary(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_checkout_vehicle_moves_location_to_user_uuid(self):
-        """checkout_vehicle() sets location to user UUID (vehicle checked out)."""
+        """checkout_vehicle() clears location from dock once bike is checked out."""
         self._insert_vehicle()
-        req_mock = self._make_request_mock({'vehicle_id': VEHICLE_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-               patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            result = vl.checkout_vehicle(self.test_uuid)
+            result = self._checkout_vehicle()
 
         self.assertEqual(result['result'], 'checked_out')
 
-        # Verify vehicle location is now user UUID
+        # Verify vehicle location is now unavailable (not docked)
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
-        self.assertEqual(vehicle['location'], str(self.test_uuid))
+        self.assertIsNone(vehicle['location'])
 
     def test_checkout_vehicle_records_checkout_timestamp(self):
         """checkout_vehicle() sets checkout_ts to current time."""
         self._insert_vehicle()
-        req_mock = self._make_request_mock({'vehicle_id': VEHICLE_ID})
         before = _now()
 
-        with patch.object(vl, 'request', req_mock), \
-               patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            vl.checkout_vehicle(self.test_uuid)
+            self._checkout_vehicle()
 
         after = _now()
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
@@ -150,24 +144,20 @@ class TestVehicleLibrary(unittest.TestCase):
     def test_checkout_vehicle_calls_bikeep_unlock(self):
         """checkout_vehicle() unlocks the dock via bikeep."""
         self._insert_vehicle()
-        req_mock = self._make_request_mock({'vehicle_id': VEHICLE_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}) as mock_unlock:
-            vl.checkout_vehicle(self.test_uuid)
+            self._checkout_vehicle()
 
         mock_unlock.assert_called_once_with(DOCK_ID)
 
     def test_checkout_vehicle_persists_active_rental_state(self):
         """checkout_vehicle() stores the active vehicle-user-dock mapping in RENTAL state."""
         self._insert_vehicle()
-        req_mock = self._make_request_mock({'vehicle_id': VEHICLE_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            vl.checkout_vehicle(self.test_uuid)
+            self._checkout_vehicle()
 
         rental_state = esas.StateStorage.get_state_storage(self.test_uuid).get_current_state(esas.StateName.RENTAL)
         self.assertEqual(rental_state['vehicle_id'], VEHICLE_ID)
@@ -185,12 +175,10 @@ class TestVehicleLibrary(unittest.TestCase):
             location=str(self.test_uuid),
         )
         self._insert_active_rental(rental_start_ts=_now())
-        req_mock = self._make_request_mock({'dock_id': ALT_DOCK_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-               patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
                patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}):
-            result = vl.check_in_vehicle(self.test_uuid)
+            result = vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
         self.assertEqual(result['result'], 'checked_in')
 
@@ -205,12 +193,10 @@ class TestVehicleLibrary(unittest.TestCase):
         )
         rental_start_ts = _now()
         self._insert_active_rental(payment_hold_info={'id': 'pi_hold_123'}, rental_start_ts=rental_start_ts)
-        req_mock = self._make_request_mock({'dock_id': ALT_DOCK_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-               patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
                patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}):
-            vl.check_in_vehicle(self.test_uuid)
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
         rental_state = esas.StateStorage.get_state_storage(self.test_uuid).get_current_state(esas.StateName.RENTAL)
         self.assertEqual(rental_state['vehicle_id'], VEHICLE_ID)
@@ -226,51 +212,38 @@ class TestVehicleLibrary(unittest.TestCase):
             location=str(self.test_uuid),
         )
         self._insert_active_rental(rental_start_ts=_now())
-        req_mock = self._make_request_mock({'dock_id': ALT_DOCK_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-             patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock, \
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock, \
              patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}):
-            vl.check_in_vehicle(self.test_uuid)
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
         mock_lock.assert_called_once_with(ALT_DOCK_ID)
 
-    def test_checkin_vehicle_captures_payment_hold(self):
-        """check_in_vehicle() captures the active Stripe hold after locking."""
+    def test_checkin_vehicle_captures_payment_hold_with_computed_amount(self):
+        """check_in_vehicle() captures the active Stripe hold after locking using computed fee tiers."""
         self._insert_vehicle(
             location=str(self.test_uuid),
         )
-        self._insert_active_rental(payment_hold_info={'id': 'pi_hold_456'}, rental_start_ts=_now())
-        req_mock = self._make_request_mock({'dock_id': ALT_DOCK_ID})
+        fixed_now = 2000000
+        # 6 hours should map to $35 -> 3500 cents
+        self._insert_active_rental(payment_hold_info={'id': 'pi_hold_456'}, rental_start_ts=fixed_now - (6 * 60 * 60))
 
-        with patch.object(vl, 'request', req_mock), \
+        with patch.object(vl, 'time') as mock_time, \
              patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
              patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_456', 'status': 'succeeded'}) as mock_capture:
-            vl.check_in_vehicle(self.test_uuid)
+            mock_time.time.return_value = fixed_now
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
-        mock_capture.assert_called_once_with('pi_hold_456')
+        mock_capture.assert_called_once_with('pi_hold_456', 3500)
 
     def test_checkin_vehicle_nothing_checked_out_returns_403(self):
         """check_in_vehicle() rejects if user has no vehicle checked out."""
-        from emission.net.api.bottle import HTTPError
         # Vehicle is at a dock, not checked out by this user
         self._insert_vehicle(location=DOCK_ID)
-        req_mock = self._make_request_mock({'dock_id': ALT_DOCK_ID})
 
-        with patch.object(vl, 'request', req_mock):
-            with self.assertRaises(HTTPError) as ctx:
-                vl.check_in_vehicle(self.test_uuid)
-        self.assertEqual(ctx.exception.status_code, 403)
-
-    def test_checkin_vehicle_missing_dock_id_returns_400(self):
-        """check_in_vehicle() rejects missing dock_id."""
-        from emission.net.api.bottle import HTTPError
-        req_mock = self._make_request_mock({})
-
-        with patch.object(vl, 'request', req_mock):
-            with self.assertRaises(HTTPError) as ctx:
-                vl.check_in_vehicle(self.test_uuid)
-        self.assertEqual(ctx.exception.status_code, 400)
+        with self.assertRaises(ValueError) as ctx:
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+        self.assertEqual(ctx.exception.args[0], 403)
 
     def test_checkin_vehicle_bikeep_failure_does_not_update_db(self):
         """check_in_vehicle() does not update DB if bikeep.lock_dock fails."""
@@ -278,12 +251,10 @@ class TestVehicleLibrary(unittest.TestCase):
             location=str(self.test_uuid),
         )
         self._insert_active_rental(rental_start_ts=_now())
-        req_mock = self._make_request_mock({'dock_id': ALT_DOCK_ID})
 
-        with patch.object(vl, 'request', req_mock), \
-             patch.object(vl.bikeep_service, 'lock_dock', side_effect=RuntimeError("lock failed")):
+        with patch.object(vl.bikeep_service, 'lock_dock', side_effect=RuntimeError("lock failed")):
             with self.assertRaises(RuntimeError):
-                vl.check_in_vehicle(self.test_uuid)
+                vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
         # Vehicle should remain unchanged in DB
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
@@ -302,22 +273,18 @@ class TestVehicleLibrary(unittest.TestCase):
         self._insert_vehicle(location=DOCK_ID)
 
         # Checkout
-        req_checkout = self._make_request_mock({'vehicle_id': VEHICLE_ID})
-        with patch.object(vl, 'request', req_checkout), \
-               patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            vl.checkout_vehicle(self.test_uuid)
+            self._checkout_vehicle()
 
-        # After checkout: vehicle location is user UUID
+        # After checkout: vehicle no longer mapped to a dock location
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
-        self.assertEqual(vehicle['location'], str(self.test_uuid))
+        self.assertIsNone(vehicle['location'])
 
         # Check-in
-        req_checkin = self._make_request_mock({'dock_id': ALT_DOCK_ID})
-        with patch.object(vl, 'request', req_checkin), \
-               patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
                patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}):
-            vl.check_in_vehicle(self.test_uuid)
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
         # After check-in: vehicle back at dock
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})

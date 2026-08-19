@@ -15,6 +15,7 @@ import emission.core.deployment_config as ecdc
 import emission.tests.common as etc
 import emission.net.api.cfc_webapp as enacw
 import importlib
+from types import SimpleNamespace
 
 class TestWebserver(unittest.TestCase):
     def setUp(self):
@@ -73,6 +74,69 @@ class TestWebserver(unittest.TestCase):
         self.assertEqual(enacw.resolve_auth("token_list"),"token_list")
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
         self.assertNotEqual(enacw.resolve_auth("dynamic"),"skip")
+
+    def test_bikeshare_checkout_aborts_on_checkout_value_error(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={"vehicle_id": "bike-1", "hold_amount_cents": 250})
+
+        with self.assertRaises(RuntimeError):
+            with self.mock.patch.object(enacw, "request", req), \
+                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw.vehicle_library, "checkout_vehicle", side_effect=ValueError(404, "Vehicle bike-1 not found")), \
+                 self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
+                enacw.bikeshare_checkout()
+
+        mock_abort.assert_called_once_with(404, "Vehicle bike-1 not found")
+
+    def test_bikeshare_checkout_aborts_on_hold_amount_missing(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={"vehicle_id": "bike-1"})
+
+        with self.assertRaises(RuntimeError):
+            with self.mock.patch.object(enacw, "request", req), \
+                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
+                enacw.bikeshare_checkout()
+
+        mock_abort.assert_called_once_with(400, "hold_amount_cents is required")
+
+    def test_bikeshare_return_calls_checkin_with_uuid_and_dock(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={"dock_id": "dock-42"})
+        expected_result = {"result": "checked_in", "vehicle_id": "bike-1", "dock_id": "dock-42"}
+
+        with self.mock.patch.object(enacw, "request", req), \
+             self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+             self.mock.patch.object(enacw.vehicle_library, "check_in_vehicle", return_value=expected_result) as mock_checkin:
+            result = enacw.bikeshare_return()
+
+        mock_checkin.assert_called_once_with(test_uuid, "dock-42")
+        self.assertEqual(result, expected_result)
+
+    def test_bikeshare_return_aborts_on_missing_dock_id(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={})
+
+        with self.assertRaises(RuntimeError):
+            with self.mock.patch.object(enacw, "request", req), \
+                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
+                enacw.bikeshare_return()
+
+        mock_abort.assert_called_once_with(400, "dock_id is required")
+
+    def test_bikeshare_return_aborts_on_checkin_value_error(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={"dock_id": "dock-42"})
+
+        with self.assertRaises(RuntimeError):
+            with self.mock.patch.object(enacw, "request", req), \
+                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw.vehicle_library, "check_in_vehicle", side_effect=ValueError(403, "No vehicle is currently checked out by this user")), \
+                 self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
+                enacw.bikeshare_return()
+
+        mock_abort.assert_called_once_with(403, "No vehicle is currently checked out by this user")
 
 
 if __name__ == "__main__":
