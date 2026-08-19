@@ -4,11 +4,40 @@ import datetime
 
 from emission.net.api.bottle import request, HTTPError
 import emission.core.get_database as edb
+import emission.core.wrapper.rental as ecwr
 import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
 import emission.net.ext_service.stripe.stripe_service as ss
 import emission.core.wrapper.payment as ecwp
+import emission.storage.modifiable.abstract_state_storage as esas
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_HOLD_AMOUNT_CENTS = 100
+
+
+def _get_rental_db(user_uuid):
+    return esas.StateStorage.get_state_storage(user_uuid)
+
+
+def _get_active_rental(user_uuid):
+    rental_state = _get_rental_db(user_uuid).get_current_state(esas.StateName.RENTAL)
+    if rental_state is None:
+        return None
+    if rental_state.get('rental_status') != 'active':
+        return None
+    return rental_state
+
+
+def _upsert_rental_state(user_uuid, vehicle, payment_hold_info, now, rental_status, rental_start_ts=None):
+    rental_state = ecwr.Rental()
+    rental_state.vehicle_id = vehicle.get('vehicle_id')
+    rental_state.vehicle_name = vehicle.get('vehicle_name')
+    rental_state.payment_hold_info = payment_hold_info
+    rental_state.rental_status = rental_status
+    rental_state.rental_start_ts = rental_start_ts if rental_start_ts is not None else now
+    rental_state.rental_end_ts = now if rental_status != 'active' else None
+    _get_rental_db(user_uuid).upsert_state(esas.StateName.RENTAL, rental_state)
+    return rental_state
 
 # BEGIN: bikeeep passthrough integration
 # The calls in this section are direct passthroughs to the Bikeep service.
@@ -35,9 +64,9 @@ def checkout_vehicle(user_uuid):
 
     Expects JSON body: {"vehicle_id": "<vehicle_id>"}
 
-    - Validates that the vehicle has an active reservation belonging to this user.
+    - Places a Stripe hold using the user's saved payment method.
+    - Persists the active rental mapping in the user's RENTAL state and vehicle DB.
     - Unlocks the vehicle's dock via bikeep_service.
-    - Updates the Vehicle location to the user's UUID and records checkout_ts.
     """
     vehicle_id = request.json.get('vehicle_id')
     if not vehicle_id:
@@ -54,8 +83,16 @@ def checkout_vehicle(user_uuid):
     if not dock_id:
         raise HTTPError(422, "Vehicle %s has no dock location to unlock" % vehicle_id)
 
-    logger.debug("Unlocking dock %s for vehicle %s for user %s" % (dock_id, vehicle_id, user_uuid))
-    bikeep_service.unlock_dock(dock_id)
+    hold_amount_cents = request.json.get('hold_amount_cents', DEFAULT_HOLD_AMOUNT_CENTS)
+    hold_info = ss.create_hold_payment_intent(
+        user_uuid,
+        hold_amount_cents,
+        metadata={
+            'vehicle_id': vehicle_id,
+            'dock_id': dock_id,
+        },
+    )
+    _upsert_rental_state(user_uuid, vehicle, hold_info, now, 'active')
 
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},
@@ -66,7 +103,10 @@ def checkout_vehicle(user_uuid):
         }},
     )
 
-    logger.info("Checked out vehicle %s (dock %s) for user %s" % (vehicle_id, dock_id, user_uuid))
+    logger.debug(f"Unlocking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
+    bikeep_service.unlock_dock(dock_id)
+
+    logger.info(f"Checked out vehicle {vehicle_id} (dock {dock_id}) for user {user_uuid}")
     return {'result': 'checked_out', 'vehicle_id': vehicle_id}
 
 
@@ -76,35 +116,52 @@ def check_in_vehicle(user_uuid):
 
     Expects JSON body: {"dock_id": "<dock_id>"}
 
-    - Finds the vehicle currently checked out by this user (location == str(user_uuid)).
-    - Fails with 403 if the user has no vehicle checked out.
     - Locks the specified dock via bikeep_service.
-    - Updates the Vehicle location to the dock_id and clears the reservation.
+    - Captures the Stripe hold for the active rental.
+    - Updates the RENTAL state and Vehicle mapping to point back to the dock.
     """
     dock_id = request.json.get('dock_id')
     if not dock_id:
         raise HTTPError(400, "dock_id is required")
 
-    vehicle_db = edb.get_vehicle_db()
-    vehicle = vehicle_db.find_one({'location': str(user_uuid)})
-    if vehicle is None:
+    rental_state = _get_active_rental(user_uuid)
+    if rental_state is None:
         raise HTTPError(403, "No vehicle is currently checked out by this user")
 
-    vehicle_id = vehicle.get('vehicle_id')
-    logger.debug("Locking dock %s for vehicle %s for user %s" % (dock_id, vehicle_id, user_uuid))
+    vehicle_id = rental_state.get('vehicle_id')
+    vehicle_db = edb.get_vehicle_db()
+    vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
+    if vehicle is None:
+        raise HTTPError(404, "Vehicle %s not found" % vehicle_id)
+
+    logger.debug(f"Locking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
     bikeep_service.lock_dock(dock_id)
+
+    payment_hold_info = rental_state.get('payment_hold_info')
+    assert payment_hold_info is not None, "Bike was rented without a hold, unsure what to capture"
+    payment_hold_id = payment_hold_info.get('id')
+    if payment_hold_id:
+        ss.capture_hold_payment_intent(payment_hold_id)
 
     now = time.time()
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},
         {'$set': {
             'location': dock_id,
-            'reservation': None,
             'updated_at': now,
         }},
     )
 
-    logger.info("Checked in vehicle %s to dock %s for user %s" % (vehicle_id, dock_id, user_uuid))
+    _upsert_rental_state(
+        user_uuid,
+        vehicle,
+        payment_hold_info,
+        now,
+        'completed',
+        rental_start_ts=rental_state.get('rental_start_ts', now),
+    )
+
+    logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} for user {user_uuid}")
     return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_id}
 
 # END: bikeep + stripe integration

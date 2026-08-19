@@ -13,6 +13,8 @@ def get_complete_ts(user_id):
 
 def get_range(user_id):
     user_profile = ecwu.User(user_id).getProfile()
+    if user_profile is None:
+        return (None, None)
     start_ts = user_profile.get("pipeline_range", {}).get("start_ts", None)
     end_ts = user_profile.get("pipeline_range", {}).get("end_ts", None)
     logging.debug("Returning range (%s, %s)" % (start_ts, end_ts))

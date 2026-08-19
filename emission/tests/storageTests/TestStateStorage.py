@@ -42,11 +42,10 @@ class TestStateStorage(unittest.TestCase):
         vehicle_state = ecwr.Rental({
             "vehicle_id": "veh-001",
             "vehicle_name": "new vehicle added",
+            "payment_hold_info": {"id": "pi_001"},
             "rental_start_ts": 100,
             "rental_end_ts": 200,
             "rental_status": "active",
-            "created_at": 100,
-            "updated_at": 200,
         })
         self.state_storage.upsert_state(esas.StateName.RENTAL, vehicle_state)
 
@@ -76,11 +75,10 @@ class TestStateStorage(unittest.TestCase):
             ecwr.Rental({
                 "vehicle_id": "veh-old",
                 "vehicle_name": "old",
+                "payment_hold_info": {"id": "pi_old"},
                 "rental_start_ts": 100,
                 "rental_end_ts": 150,
                 "rental_status": "active",
-                "created_at": 100,
-                "updated_at": 150,
             }),
         )
         self.state_storage.upsert_state(
@@ -88,11 +86,10 @@ class TestStateStorage(unittest.TestCase):
             ecwr.Rental({
                 "vehicle_id": "veh-new",
                 "vehicle_name": "new",
+                "payment_hold_info": {"id": "pi_new"},
                 "rental_start_ts": 200,
                 "rental_end_ts": 250,
                 "rental_status": "active",
-                "created_at": 200,
-                "updated_at": 250,
             }),
         )
 

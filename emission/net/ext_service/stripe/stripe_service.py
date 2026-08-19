@@ -166,3 +166,85 @@ def get_current_payment_state(uuid):
     payment_db = esas.StateStorage.get_state_storage(uuid)
     payment_info = payment_db.get_current_state(esas.StateName.PAYMENT)
     return payment_info if payment_info is not None else {}
+
+## END: setup flow
+
+## BEGIN: payment flow
+
+def _get_setup_payment_method_id(uuid):
+    """
+    Return the reusable Stripe payment method saved during setup.
+
+    Raises ValueError if setup has not completed successfully or if
+    the payment method is unavailable.
+    """
+    payment_db = esas.StateStorage.get_state_storage(uuid)
+    payment_info = payment_db.get_current_state(esas.StateName.PAYMENT)
+    if payment_info is None:
+        raise ValueError("No payment setup found for user %s" % uuid)
+
+    setup_status = payment_info.get("payment_setup_status")
+    if setup_status != ecwp.PaymentSetupStatus.SUCCEEDED.value and \
+       setup_status != ecwp.PaymentSetupStatus.SUCCEEDED:
+        raise ValueError("Payment setup is not complete for user %s" % uuid)
+
+    payment_method = payment_info.get("payment_setup", {}).get("payment_method")
+    if not payment_method:
+        raise ValueError("No reusable payment method found for user %s" % uuid)
+
+    return payment_method
+
+
+def create_hold_payment_intent(uuid, amount_cents, currency="usd", metadata=None):
+    """
+    Create a Stripe PaymentIntent hold (manual capture).
+
+    The hold is confirmed immediately using the saved setup payment method,
+    but funds are only captured later via capture_hold_payment_intent().
+    """
+    if amount_cents is None or int(amount_cents) <= 0:
+        raise ValueError("amount_cents must be a positive integer")
+
+    payment_method_id = _get_setup_payment_method_id(uuid)
+
+    payload = {
+        "amount": int(amount_cents),
+        "currency": currency,
+        "payment_method": payment_method_id,
+        "confirm": True,
+        "capture_method": "manual",
+        "off_session": True,
+        "metadata": metadata,
+    }
+
+    logging.info(f"Invoking stripe PaymentIntent.create with {payload=}")
+    payment_intent = stripe.PaymentIntent.create(**payload)
+    json_payment_intent = json.loads(str(payment_intent))
+
+    logging.debug(f"Received stripe PaymentIntent.create response: {json_payment_intent}")
+    return json_payment_intent
+
+
+def capture_hold_payment_intent(payment_intent_id, amount_to_capture_cents=None):
+    """
+    Capture a previously authorized Stripe PaymentIntent hold.
+
+    If amount_to_capture_cents is provided, performs a partial capture.
+    """
+    if not payment_intent_id:
+        raise ValueError("payment_intent_id is required")
+
+    payload = {}
+    if amount_to_capture_cents is not None:
+        if int(amount_to_capture_cents) <= 0:
+            raise ValueError("amount_to_capture_cents must be a positive integer")
+        payload["amount_to_capture"] = int(amount_to_capture_cents)
+
+    logging.info(f"Invoking stripe PaymentIntent.capture for {payment_intent_id=} with {payload=}")
+    captured_intent = stripe.PaymentIntent.capture(payment_intent_id, **payload)
+    json_captured_intent = json.loads(str(captured_intent))
+
+    logging.debug(f"Received stripe PaymentIntent.capture response: {json_captured_intent}")
+    return json_captured_intent
+
+## END: payment flow

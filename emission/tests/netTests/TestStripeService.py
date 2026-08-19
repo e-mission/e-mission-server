@@ -1,4 +1,5 @@
 from builtins import *
+import json
 import unittest
 from unittest.mock import patch
 
@@ -70,6 +71,67 @@ class TestStripeService(unittest.TestCase):
              patch.object(stripe_service.stripe.checkout.Session, 'create', side_effect=RuntimeError('stripe request failed')):
             with self.assertRaisesRegex(RuntimeError, 'stripe request failed'):
                 stripe_service.invoke_setup_checkout_session_api(self.test_uuid)
+
+    def test_create_hold_payment_intent_uses_saved_setup_payment_method(self):
+        payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
+        seed_payment = ecwp.Payment()
+        seed_payment.payment_setup_status = ecwp.PaymentSetupStatus.SUCCEEDED
+        seed_payment.payment_setup = {
+            'id': 'seti_123',
+            'payment_method': 'pm_saved_123',
+        }
+        payment_db.upsert_state(
+            stripe_service.esas.StateName.PAYMENT,
+            seed_payment,
+        )
+
+        fake_intent = {
+            'id': 'pi_hold_123',
+            'status': 'requires_capture',
+            'amount': 1200,
+            'capture_method': 'manual',
+            'payment_method': 'pm_saved_123',
+        }
+
+        with patch.object(stripe_service.stripe.PaymentIntent, 'create', return_value=json.dumps(fake_intent)) as mock_create:
+            result = stripe_service.create_hold_payment_intent(self.test_uuid, 1200, metadata={'vehicle_id': 'bike-123'})
+
+        self.assertEqual(result, fake_intent)
+        mock_create.assert_called_once()
+        called_kwargs = mock_create.call_args.kwargs
+        self.assertEqual(called_kwargs['amount'], 1200)
+        self.assertEqual(called_kwargs['currency'], 'usd')
+        self.assertEqual(called_kwargs['payment_method'], 'pm_saved_123')
+        self.assertEqual(called_kwargs['capture_method'], 'manual')
+        self.assertTrue(called_kwargs['confirm'])
+        self.assertTrue(called_kwargs['off_session'])
+        self.assertEqual(called_kwargs['metadata']['vehicle_id'], 'bike-123')
+
+    def test_create_hold_payment_intent_requires_succeeded_setup(self):
+        payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
+        seed_payment = ecwp.Payment()
+        seed_payment.payment_setup_status = ecwp.PaymentSetupStatus.WAITING_FOR_USER
+        seed_payment.payment_setup = {'payment_method': 'pm_saved_123'}
+        payment_db.upsert_state(
+            stripe_service.esas.StateName.PAYMENT,
+            seed_payment,
+        )
+
+        with self.assertRaisesRegex(ValueError, 'Payment setup is not complete'):
+            stripe_service.create_hold_payment_intent(self.test_uuid, 1200)
+
+    def test_capture_hold_payment_intent_calls_stripe_capture(self):
+        fake_capture = {
+            'id': 'pi_hold_123',
+            'status': 'succeeded',
+            'amount_capturable': 0,
+        }
+
+        with patch.object(stripe_service.stripe.PaymentIntent, 'capture', return_value=json.dumps(fake_capture)) as mock_capture:
+            result = stripe_service.capture_hold_payment_intent('pi_hold_123', amount_to_capture_cents=900)
+
+        self.assertEqual(result, fake_capture)
+        mock_capture.assert_called_once_with('pi_hold_123', amount_to_capture=900)
 
 
 if __name__ == '__main__':
