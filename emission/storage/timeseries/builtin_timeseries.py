@@ -65,6 +65,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "manual/trip_addition_input": self.timeseries_db,
                 "manual/place_addition_input": self.timeseries_db,
                 "manual/demographic_survey": self.timeseries_db,
+                "manual/vehicle_rental": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,

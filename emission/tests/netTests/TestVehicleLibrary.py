@@ -10,7 +10,7 @@ from unittest.mock import patch
 import emission.core.get_database as edb
 import emission.core.wrapper.rental as ecwr
 import emission.net.api.vehicle_library as vl
-import emission.storage.modifiable.abstract_state_storage as esas
+import emission.storage.timeseries.abstract_timeseries as esta
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,7 @@ class TestVehicleLibrary(unittest.TestCase):
         self.mock_db = edb.get_vehicle_db()
         self.profile_db = edb.get_profile_db()
         self.state_db = edb.get_state_db()
+        self.timeseries_db = edb.get_timeseries_db()
 
         # Clean up any previous test data
 
@@ -43,6 +44,7 @@ class TestVehicleLibrary(unittest.TestCase):
         self.mock_db.delete_many({'location': str(self.test_uuid)})
         self.profile_db.delete_many({'user_id': self.test_uuid})
         self.state_db.delete_many({'user_id': self.test_uuid})
+        self.timeseries_db.delete_many({'user_id': self.test_uuid, 'metadata.key': vl.VEHICLE_RENTAL_KEY})
 
     def tearDown(self):
         """Clean up test data from MongoDB."""
@@ -50,6 +52,7 @@ class TestVehicleLibrary(unittest.TestCase):
         self.mock_db.delete_many({'location': str(self.test_uuid)})
         self.profile_db.delete_many({'user_id': self.test_uuid})
         self.state_db.delete_many({'user_id': self.test_uuid})
+        self.timeseries_db.delete_many({'user_id': self.test_uuid, 'metadata.key': vl.VEHICLE_RENTAL_KEY})
 
     # ------------------------------------------------------------------
     # Helpers
@@ -68,7 +71,7 @@ class TestVehicleLibrary(unittest.TestCase):
         return doc
 
     def _insert_active_rental(self, payment_hold_info=None, rental_start_ts=None):
-        """Insert an active rental mapping into the user's state DB."""
+        """Insert an active rental entry into the user's timeseries."""
         start_ts = rental_start_ts if rental_start_ts is not None else _now()
         if payment_hold_info is None:
             payment_hold_info = {'id': 'pi_hold_123'}
@@ -76,15 +79,22 @@ class TestVehicleLibrary(unittest.TestCase):
             'vehicle_id': VEHICLE_ID,
             'vehicle_name': 'test vehicle',
             'payment_hold_info': payment_hold_info,
-            'rental_start_ts': start_ts,
-            'rental_end_ts': None,
+            'start_ts': start_ts,
+            'end_ts': None,
             'rental_status': 'active',
         })
-        esas.StateStorage.get_state_storage(self.test_uuid).upsert_state(
-            esas.StateName.RENTAL,
+        esta.TimeSeries.get_time_series(self.test_uuid).insert_data(
+            self.test_uuid,
+            vl.VEHICLE_RENTAL_KEY,
             rental_state,
         )
         return rental_state
+
+    def _get_latest_rental_entry(self):
+        entries = esta.TimeSeries.get_time_series(self.test_uuid).find_entries([vl.VEHICLE_RENTAL_KEY])
+        if len(entries) == 0:
+            return None
+        return entries[-1]
 
     def _checkout_vehicle(self, hold_amount_cents=vl.DEFAULT_HOLD_AMOUNT_CENTS):
         """Call checkout_vehicle with the current explicit signature."""
@@ -151,18 +161,22 @@ class TestVehicleLibrary(unittest.TestCase):
 
         mock_unlock.assert_called_once_with(DOCK_ID)
 
-    def test_checkout_vehicle_persists_active_rental_state(self):
-        """checkout_vehicle() stores the active vehicle-user-dock mapping in RENTAL state."""
+    def test_checkout_vehicle_persists_active_rental_entry(self):
+        """checkout_vehicle() stores the active vehicle-user mapping in manual/vehicle_rental."""
         self._insert_vehicle()
 
         with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
             self._checkout_vehicle()
 
-        rental_state = esas.StateStorage.get_state_storage(self.test_uuid).get_current_state(esas.StateName.RENTAL)
+        rental_entry = self._get_latest_rental_entry()
+        self.assertIsNotNone(rental_entry)
+        rental_state = rental_entry['data']
         self.assertEqual(rental_state['vehicle_id'], VEHICLE_ID)
         self.assertEqual(rental_state['payment_hold_info']['id'], 'pi_hold_123')
         self.assertEqual(rental_state['rental_status'], 'active')
+        self.assertIsNotNone(rental_state['start_ts'])
+        self.assertIsNone(rental_state.get('end_ts'))
 
     # ------------------------------------------------------------------
     # check_in_vehicle()
@@ -198,13 +212,14 @@ class TestVehicleLibrary(unittest.TestCase):
                patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}):
             vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
-        rental_state = esas.StateStorage.get_state_storage(self.test_uuid).get_current_state(esas.StateName.RENTAL)
+        rental_entry = self._get_latest_rental_entry()
+        rental_state = rental_entry['data']
         self.assertEqual(rental_state['vehicle_id'], VEHICLE_ID)
         self.assertEqual(rental_state['payment_hold_info']['id'], 'pi_hold_123')
         self.assertEqual(rental_state['rental_status'], 'completed')
-        self.assertEqual(rental_state['rental_start_ts'], rental_start_ts)
-        self.assertIsNotNone(rental_state['rental_end_ts'])
-        self.assertGreaterEqual(rental_state['rental_end_ts'], rental_start_ts)
+        self.assertEqual(rental_state['start_ts'], rental_start_ts)
+        self.assertIsNotNone(rental_state['end_ts'])
+        self.assertGreaterEqual(rental_state['end_ts'], rental_start_ts)
 
     def test_checkin_vehicle_calls_bikeep_lock(self):
         """check_in_vehicle() locks the dock via bikeep."""
@@ -260,8 +275,8 @@ class TestVehicleLibrary(unittest.TestCase):
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
         self.assertEqual(vehicle['location'], str(self.test_uuid))
 
-        rental_state = esas.StateStorage.get_state_storage(self.test_uuid).get_current_state(esas.StateName.RENTAL)
-        self.assertEqual(rental_state['rental_status'], 'active')
+        rental_entry = self._get_latest_rental_entry()
+        self.assertEqual(rental_entry['data']['rental_status'], 'active')
 
     # ------------------------------------------------------------------
     # Integration: full workflow

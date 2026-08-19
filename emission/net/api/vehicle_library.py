@@ -3,15 +3,17 @@ import time
 import datetime
 
 import emission.core.get_database as edb
+import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.rental as ecwr
 import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
 import emission.net.ext_service.stripe.stripe_service as ss
 import emission.core.wrapper.payment as ecwp
-import emission.storage.modifiable.abstract_state_storage as esas
+import emission.storage.timeseries.abstract_timeseries as esta
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_HOLD_AMOUNT_CENTS = 100
+VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
 
 
 def _compute_rental_fee_dollars(rental_hours):
@@ -32,29 +34,18 @@ def _compute_capture_amount_cents(rental_start_ts, now_ts):
     return _compute_rental_fee_dollars(rental_hours) * 100
 
 
-def _get_rental_db(user_uuid):
-    return esas.StateStorage.get_state_storage(user_uuid)
+def _get_rental_ts(user_uuid):
+    return esta.TimeSeries.get_time_series(user_uuid)
 
 
-def _get_active_rental(user_uuid):
-    rental_state = _get_rental_db(user_uuid).get_current_state(esas.StateName.RENTAL)
-    if rental_state is None:
+def _get_active_rental_entry(user_uuid):
+    active_entries = _get_rental_ts(user_uuid).find_entries(
+        [VEHICLE_RENTAL_KEY],
+        extra_query_list=[{"data.rental_status": "active"}],
+    )
+    if len(active_entries) == 0:
         return None
-    if rental_state.get('rental_status') != 'active':
-        return None
-    return rental_state
-
-
-def _upsert_rental_state(user_uuid, vehicle, payment_hold_info, now, rental_status, rental_start_ts=None):
-    rental_state = ecwr.Rental()
-    rental_state.vehicle_id = vehicle.get('vehicle_id')
-    rental_state.vehicle_name = vehicle.get('vehicle_name')
-    rental_state.payment_hold_info = payment_hold_info
-    rental_state.rental_status = rental_status
-    rental_state.rental_start_ts = rental_start_ts if rental_start_ts is not None else now
-    rental_state.rental_end_ts = now if rental_status != 'active' else None
-    _get_rental_db(user_uuid).upsert_state(esas.StateName.RENTAL, rental_state)
-    return rental_state
+    return ecwe.Entry(active_entries[-1])
 
 # BEGIN: bikeeep passthrough integration
 # The calls in this section are direct passthroughs to the Bikeep service.
@@ -80,7 +71,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     Check out (unlock) a vehicle for the authenticated user.
 
     - Places a Stripe hold using the user's saved payment method.
-    - Persists the active rental mapping in the user's RENTAL state and vehicle DB.
+    - Persists the active rental mapping in the user's timeseries.
     - Unlocks the vehicle's dock via bikeep_service.
     """
     vehicle_db = edb.get_vehicle_db()
@@ -103,7 +94,15 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
             'hold_amount_cents': hold_amount_cents,
         },
     )
-    _upsert_rental_state(user_uuid, vehicle, hold_info, now, 'active')
+    rental_state = ecwr.Rental({
+        'vehicle_id': vehicle.get('vehicle_id'),
+        'vehicle_name': vehicle.get('vehicle_name'),
+        'payment_hold_info': hold_info,
+        'rental_status': 'active',
+        'start_ts': now,
+        'end_ts': None,
+    })
+    _get_rental_ts(user_uuid).insert_data(user_uuid, VEHICLE_RENTAL_KEY, rental_state)
 
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},
@@ -127,13 +126,14 @@ def check_in_vehicle(user_uuid, dock_id):
 
     - Locks the specified dock via bikeep_service.
     - Captures the Stripe hold for the active rental.
-    - Updates the RENTAL state and Vehicle mapping to point back to the dock.
+    - Updates the active rental entry and Vehicle mapping to point back to the dock.
     """
-    rental_state = _get_active_rental(user_uuid)
-    if rental_state is None:
+    rental_entry = _get_active_rental_entry(user_uuid)
+    if rental_entry is None:
         raise ValueError(403, "No vehicle is currently checked out by this user")
+    rental_state = rental_entry.data
 
-    vehicle_id = rental_state.get('vehicle_id')
+    vehicle_id = rental_state.vehicle_id
     vehicle_db = edb.get_vehicle_db()
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
     if vehicle is None:
@@ -146,7 +146,7 @@ def check_in_vehicle(user_uuid, dock_id):
     assert payment_hold_info is not None, "Bike was rented without a hold, unsure what to capture"
     payment_hold_id = payment_hold_info.get('id')
     now = time.time()
-    rental_start_ts = rental_state.get('rental_start_ts', now)
+    rental_start_ts = rental_state.start_ts
     capture_amount = _compute_capture_amount_cents(rental_start_ts, now)
     if payment_hold_id:
         ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
@@ -159,13 +159,18 @@ def check_in_vehicle(user_uuid, dock_id):
         }},
     )
 
-    _upsert_rental_state(
+    updated_rental_state = ecwr.Rental({
+        **rental_state,
+        'rental_status': 'completed',
+        'end_ts': now,
+    })
+
+    import emission.storage.timeseries.builtin_timeseries as estb
+    estb.BuiltinTimeSeries.update_data(
         user_uuid,
-        vehicle,
-        payment_hold_info,
-        now,
-        'completed',
-        rental_start_ts=rental_start_ts,
+        VEHICLE_RENTAL_KEY,
+        rental_entry.get('_id'),
+        updated_rental_state,
     )
 
     logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} for user {user_uuid}")
