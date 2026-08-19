@@ -424,13 +424,8 @@ def bikeshare_finalize_setup():
     user_uuid = getUUID(request)
     return vehicle_library.check_and_get_pending_setup_status(user_uuid)
 
-@post('/library/reserve')
-def bikeshare_checkout():
-    user_uuid = getUUID(request)
-    return vehicle_library.reserve_vehicle(user_uuid)
-
 @post('/library/checkout')
-def bikeshare_unlock():
+def bikeshare_checkout():
     user_uuid = getUUID(request)
     return vehicle_library.checkout_vehicle(user_uuid)
 
