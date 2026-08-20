@@ -449,6 +449,11 @@ def bikeshare_return():
     except ValueError as e:
         abort(e.args[0], e.args[1])
 
+@post('/library/rental_history')
+def bikeshare_rental_history():
+    user_uuid = getUUID(request)
+    return vehicle_library.get_rental_history(user_uuid)
+
 # Vehicle library endpoints END
 
 @post('/habiticaRegister')

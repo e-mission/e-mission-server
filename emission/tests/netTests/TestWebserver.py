@@ -138,6 +138,19 @@ class TestWebserver(unittest.TestCase):
 
         mock_abort.assert_called_once_with(403, "No vehicle is currently checked out by this user")
 
+    def test_bikeshare_rental_history_calls_library_with_uuid(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={})
+        expected_history = [{"data": {"vehicle_id": "bike-1", "rental_status": "completed"}}]
+
+        with self.mock.patch.object(enacw, "request", req), \
+             self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+             self.mock.patch.object(enacw.vehicle_library, "get_rental_history", return_value=expected_history) as mock_history:
+            result = enacw.bikeshare_rental_history()
+
+        mock_history.assert_called_once_with(test_uuid)
+        self.assertEqual(result, expected_history)
+
 
 if __name__ == "__main__":
     etc.configLogging()

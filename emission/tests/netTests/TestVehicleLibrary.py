@@ -278,6 +278,47 @@ class TestVehicleLibrary(unittest.TestCase):
         rental_entry = self._get_latest_rental_entry()
         self.assertEqual(rental_entry['data']['rental_status'], 'active')
 
+    def test_get_rental_history_returns_user_rental_entries(self):
+        """get_rental_history() returns entries from manual/vehicle_rental for the user."""
+        self._insert_active_rental(payment_hold_info={'id': 'pi_hold_123'}, rental_start_ts=_now())
+
+        history = vl.get_rental_history(self.test_uuid)
+
+        self.assertGreaterEqual(len(history), 1)
+        latest_entry = history[-1]
+        self.assertEqual(latest_entry['data']['vehicle_id'], VEHICLE_ID)
+        self.assertEqual(latest_entry['data']['payment_hold_info']['id'], 'pi_hold_123')
+
+    def test_get_rental_history_multiple_entries_latest_is_active(self):
+        """When history has multiple rentals, the most recent entry can be active."""
+        base_ts = _now()
+        completed_rental = ecwr.Rental({
+            'vehicle_id': VEHICLE_ID,
+            'vehicle_name': 'test vehicle',
+            'payment_hold_info': {'id': 'pi_completed_001'},
+            'start_ts': base_ts - 600,
+            'end_ts': base_ts - 300,
+            'rental_status': 'completed',
+        })
+        esta.TimeSeries.get_time_series(self.test_uuid).insert_data(
+            self.test_uuid,
+            vl.VEHICLE_RENTAL_KEY,
+            completed_rental,
+        )
+
+        self._insert_active_rental(
+            payment_hold_info={'id': 'pi_active_002'},
+            rental_start_ts=base_ts,
+        )
+
+        history = vl.get_rental_history(self.test_uuid)
+
+        self.assertGreaterEqual(len(history), 2)
+        latest_entry = history[-1]
+        self.assertEqual(latest_entry['data']['rental_status'], 'active')
+        self.assertEqual(latest_entry['data']['payment_hold_info']['id'], 'pi_active_002')
+        self.assertTrue(any(e['data']['rental_status'] == 'completed' for e in history[:-1]))
+
     # ------------------------------------------------------------------
     # Integration: full workflow
     # ------------------------------------------------------------------

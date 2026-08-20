@@ -176,6 +176,11 @@ def check_in_vehicle(user_uuid, dock_id):
     logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} for user {user_uuid}")
     return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_id}
 
+
+def get_rental_history(user_uuid):
+    """Return all rental entries for the user from the vehicle rental stream."""
+    return _get_rental_ts(user_uuid).find_entries([VEHICLE_RENTAL_KEY])
+
 # END: bikeep + stripe integration
 
 ## BEGIN: Stripe passthrough integration
