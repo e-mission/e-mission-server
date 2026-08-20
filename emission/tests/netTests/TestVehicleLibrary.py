@@ -109,7 +109,7 @@ class TestVehicleLibrary(unittest.TestCase):
         expected = [{'station_id': '1', 'name': 'Main St', 'docks': []}]
         with patch.object(vl.bikeep_service, 'get_locations', return_value=expected):
             result = vl.stations()
-        self.assertEqual(result, expected)
+        self.assertEqual(result, {'stations': expected})
 
     def test_stations_propagates_bikeep_exception(self):
         """stations() propagates exceptions from bikeep_service."""
@@ -283,11 +283,12 @@ class TestVehicleLibrary(unittest.TestCase):
         self._insert_active_rental(payment_hold_info={'id': 'pi_hold_123'}, rental_start_ts=_now())
 
         history = vl.get_rental_history(self.test_uuid)
+        rental_history = history['rental_history']
 
-        self.assertGreaterEqual(len(history), 1)
-        latest_entry = history[-1]
-        self.assertEqual(latest_entry['data']['vehicle_id'], VEHICLE_ID)
-        self.assertEqual(latest_entry['data']['payment_hold_info']['id'], 'pi_hold_123')
+        self.assertGreaterEqual(len(rental_history), 1)
+        latest_rental = rental_history[-1]
+        self.assertEqual(latest_rental['vehicle_id'], VEHICLE_ID)
+        self.assertEqual(latest_rental['payment_hold_info']['id'], 'pi_hold_123')
 
     def test_get_rental_history_multiple_entries_latest_is_active(self):
         """When history has multiple rentals, the most recent entry can be active."""
@@ -312,12 +313,13 @@ class TestVehicleLibrary(unittest.TestCase):
         )
 
         history = vl.get_rental_history(self.test_uuid)
+        rental_history = history['rental_history']
 
-        self.assertGreaterEqual(len(history), 2)
-        latest_entry = history[-1]
-        self.assertEqual(latest_entry['data']['rental_status'], 'active')
-        self.assertEqual(latest_entry['data']['payment_hold_info']['id'], 'pi_active_002')
-        self.assertTrue(any(e['data']['rental_status'] == 'completed' for e in history[:-1]))
+        self.assertGreaterEqual(len(rental_history), 2)
+        latest_rental = rental_history[-1]
+        self.assertEqual(latest_rental['rental_status'], 'active')
+        self.assertEqual(latest_rental['payment_hold_info']['id'], 'pi_active_002')
+        self.assertTrue(any(r['rental_status'] == 'completed' for r in rental_history[:-1]))
 
     # ------------------------------------------------------------------
     # Integration: full workflow

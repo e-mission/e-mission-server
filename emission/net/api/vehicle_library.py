@@ -57,7 +57,9 @@ def stations():
     Return a list of Bikeep station locations and dock states.
     Calls bikeep_service.get_locations() and returns the result directly.
     """
-    return bikeep_service.get_locations()
+    # bottle only supports returning objects, not raw lists, due to vulnerabilities with JSON arrays
+    # https://stackoverflow.com/a/40695739
+    return {'stations': bikeep_service.get_locations()}
 
 # END: bikeeep passthrough integration
 
@@ -179,7 +181,9 @@ def check_in_vehicle(user_uuid, dock_id):
 
 def get_rental_history(user_uuid):
     """Return all rental entries for the user from the vehicle rental stream."""
-    return _get_rental_ts(user_uuid).find_entries([VEHICLE_RENTAL_KEY])
+    # bottle only supports returning objects, not raw lists, due to vulnerabilities with JSON arrays
+    # https://stackoverflow.com/a/40695739
+    return {"rental_history": [e['data'] for e in _get_rental_ts(user_uuid).find_entries([VEHICLE_RENTAL_KEY])]}
 
 # END: bikeep + stripe integration
 
