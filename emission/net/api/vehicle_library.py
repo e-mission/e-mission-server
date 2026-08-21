@@ -76,8 +76,10 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     - Persists the active rental mapping in the user's timeseries.
     - Unlocks the vehicle's dock via bikeep_service.
     """
+    logging.debug(f"In vehicle_library module with vehicle {vehicle_id} for user {user_uuid} with hold amount {hold_amount_cents}")
     vehicle_db = edb.get_vehicle_db()
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
+    logging.debug(f"Found matching vehicle {vehicle=} for {vehicle_id}")
     if vehicle is None:
         raise ValueError(404, "Vehicle %s not found" % vehicle_id)
 
@@ -96,6 +98,20 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
             'hold_amount_cents': hold_amount_cents,
         },
     )
+
+    try:
+        logger.debug(f"Unlocking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
+        bikeep_service.unlock_dock(dock_id)
+    except Exception as e:
+        logging.error(f"Error occurred while checking out vehicle {vehicle_id} for user {user_uuid}: {e}")
+        try:
+            ss.cancel_hold_payment_intent(hold_info.get('id'))
+        except Exception as cancel_err:
+            # TODO: figure out what we should do here
+            logging.error(f"Failed to cancel hold {hold_info.get('id')} after checkout failure: {cancel_err}")
+        raise
+
+    # TODO: what do we do if saving the state fails here
     rental_state = ecwr.Rental({
         'vehicle_id': vehicle.get('vehicle_id'),
         'vehicle_name': vehicle.get('vehicle_name'),
@@ -114,9 +130,6 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
             'updated_at': now,
         }},
     )
-
-    logger.debug(f"Unlocking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
-    bikeep_service.unlock_dock(dock_id)
 
     logger.info(f"Checked out vehicle {vehicle_id} (dock {dock_id}) for user {user_uuid}")
     return {'result': 'checked_out', 'vehicle_id': vehicle_id}

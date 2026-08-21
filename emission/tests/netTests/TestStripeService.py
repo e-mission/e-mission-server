@@ -198,6 +198,25 @@ class TestStripeService(unittest.TestCase):
         self.assertEqual(result, fake_capture)
         mock_capture.assert_called_once_with('pi_hold_123', amount_to_capture=900)
 
+    def test_cancel_hold_payment_intent_calls_stripe_cancel(self):
+        fake_cancel = {
+            'id': 'pi_hold_123',
+            'status': 'canceled',
+        }
+
+        with patch.object(stripe_service.stripe.PaymentIntent, 'cancel', return_value=json.dumps(fake_cancel)) as mock_cancel:
+            result = stripe_service.cancel_hold_payment_intent('pi_hold_123')
+
+        self.assertEqual(result, fake_cancel)
+        mock_cancel.assert_called_once_with('pi_hold_123')
+
+    def test_cancel_hold_payment_intent_raises_on_missing_id(self):
+        with patch.object(stripe_service.stripe.PaymentIntent, 'cancel') as mock_cancel:
+            with self.assertRaisesRegex(ValueError, 'payment_intent_id is required'):
+                stripe_service.cancel_hold_payment_intent(None)
+
+        mock_cancel.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -271,4 +271,16 @@ def capture_hold_payment_intent(payment_intent_id, amount_to_capture_cents=None)
     logging.debug(f"Received stripe PaymentIntent.capture response: {json_captured_intent}")
     return json_captured_intent
 
+
+def cancel_hold_payment_intent(payment_intent_id):
+    if not payment_intent_id:
+        raise ValueError("payment_intent_id is required")
+
+    logging.info(f"Invoking stripe PaymentIntent.cancel for {payment_intent_id=}")
+    cancelled_intent = stripe.PaymentIntent.cancel(payment_intent_id)
+    json_cancelled_intent = json.loads(str(cancelled_intent))
+
+    logging.debug(f"Received stripe PaymentIntent.cancel response: {json_cancelled_intent}")
+    return json_cancelled_intent
+
 ## END: payment flow

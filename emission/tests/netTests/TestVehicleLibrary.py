@@ -161,6 +161,28 @@ class TestVehicleLibrary(unittest.TestCase):
 
         mock_unlock.assert_called_once_with(DOCK_ID)
 
+    def test_checkout_vehicle_cancels_hold_if_unlock_fails(self):
+        """checkout_vehicle() cancels the Stripe hold when bikeep unlock raises."""
+        self._insert_vehicle()
+
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('dock unreachable')), \
+             patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel:
+            with self.assertRaises(RuntimeError):
+                self._checkout_vehicle()
+
+        mock_cancel.assert_called_once_with('pi_hold_123')
+
+    def test_checkout_vehicle_raises_original_error_when_cancel_also_fails(self):
+        """checkout_vehicle() still raises the checkout error even if cancel itself fails."""
+        self._insert_vehicle()
+
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('dock unreachable')), \
+             patch.object(vl.ss, 'cancel_hold_payment_intent', side_effect=RuntimeError('stripe unreachable')):
+            with self.assertRaisesRegex(RuntimeError, 'dock unreachable'):
+                self._checkout_vehicle()
+
     def test_checkout_vehicle_persists_active_rental_entry(self):
         """checkout_vehicle() stores the active vehicle-user mapping in manual/vehicle_rental."""
         self._insert_vehicle()
