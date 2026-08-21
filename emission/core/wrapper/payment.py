@@ -19,6 +19,7 @@ class Payment(ecwb.WrapperBase):
         "payment_setup_status": ecwb.WrapperBase.Access.RW,  # the status of the payment setup process
         "pending_setup_session": ecwb.WrapperBase.Access.RW, # while waiting for setup
         "payment_setup": ecwb.WrapperBase.Access.RW, # the setup intent returned by stripe after successful setup
+        "stripe_customer_id": ecwb.WrapperBase.Access.RW, # customer used to store reusable payment methods
     }
 
     enums = {

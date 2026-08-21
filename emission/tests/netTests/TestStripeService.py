@@ -17,29 +17,35 @@ class TestStripeService(unittest.TestCase):
         ecwu.User.unregister(self.test_email)
 
     def test_create_setup_checkout_session_success(self):
+        fake_customer = {
+            'id': 'cus_123',
+        }
         fake_session = {
             'id': 'cs_setup_123',
             'url': 'https://checkout.stripe.com/c/pay/cs_setup_123',
             'status': 'open',
         }
 
-        with patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup, \
+        with patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps(fake_customer)) as mock_create_customer, \
+             patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup, \
              patch.object(stripe_service, 'invoke_get_checkout_session_status_api') as mock_invoke_status:
             result = stripe_service.create_setup_checkout_session(self.test_uuid)
 
         self.assertEqual(result, fake_session)
-        mock_invoke_setup.assert_called_once_with(self.test_uuid)
+        mock_create_customer.assert_called_once()
+        mock_invoke_setup.assert_called_once_with(self.test_uuid, 'cus_123')
         mock_invoke_status.assert_not_called()
 
         saved_payment = stripe_service.get_current_payment_state(self.test_uuid)
         self.assertEqual(saved_payment.get('payment_setup_status'), ecwp.PaymentSetupStatus.WAITING_FOR_USER.value)
         self.assertEqual(saved_payment.get('pending_setup_session'), fake_session)
+        self.assertEqual(saved_payment.get('stripe_customer_id'), 'cus_123')
 
     def test_invoke_setup_checkout_session_api_raises_when_success_url_missing(self):
         with patch.object(stripe_service, 'STRIPE_SUCCESS_URL', None), \
              patch.object(stripe_service.stripe.checkout.Session, 'create') as mock_create:
             with self.assertRaisesRegex(ValueError, 'STRIPE_SUCCESS_URL is required for setup checkout'):
-                stripe_service.invoke_setup_checkout_session_api(self.test_uuid)
+                stripe_service.invoke_setup_checkout_session_api(self.test_uuid, 'cus_123')
 
         mock_create.assert_not_called()
 
@@ -59,23 +65,50 @@ class TestStripeService(unittest.TestCase):
         )
 
         with patch.object(stripe_service, 'invoke_get_checkout_session_status_api', return_value=pending_session) as mock_invoke_status, \
+             patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps({'id': 'cus_123'})) as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api') as mock_invoke_setup:
             result = stripe_service.create_setup_checkout_session(self.test_uuid)
 
         self.assertEqual(result, pending_session)
         mock_invoke_status.assert_called_once_with(self.test_uuid)
+        mock_create_customer.assert_called_once()
         mock_invoke_setup.assert_not_called()
+
+    def test_create_setup_checkout_session_reuses_saved_customer(self):
+        payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
+        seed_payment = ecwp.Payment()
+        seed_payment.payment_setup_status = ecwp.PaymentSetupStatus.NOT_STARTED
+        seed_payment.stripe_customer_id = 'cus_saved_123'
+        payment_db.upsert_state(
+            stripe_service.esas.StateName.PAYMENT,
+            seed_payment,
+        )
+
+        fake_session = {
+            'id': 'cs_setup_123',
+            'url': 'https://checkout.stripe.com/c/pay/cs_setup_123',
+            'status': 'open',
+        }
+
+        with patch.object(stripe_service.stripe.Customer, 'create') as mock_create_customer, \
+             patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup:
+            result = stripe_service.create_setup_checkout_session(self.test_uuid)
+
+        self.assertEqual(result, fake_session)
+        mock_create_customer.assert_not_called()
+        mock_invoke_setup.assert_called_once_with(self.test_uuid, 'cus_saved_123')
 
     def test_invoke_setup_checkout_session_api_propagates_stripe_error(self):
         with patch.object(stripe_service, 'STRIPE_SUCCESS_URL', 'https://example.com/success'), \
              patch.object(stripe_service.stripe.checkout.Session, 'create', side_effect=RuntimeError('stripe request failed')):
             with self.assertRaisesRegex(RuntimeError, 'stripe request failed'):
-                stripe_service.invoke_setup_checkout_session_api(self.test_uuid)
+                stripe_service.invoke_setup_checkout_session_api(self.test_uuid, 'cus_123')
 
     def test_create_hold_payment_intent_uses_saved_setup_payment_method(self):
         payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
         seed_payment = ecwp.Payment()
         seed_payment.payment_setup_status = ecwp.PaymentSetupStatus.SUCCEEDED
+        seed_payment.stripe_customer_id = 'cus_saved_123'
         seed_payment.payment_setup = {
             'id': 'seti_123',
             'payment_method': 'pm_saved_123',
@@ -102,10 +135,42 @@ class TestStripeService(unittest.TestCase):
         self.assertEqual(called_kwargs['amount'], 1200)
         self.assertEqual(called_kwargs['currency'], 'usd')
         self.assertEqual(called_kwargs['payment_method'], 'pm_saved_123')
+        self.assertEqual(called_kwargs['customer'], 'cus_saved_123')
         self.assertEqual(called_kwargs['capture_method'], 'manual')
         self.assertTrue(called_kwargs['confirm'])
         self.assertTrue(called_kwargs['off_session'])
         self.assertEqual(called_kwargs['metadata']['vehicle_id'], 'bike-123')
+
+    def test_check_pending_setup_status_attaches_payment_method_to_customer(self):
+        payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
+        seed_payment = ecwp.Payment()
+        seed_payment.payment_setup_status = ecwp.PaymentSetupStatus.WAITING_FOR_USER
+        seed_payment.pending_setup_session = {'id': 'cs_setup_123'}
+        seed_payment.stripe_customer_id = 'cus_saved_123'
+        payment_db.upsert_state(
+            stripe_service.esas.StateName.PAYMENT,
+            seed_payment,
+        )
+
+        complete_session = {
+            'id': 'cs_setup_123',
+            'status': 'complete',
+            'setup_intent': {
+                'id': 'seti_123',
+                'payment_method': 'pm_saved_123',
+            },
+        }
+
+        with patch.object(stripe_service, 'invoke_get_checkout_session_status_api', return_value=complete_session), \
+             patch.object(stripe_service.stripe.PaymentMethod, 'attach', return_value=json.dumps({'id': 'pm_saved_123'})) as mock_attach:
+            result = stripe_service.check_pending_setup_status(self.test_uuid)
+
+        self.assertEqual(result, ecwp.PaymentSetupStatus.SUCCEEDED)
+        mock_attach.assert_called_once_with('pm_saved_123', customer='cus_saved_123')
+
+        saved_payment = stripe_service.get_current_payment_state(self.test_uuid)
+        self.assertEqual(saved_payment.get('stripe_customer_id'), 'cus_saved_123')
+        self.assertEqual(saved_payment.get('payment_setup_status'), ecwp.PaymentSetupStatus.SUCCEEDED.value)
 
     def test_create_hold_payment_intent_requires_succeeded_setup(self):
         payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
