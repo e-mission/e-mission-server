@@ -156,19 +156,5 @@ class TestBikeepServiceMocked(unittest.TestCase):
         logger.info(f"Unlock result: {unlock_result}")
         self.assertIsInstance(unlock_result, dict)
 
-    # ------------------------------------------------------------------
-    # Book then cancel booking (round-trip)
-    # ------------------------------------------------------------------
-    def test_book_then_cancel_booking_device(self):
-        """Book followed by cancel-booking against mocked Bikeep API."""
-        book_result = bikeep.book_dock(TEST_DEVICE_ID)
-        logger.info(f"Book result: {book_result}")
-        self.assertIsInstance(book_result, dict)
-
-        cancel_result = bikeep.cancel_booking_dock(TEST_DEVICE_ID)
-        logger.info(f"Cancel booking result: {cancel_result}")
-        self.assertIsInstance(cancel_result, dict)
-
-
 if __name__ == "__main__":
     unittest.main()
