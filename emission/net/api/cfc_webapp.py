@@ -405,7 +405,11 @@ def getCustomURL(route):
 # Vehicle library endpoints START
 # ============================================================================
 
-@get('/library/stations')
+# TODO: should this be GET or POST? We use POST for many retrieval functions.
+# If we choose to use GET instead, we will need to use fetch directly from the
+# client, and make the call directly from javascript, which means more changes
+# to the CSP and so on. Sidestepping that for now...
+@post('/library/stations')
 def get_bikeshare_stations():
     return vehicle_library.stations()
 
