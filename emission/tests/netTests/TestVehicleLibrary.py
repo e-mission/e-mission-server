@@ -6,9 +6,12 @@ import time
 import logging
 from unittest.mock import patch
 
+import arrow
+
 # Our imports
 import emission.core.get_database as edb
 import emission.core.wrapper.rental as ecwr
+import emission.core.wrapper.localdate as ecwld
 import emission.net.api.vehicle_library as vl
 import emission.storage.timeseries.abstract_timeseries as esta
 
@@ -73,6 +76,7 @@ class TestVehicleLibrary(unittest.TestCase):
     def _insert_active_rental(self, payment_hold_info=None, rental_start_ts=None):
         """Insert an active rental entry into the user's timeseries."""
         start_ts = rental_start_ts if rental_start_ts is not None else _now()
+        timezone = "America/Los_Angeles"
         if payment_hold_info is None:
             payment_hold_info = {'id': 'pi_hold_123'}
         rental_state = ecwr.Rental({
@@ -80,7 +84,13 @@ class TestVehicleLibrary(unittest.TestCase):
             'vehicle_name': 'test vehicle',
             'payment_hold_info': payment_hold_info,
             'start_ts': start_ts,
+            'start_local_dt': ecwld.LocalDate.get_local_date(start_ts, timezone),
+            'start_fmt_time': arrow.get(start_ts).to(timezone).isoformat(),
+            'start_dock_id': DOCK_ID,
             'end_ts': None,
+            'end_local_dt': None,
+            'end_fmt_time': None,
+            'end_dock_id': None,
             'rental_status': 'active',
         })
         esta.TimeSeries.get_time_series(self.test_uuid).insert_data(
@@ -199,6 +209,13 @@ class TestVehicleLibrary(unittest.TestCase):
         self.assertEqual(rental_state['rental_status'], 'active')
         self.assertIsNotNone(rental_state['start_ts'])
         self.assertIsNone(rental_state.get('end_ts'))
+        # Verify new fields are populated
+        self.assertIsNotNone(rental_state.get('start_local_dt'))
+        self.assertIsNotNone(rental_state.get('start_fmt_time'))
+        self.assertEqual(rental_state.get('start_dock_id'), DOCK_ID)
+        self.assertIsNone(rental_state.get('end_local_dt'))
+        self.assertIsNone(rental_state.get('end_fmt_time'))
+        self.assertIsNone(rental_state.get('end_dock_id'))
 
     # ------------------------------------------------------------------
     # check_in_vehicle()
@@ -242,6 +259,10 @@ class TestVehicleLibrary(unittest.TestCase):
         self.assertEqual(rental_state['start_ts'], rental_start_ts)
         self.assertIsNotNone(rental_state['end_ts'])
         self.assertGreaterEqual(rental_state['end_ts'], rental_start_ts)
+        # Verify new end fields are populated
+        self.assertIsNotNone(rental_state.get('end_local_dt'))
+        self.assertIsNotNone(rental_state.get('end_fmt_time'))
+        self.assertEqual(rental_state.get('end_dock_id'), ALT_DOCK_ID)
 
     def test_checkin_vehicle_calls_bikeep_lock(self):
         """check_in_vehicle() locks the dock via bikeep."""
@@ -315,12 +336,19 @@ class TestVehicleLibrary(unittest.TestCase):
     def test_get_rental_history_multiple_entries_latest_is_active(self):
         """When history has multiple rentals, the most recent entry can be active."""
         base_ts = _now()
+        timezone = "America/Los_Angeles"
         completed_rental = ecwr.Rental({
             'vehicle_id': VEHICLE_ID,
             'vehicle_name': 'test vehicle',
             'payment_hold_info': {'id': 'pi_completed_001'},
             'start_ts': base_ts - 600,
+            'start_local_dt': ecwld.LocalDate.get_local_date(base_ts - 600, timezone),
+            'start_fmt_time': arrow.get(base_ts - 600).to(timezone).isoformat(),
+            'start_dock_id': DOCK_ID,
             'end_ts': base_ts - 300,
+            'end_local_dt': ecwld.LocalDate.get_local_date(base_ts - 300, timezone),
+            'end_fmt_time': arrow.get(base_ts - 300).to(timezone).isoformat(),
+            'end_dock_id': ALT_DOCK_ID,
             'rental_status': 'completed',
         })
         esta.TimeSeries.get_time_series(self.test_uuid).insert_data(

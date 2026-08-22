@@ -2,9 +2,12 @@ import logging
 import time
 import datetime
 
+import arrow
+
 import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.rental as ecwr
+import emission.core.wrapper.localdate as ecwld
 import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
 import emission.net.ext_service.stripe.stripe_service as ss
 import emission.core.wrapper.payment as ecwp
@@ -112,13 +115,23 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         raise
 
     # TODO: what do we do if saving the state fails here
+    timezone = "America/Los_Angeles"  # Default timezone
+    start_fmt_time = arrow.get(now).to(timezone).isoformat()
+    start_local_dt = ecwld.LocalDate.get_local_date(now, timezone)
+
     rental_state = ecwr.Rental({
         'vehicle_id': vehicle.get('vehicle_id'),
         'vehicle_name': vehicle.get('vehicle_name'),
         'payment_hold_info': hold_info,
         'rental_status': 'active',
         'start_ts': now,
+        'start_local_dt': start_local_dt,
+        'start_fmt_time': start_fmt_time,
+        'start_dock_id': dock_id,
         'end_ts': None,
+        'end_local_dt': None,
+        'end_fmt_time': None,
+        'end_dock_id': None,
     })
     _get_rental_ts(user_uuid).insert_data(user_uuid, VEHICLE_RENTAL_KEY, rental_state)
 
@@ -178,6 +191,9 @@ def check_in_vehicle(user_uuid, dock_id):
         **rental_state,
         'rental_status': 'completed',
         'end_ts': now,
+        'end_local_dt': ecwld.LocalDate.get_local_date(now, "America/Los_Angeles"),
+        'end_fmt_time': arrow.get(now).to("America/Los_Angeles").isoformat(),
+        'end_dock_id': dock_id,
     })
 
     import emission.storage.timeseries.builtin_timeseries as estb
