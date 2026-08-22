@@ -89,13 +89,15 @@ def get_locations():
     Get all locations, docks, and their lock states from Bikeep.
     
     Returns:
-        list of station dicts with structure:
+        list of location dicts with structure:
         {
-            "station_id": "1",
+            "id": "abc123",
             "name": "Downtown Station",
+            "latitude": 37.7749,
+            "longitude": -122.4194,
             "docks": [
                 {
-                    "dock_id": "1-1",
+                    "dock_id": "abc123",  # dock_id == location_id
                     "lock_state": "locked" | "unlocked",
                     "bike_id": None,  # Bikeep doesn't track this; OpenPATH does
                 }
@@ -124,6 +126,44 @@ def get_locations():
         logger.error(f"Error retrieving locations from Bikeep: {e}")
         raise
 
+def get_location(device_id):
+    """
+    Get a location object for a Bikeep device.
+
+    The input ID is a Bikeep device ID. We first retrieve the device from
+    /device/v1/devices/{device_id}, then follow the location reference in the
+    device payload to fetch the location object.
+
+    Returns a dict with at least: id, name, latitude, longitude.
+    Raises RequestException if the API call fails.
+    """
+    device_url = f"{BIKEEP_API_URL}/device/v1/devices/{device_id}"
+    headers = _get_headers()
+
+    try:
+        device_response = requests.get(device_url, headers=headers, timeout=10)
+        device_response.raise_for_status()
+        device_data = device_response.json()
+
+        location_ref = device_data.get("location", {}).get("uri")
+        if location_ref is None:
+            raise ValueError(400, f"Device {device_id} response missing location reference")
+
+        location_response = requests.get(location_ref, headers=headers, timeout=10)
+        location_response.raise_for_status()
+        data = location_response.json()
+        logger.debug(f"Retrieved location for device {device_id} from Bikeep")
+        return data
+    except Timeout:
+        logger.error(f"Timeout retrieving location for device {device_id} from Bikeep")
+        raise
+    except ConnectionError:
+        logger.error(f"Connection error retrieving location for device {device_id} from Bikeep")
+        raise
+    except RequestException as e:
+        logger.error(f"Error retrieving location for device {device_id} from Bikeep: {e}")
+        raise
+
 def lock_dock(dock_id):
     """
     Lock a dock via Bikeep API.
@@ -142,7 +182,12 @@ def lock_dock(dock_id):
     payload = {"command": "lock"}
     
     try:
+        logger.debug(f"About to lock dock {dock_id}, {headers=}, {payload=}")
         response = requests.post(url, headers=headers, json=payload, timeout=10)
+        logger.debug(f"Response from locking dock {dock_id}: {response}")
+        if response.status_code != 200:
+            logger.error(f"Response from locking dock {dock_id}: {response}")
+            logger.error(f"Failed to lock dock {dock_id}, status code: {response.status_code}, response: {response.error_code=}, {response.error_message=}")
         response.raise_for_status()
         data = response.json()
         logger.info(f"Locked dock {dock_id} via Bikeep")
@@ -175,7 +220,13 @@ def unlock_dock(dock_id):
     payload = {"command": "unlock"}
     
     try:
+        logger.debug(f"About to unlock dock {dock_id}, {headers=}, {payload=}")
         response = requests.post(url, headers=headers, json=payload, timeout=10)
+        logger.debug(f"Response from unlocking dock {dock_id}: {response.text}")
+        if response.status_code != 200:
+            response_json = response.json()
+            logger.error(f"Response from unlocking dock {dock_id}: {response_json}")
+            logger.error(f"Failed to unlock dock {dock_id}, status code: {response.status_code}, response: {response_json.get('error_code')=}, {response_json.get('error_message')=}")
         response.raise_for_status()
         data = response.json()
         logger.info(f"Unlocked dock {dock_id} via Bikeep")

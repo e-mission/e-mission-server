@@ -12,6 +12,7 @@ import time
 import uuid
 
 import arrow
+import geojson
 
 import emission.core.wrapper.rental as ecwr
 import emission.core.wrapper.localdate as ecwld
@@ -50,9 +51,11 @@ def seed_rental_history(
             'start_ts': start,
             'start_local_dt': start_local_dt,
             'start_fmt_time': start_fmt_time,
+            'start_loc': geojson.Point((-122.4194 + i * 0.01, 37.7749 + i * 0.01)),
             'end_ts': end,
             'end_local_dt': end_local_dt,
             'end_fmt_time': end_fmt_time,
+            'end_loc': geojson.Point((-122.4194 + (i + 1) * 0.01, 37.7749 + (i + 1) * 0.01)),
             'start_dock_id': f'dock_{i}',
             'end_dock_id': f'dock_{i+1}',
         }))
@@ -69,9 +72,11 @@ def seed_rental_history(
         'start_ts': active_start,
         'start_local_dt': start_local_dt,
         'start_fmt_time': start_fmt_time,
+        'start_loc': geojson.Point((-122.4194 + num_completed * 0.01, 37.7749 + num_completed * 0.01)),
         'end_ts': None,
         'end_local_dt': None,
         'end_fmt_time': None,
+        'end_loc': None,
         'start_dock_id': f'dock_{num_completed}',
         'end_dock_id': None,
     }))

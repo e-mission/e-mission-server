@@ -18,13 +18,15 @@ class Rental(ecwb.WrapperBase):
         "end_local_dt": ecwb.WrapperBase.Access.WORM,
         "end_fmt_time": ecwb.WrapperBase.Access.WORM,
         "start_dock_id": ecwb.WrapperBase.Access.WORM,
+        "start_loc": ecwb.WrapperBase.Access.WORM,  # start location (dock/bay/parking spot ID or user UUID if checked out)
         "end_dock_id": ecwb.WrapperBase.Access.WORM,
+        "end_loc": ecwb.WrapperBase.Access.WORM,  # end location (dock/bay/parking spot ID or user UUID if checked out)
         "rental_status": ecwb.WrapperBase.Access.RW,
     }
 
     enums = {}
-    geojson = []
-    nullable = []
+    geojson = ['start_loc', 'end_loc']
+    nullable = ['end_loc']
     local_dates = ['start_local_dt', 'end_local_dt']
 
     def _populateDependencies(self):

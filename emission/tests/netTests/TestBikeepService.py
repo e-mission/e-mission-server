@@ -27,6 +27,7 @@ class _MockResponse:
     def __init__(self, payload, status_code=200):
         self._payload = payload
         self.status_code = status_code
+        self.text = str(payload)
 
     def json(self):
         return self._payload
@@ -78,16 +79,43 @@ class TestBikeepServiceMocked(unittest.TestCase):
                         {
                             "station_id": "station-1",
                             "name": "Mock Station 1",
+                            "latitude": 37.7749,
+                            "longitude": -122.4194,
                             "devices": {"total": 4},
                         },
                         {
                             "station_id": "station-2",
                             "name": "Mock Station 2",
+                            "latitude": 37.7900,
+                            "longitude": -122.4100,
                             "devices": {"total": 3},
                         },
                     ]
                 }
             )
+        if "/device/v1/devices/" in url:
+            device_id = url.rsplit("/", 1)[-1]
+            if device_id == "unknown-id":
+                return _MockResponse({}, status_code=404)
+            return _MockResponse(
+                {
+                    "id": device_id,
+                    "name": "Mock Device",
+                    "location": {
+                        "uri": f"/location/v1/locations/test-station-1"
+                    },
+                }
+            )
+        if "/location/v1/locations/" in url:
+            location_id = url.rsplit("/", 1)[-1]
+            if location_id == "unknown-id":
+                return _MockResponse({}, status_code=404)
+            return _MockResponse({
+                "id": location_id,
+                "name": "Mock Station",
+                "latitude": 37.7749,
+                "longitude": -122.4194,
+            })
         return _MockResponse({}, status_code=404)
 
     def _mocked_post(self, url, headers=None, json=None, data=None, timeout=10):
@@ -155,6 +183,32 @@ class TestBikeepServiceMocked(unittest.TestCase):
         unlock_result = bikeep.unlock_dock(TEST_DEVICE_ID)
         logger.info(f"Unlock result: {unlock_result}")
         self.assertIsInstance(unlock_result, dict)
+
+    # ------------------------------------------------------------------
+    # get_location()
+    # ------------------------------------------------------------------
+
+    def test_get_location_returns_lat_lng(self):
+        """get_location() returns a location dict for a device ID."""
+        result = bikeep.get_location("test-device-1")
+
+        self.assertIn("latitude", result)
+        self.assertIn("longitude", result)
+        self.assertIsInstance(result["latitude"], float)
+        self.assertIsInstance(result["longitude"], float)
+
+    def test_get_location_returns_id_and_name(self):
+        """get_location() returns location id and name for a device ID."""
+        result = bikeep.get_location("test-device-1")
+
+        self.assertIn("id", result)
+        self.assertIn("name", result)
+        self.assertEqual(result["id"], "test-station-1")
+
+    def test_get_location_not_found_raises(self):
+        """get_location() raises on 404 for an unknown device ID."""
+        with self.assertRaises(Exception):
+            bikeep.get_location("unknown-id")
 
 if __name__ == "__main__":
     unittest.main()

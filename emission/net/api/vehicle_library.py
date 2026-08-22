@@ -3,6 +3,8 @@ import time
 import datetime
 
 import arrow
+import geojson
+import tzfpy
 
 import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
@@ -40,6 +42,26 @@ def _compute_capture_amount_cents(rental_start_ts, now_ts):
 def _get_rental_ts(user_uuid):
     return esta.TimeSeries.get_time_series(user_uuid)
 
+
+def _get_loc_and_timezone(dock_id):
+    """Return (geojson.Point, timezone_str) for a dock; falls back to defaults on error."""
+    try:
+        loc_data = bikeep_service.get_location(dock_id)
+        logger.debug(f"Retrieved location data for dock {dock_id}: {loc_data}")
+        lat = loc_data["latitude"]
+        lng = loc_data["longitude"]
+        ret_loc = geojson.Point((lng, lat))
+        ret_tz = tzfpy.get_tz(lng, lat)
+        logger.debug(f"Returning location {ret_loc}, timezone {ret_tz}")
+        return ret_loc, ret_tz
+    except Exception as e:
+        logger.exception(f"Could not look up location for dock {dock_id} because of {e}, using defaults")
+        # Defaults are 0, 0 = GMT
+        lat = 0
+        lng = 0
+        ret_loc = geojson.Point((lng, lat))
+        ret_tz = tzfpy.get_tz(lng, lat)
+        return ret_loc, ret_tz
 
 def _get_active_rental_entry(user_uuid):
     active_entries = _get_rental_ts(user_uuid).find_entries(
@@ -92,6 +114,8 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     if not dock_id:
         raise ValueError(422, "Vehicle %s has no dock location to unlock" % vehicle_id)
 
+    start_loc, timezone = _get_loc_and_timezone(dock_id)
+
     hold_info = ss.create_hold_payment_intent(
         user_uuid,
         hold_amount_cents,
@@ -115,7 +139,6 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         raise
 
     # TODO: what do we do if saving the state fails here
-    timezone = "America/Los_Angeles"  # Default timezone
     start_fmt_time = arrow.get(now).to(timezone).isoformat()
     start_local_dt = ecwld.LocalDate.get_local_date(now, timezone)
 
@@ -127,10 +150,12 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         'start_ts': now,
         'start_local_dt': start_local_dt,
         'start_fmt_time': start_fmt_time,
+        'start_loc': start_loc,
         'start_dock_id': dock_id,
         'end_ts': None,
         'end_local_dt': None,
         'end_fmt_time': None,
+        'end_loc': None,
         'end_dock_id': None,
     })
     _get_rental_ts(user_uuid).insert_data(user_uuid, VEHICLE_RENTAL_KEY, rental_state)
@@ -187,12 +212,14 @@ def check_in_vehicle(user_uuid, dock_id):
         }},
     )
 
+    end_loc, end_timezone = _get_loc_and_timezone(dock_id)
     updated_rental_state = ecwr.Rental({
         **rental_state,
         'rental_status': 'completed',
         'end_ts': now,
-        'end_local_dt': ecwld.LocalDate.get_local_date(now, "America/Los_Angeles"),
-        'end_fmt_time': arrow.get(now).to("America/Los_Angeles").isoformat(),
+        'end_local_dt': ecwld.LocalDate.get_local_date(now, end_timezone),
+        'end_fmt_time': arrow.get(now).to(end_timezone).isoformat(),
+        'end_loc': end_loc,
         'end_dock_id': dock_id,
     })
 

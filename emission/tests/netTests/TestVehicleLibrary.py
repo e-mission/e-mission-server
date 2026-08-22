@@ -21,6 +21,9 @@ VEHICLE_ID = "test-bike-001"
 DOCK_ID = "test-dock-1"
 ALT_DOCK_ID = "test-dock-2"
 
+_MOCK_DOCK_LOC = {'id': DOCK_ID, 'name': 'Test Dock', 'latitude': 37.7749, 'longitude': -122.4194}
+_MOCK_ALT_DOCK_LOC = {'id': ALT_DOCK_ID, 'name': 'Alt Test Dock', 'latitude': 37.7900, 'longitude': -122.4100}
+
 
 def _now():
     return time.time()
@@ -370,6 +373,79 @@ class TestVehicleLibrary(unittest.TestCase):
         self.assertEqual(latest_rental['rental_status'], 'active')
         self.assertEqual(latest_rental['payment_hold_info']['id'], 'pi_active_002')
         self.assertTrue(any(r['rental_status'] == 'completed' for r in rental_history[:-1]))
+
+    # ------------------------------------------------------------------
+    # _get_loc_and_timezone() / start_loc / end_loc
+    # ------------------------------------------------------------------
+
+    def test_checkout_vehicle_sets_start_loc_from_bikeep(self):
+        """checkout_vehicle() sets start_loc as a GeoJSON Point using bikeep location data."""
+        self._insert_vehicle()
+
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}), \
+             patch.object(vl.bikeep_service, 'get_location', return_value=_MOCK_DOCK_LOC):
+            self._checkout_vehicle()
+
+        rental_state = self._get_latest_rental_entry()['data']
+        self.assertIsNotNone(rental_state.get('start_loc'))
+        self.assertEqual(rental_state['start_loc']['type'], 'Point')
+        self.assertEqual(rental_state['start_loc']['coordinates'], [-122.4194, 37.7749])
+
+    def test_checkout_vehicle_uses_timezone_from_dock_location(self):
+        """checkout_vehicle() derives start_fmt_time timezone from the dock's coordinates."""
+        self._insert_vehicle()
+
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}), \
+             patch.object(vl.bikeep_service, 'get_location', return_value=_MOCK_DOCK_LOC):
+            self._checkout_vehicle()
+
+        rental_state = self._get_latest_rental_entry()['data']
+        # SF coordinates resolve to America/Los_Angeles (UTC-7 PDT or UTC-8 PST)
+        self.assertRegex(rental_state['start_fmt_time'], r'-0[78]:00$')
+
+    def test_checkout_vehicle_falls_back_when_bikeep_location_fails(self):
+        """checkout_vehicle() falls back to default timezone and None loc when location lookup fails."""
+        self._insert_vehicle()
+
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}), \
+             patch.object(vl.bikeep_service, 'get_location', side_effect=RuntimeError('API down')):
+            self._checkout_vehicle()  # must not raise
+
+        rental_state = self._get_latest_rental_entry()['data']
+        self.assertEqual(rental_state.get('start_loc'), {'type': 'Point', 'coordinates': [0, 0]})
+        self.assertIsNotNone(rental_state.get('start_fmt_time'))
+
+    def test_checkin_vehicle_sets_end_loc_from_bikeep(self):
+        """check_in_vehicle() sets end_loc as a GeoJSON Point using bikeep location data."""
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_active_rental(rental_start_ts=_now())
+
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
+             patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'status': 'succeeded'}), \
+             patch.object(vl.bikeep_service, 'get_location', return_value=_MOCK_ALT_DOCK_LOC):
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+
+        rental_state = self._get_latest_rental_entry()['data']
+        self.assertIsNotNone(rental_state.get('end_loc'))
+        self.assertEqual(rental_state['end_loc']['type'], 'Point')
+        self.assertEqual(rental_state['end_loc']['coordinates'], [-122.4100, 37.7900])
+
+    def test_checkin_vehicle_falls_back_when_bikeep_location_fails(self):
+        """check_in_vehicle() falls back to default timezone and None end_loc when location lookup fails."""
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_active_rental(rental_start_ts=_now())
+
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}), \
+             patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'status': 'succeeded'}), \
+             patch.object(vl.bikeep_service, 'get_location', side_effect=RuntimeError('API down')):
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)  # must not raise
+
+        rental_state = self._get_latest_rental_entry()['data']
+        self.assertEqual(rental_state.get('end_loc'), {'type': 'Point', 'coordinates': [0, 0]})
+        self.assertIsNotNone(rental_state.get('end_fmt_time'))
 
     # ------------------------------------------------------------------
     # Integration: full workflow
