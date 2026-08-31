@@ -1,9 +1,11 @@
 import json
 import os
 import logging
+import random
 import stripe
 import emission.storage.modifiable.abstract_state_storage as esas
 import emission.core.wrapper.payment as ecwp
+import emission.core.wrapper.user as ecwu
 
 # BEGIN DO NOT REFACTOR: I do not want to wrap these accesses
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
@@ -68,11 +70,12 @@ def _get_or_create_customer_id(uuid, payment_info):
     if stripe_customer_id:
         return stripe_customer_id
 
-    # TODO: Consider using a different, newly generated identifier for the stripe integration
-    # and storing it in the profile
+    curr_user = ecwu.User.fromUUID(uuid)
+    username = curr_user.create_and_store_username()
+
     customer = stripe.Customer.create(
-        metadata={"user_uuid": str(uuid)},
-        description=f"e-mission user {uuid}",
+        metadata={"username": username},
+        description=username,
     )
     json_customer = json.loads(str(customer))
     return json_customer["id"]

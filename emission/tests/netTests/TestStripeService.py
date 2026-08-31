@@ -26,13 +26,22 @@ class TestStripeService(unittest.TestCase):
             'status': 'open',
         }
 
-        with patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps(fake_customer)) as mock_create_customer, \
+        mock_user = unittest.mock.Mock()
+        mock_user.create_and_store_username.return_value = 'atlas_beacon'
+
+        with patch.object(stripe_service.ecwu.User, 'fromUUID', return_value=mock_user) as mock_from_uuid, \
+             patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps(fake_customer)) as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup, \
              patch.object(stripe_service, 'invoke_get_checkout_session_status_api') as mock_invoke_status:
             result = stripe_service.create_setup_checkout_session(self.test_uuid)
 
         self.assertEqual(result, fake_session)
-        mock_create_customer.assert_called_once()
+        mock_from_uuid.assert_called_once_with(self.test_uuid)
+        mock_user.create_and_store_username.assert_called_once_with()
+        mock_create_customer.assert_called_once_with(
+            metadata={'username': 'atlas_beacon'},
+            description='atlas_beacon',
+        )
         mock_invoke_setup.assert_called_once_with(self.test_uuid, 'cus_123')
         mock_invoke_status.assert_not_called()
 
@@ -64,14 +73,23 @@ class TestStripeService(unittest.TestCase):
             seed_payment,
         )
 
-        with patch.object(stripe_service, 'invoke_get_checkout_session_status_api', return_value=pending_session) as mock_invoke_status, \
+        mock_user = unittest.mock.Mock()
+        mock_user.create_and_store_username.return_value = 'atlas_beacon'
+
+        with patch.object(stripe_service.ecwu.User, 'fromUUID', return_value=mock_user) as mock_from_uuid, \
+             patch.object(stripe_service, 'invoke_get_checkout_session_status_api', return_value=pending_session) as mock_invoke_status, \
              patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps({'id': 'cus_123'})) as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api') as mock_invoke_setup:
             result = stripe_service.create_setup_checkout_session(self.test_uuid)
 
         self.assertEqual(result, pending_session)
         mock_invoke_status.assert_called_once_with(self.test_uuid)
-        mock_create_customer.assert_called_once()
+        mock_from_uuid.assert_called_once_with(self.test_uuid)
+        mock_user.create_and_store_username.assert_called_once_with()
+        mock_create_customer.assert_called_once_with(
+            metadata={'username': 'atlas_beacon'},
+            description='atlas_beacon',
+        )
         mock_invoke_setup.assert_not_called()
 
     def test_create_setup_checkout_session_reuses_saved_customer(self):
@@ -90,11 +108,13 @@ class TestStripeService(unittest.TestCase):
             'status': 'open',
         }
 
-        with patch.object(stripe_service.stripe.Customer, 'create') as mock_create_customer, \
+        with patch.object(stripe_service.ecwu.User, 'fromUUID') as mock_from_uuid, \
+             patch.object(stripe_service.stripe.Customer, 'create') as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup:
             result = stripe_service.create_setup_checkout_session(self.test_uuid)
 
         self.assertEqual(result, fake_session)
+        mock_from_uuid.assert_not_called()
         mock_create_customer.assert_not_called()
         mock_invoke_setup.assert_called_once_with(self.test_uuid, 'cus_saved_123')
 
