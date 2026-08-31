@@ -36,7 +36,7 @@ class TestStripeService(unittest.TestCase):
         mock_user = unittest.mock.Mock()
         mock_user.create_and_store_username.return_value = 'atlas_beacon'
 
-        with patch.object(stripe_service.ecwu.User, 'fromUUID', return_value=mock_user) as mock_from_uuid, \
+        with patch.object(stripe_service.User, 'fromUUID', return_value=mock_user) as mock_from_uuid, \
              patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps(fake_customer)) as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup, \
              patch.object(stripe_service, 'invoke_get_checkout_session_status_api') as mock_invoke_status:
@@ -83,7 +83,7 @@ class TestStripeService(unittest.TestCase):
         mock_user = unittest.mock.Mock()
         mock_user.create_and_store_username.return_value = 'atlas_beacon'
 
-        with patch.object(stripe_service.ecwu.User, 'fromUUID', return_value=mock_user) as mock_from_uuid, \
+        with patch.object(stripe_service.User, 'fromUUID', return_value=mock_user) as mock_from_uuid, \
              patch.object(stripe_service, 'invoke_get_checkout_session_status_api', return_value=pending_session) as mock_invoke_status, \
              patch.object(stripe_service.stripe.Customer, 'create', return_value=json.dumps({'id': 'cus_123'})) as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api') as mock_invoke_setup:
@@ -115,7 +115,7 @@ class TestStripeService(unittest.TestCase):
             'status': 'open',
         }
 
-        with patch.object(stripe_service.ecwu.User, 'fromUUID') as mock_from_uuid, \
+        with patch.object(stripe_service.User, 'fromUUID') as mock_from_uuid, \
              patch.object(stripe_service.stripe.Customer, 'create') as mock_create_customer, \
              patch.object(stripe_service, 'invoke_setup_checkout_session_api', return_value=fake_session) as mock_invoke_setup:
             result = stripe_service.create_setup_checkout_session(self.test_uuid)
