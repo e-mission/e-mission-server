@@ -3,12 +3,46 @@ from builtins import object
 import json
 import logging
 from datetime import datetime
+import random
+import requests
 
 # Our imports
 from emission.core.get_database import get_profile_db, get_uuid_db
 
 defaultCarFootprint = 278.0 / 1609
 defaultMpg = 8.91 / (1.6093 * defaultCarFootprint) # Should be roughly 32
+
+# TODO: potentially pull this out into a separate module
+# And have the words be i18n and downloaded from github on startup
+# and have the word list be part of the dynamic config
+ENGLISH_WORD_LIST = "https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt"
+
+_ENGLISH_WORDS_CACHE = None
+
+# Uses the singleton pattern to cache english words grouped by first character.
+# Every cached word is alpha-only and at least 3 characters long.
+def _load_words():
+    global _ENGLISH_WORDS_CACHE
+    if _ENGLISH_WORDS_CACHE is not None:
+        return _ENGLISH_WORDS_CACHE
+
+    words_by_first_char = {}
+    response = requests.get(ENGLISH_WORD_LIST)
+    if response.status_code != 200:
+        response.raise_for_status()
+        raise ValueError(response.status_code, "Failed to download ENGLISH_WORD_LIST from %s" % ENGLISH_WORD_LIST)
+    for line in response.text.splitlines():
+        word = line.strip().lower()
+        if len(word) < 3 or not word.isalpha():
+            continue
+        first_char = word[0]
+        words_by_first_char.setdefault(first_char, []).append(word)
+
+    if len(words_by_first_char) < 2:
+        raise ValueError(400, "Need valid words from at least two starting characters in ENGLISH_WORD_LIST")
+
+    _ENGLISH_WORDS_CACHE = words_by_first_char
+    return _ENGLISH_WORDS_CACHE
 
 class User(object):
   def __init__(self, uuid):
@@ -182,6 +216,25 @@ class User(object):
     get_uuid_db().delete_one({'user_email': userEmail})
     get_profile_db().delete_one({'user_id': uuid})
     return uuid
+
+  @staticmethod
+  def generate_username():
+      words_by_first_char = _load_words()
+      rng = random.SystemRandom()
+
+      first_char, second_char = rng.sample(list(words_by_first_char.keys()), 2)
+      first_word = rng.choice(words_by_first_char[first_char])
+      second_word = rng.choice(words_by_first_char[second_char])
+      return f"{first_word}_{second_word}"
+
+  def create_and_store_username(self):
+      user = get_profile_db().find_one({'user_id': self.uuid})
+      if 'username' in user and user['username']:
+          return user['username']
+      generated_username = User.generate_username()
+      logging.info(f"Generated username for user {self.uuid}: {generated_username}")
+      get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'username': generated_username}})
+      return generated_username
 
   def getUserCustomLabel(self, key):
     user = get_profile_db().find_one({'user_id': self.uuid})

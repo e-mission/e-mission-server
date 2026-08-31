@@ -23,4 +23,6 @@ dependencies:
   - pyfcm==2.0.1
   - pygeocoder==1.2.5
   - pymongo==4.6.3
+  - stripe==15.4.0
+  - tzfpy[tzdata]===1.3.3
 prefix: /Users/shankari/OSS/anaconda/envs/emission

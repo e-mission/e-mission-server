@@ -5,7 +5,7 @@ import emission.core.wrapper.wrapperbase as ecwb
 
 
 class StateName(enum.Enum):
-    VEHICLE = "VEHICLE"
+    DOCK = "DOCK"
     PAYMENT = "PAYMENT"
 
 
@@ -13,7 +13,7 @@ class StateStorage(object):
     @staticmethod
     def _getStateName2Wrapper():
         return {
-            StateName.VEHICLE: "vehicle",
+            StateName.DOCK: "dock",
             StateName.PAYMENT: "payment",
         }
 

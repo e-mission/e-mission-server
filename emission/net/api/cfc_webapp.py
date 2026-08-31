@@ -29,6 +29,7 @@ import emission.net.api.usercache as usercache
 import emission.net.api.timeline as timeline
 import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
+import emission.net.api.vehicle_library as vehicle_library
 
 import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
@@ -399,6 +400,65 @@ def getCustomURL(route):
   return {'redirect': 'success'}
 
 # Small utilities to make client software easier END
+
+# ============================================================================
+# Vehicle library endpoints START
+# ============================================================================
+
+# TODO: should this be GET or POST? We use POST for many retrieval functions.
+# If we choose to use GET instead, we will need to use fetch directly from the
+# client, and make the call directly from javascript, which means more changes
+# to the CSP and so on. Sidestepping that for now...
+@post('/library/stations')
+def get_bikeshare_stations():
+    return vehicle_library.stations()
+
+@post('/library/setup/create')
+def bikeshare_setup_user():
+    user_uuid = getUUID(request)
+    return vehicle_library.initiate_user_setup(user_uuid)
+
+@post('/library/setup/get_status')
+def bikeshare_setup_status():
+    user_uuid = getUUID(request)
+    return vehicle_library.get_user_setup_status(user_uuid)
+
+@post('/library/setup/check_and_get_status')
+def bikeshare_finalize_setup():
+    user_uuid = getUUID(request)
+    return vehicle_library.check_and_get_pending_setup_status(user_uuid)
+
+@post('/library/checkout')
+def bikeshare_checkout():
+    user_uuid = getUUID(request)
+    vehicle_id = request.json.get('vehicle_id')
+    if not vehicle_id:
+        abort(400, "vehicle_id is required")
+    hold_amount_cents = request.json.get('hold_amount_cents')
+    if hold_amount_cents is None:
+        abort(400, "hold_amount_cents is required")
+    try:
+        return vehicle_library.checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents)
+    except ValueError as e:
+        abort(e.args[0], e.args[1])
+
+@post('/library/checkin')
+def bikeshare_return():
+    user_uuid = getUUID(request)
+    dock_id = request.json.get('dock_id')
+    if not dock_id:
+        abort(400, "dock_id is required")
+    try:
+        return vehicle_library.check_in_vehicle(user_uuid, dock_id)
+    except ValueError as e:
+        abort(e.args[0], e.args[1])
+
+@post('/library/rental_history')
+def bikeshare_rental_history():
+    user_uuid = getUUID(request)
+    return vehicle_library.get_rental_history(user_uuid)
+
+# Vehicle library endpoints END
 
 @post('/habiticaRegister')
 def habiticaRegister():

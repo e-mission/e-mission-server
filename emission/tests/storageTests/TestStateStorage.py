@@ -4,8 +4,7 @@ import unittest
 import uuid
 
 import emission.core.get_database as edb
-import emission.core.wrapper.payment as ecwp
-import emission.core.wrapper.vehicle as ecwvs
+import emission.core.wrapper.dock as ecwd
 import emission.storage.modifiable.abstract_state_storage as esas
 
 
@@ -20,64 +19,60 @@ class TestStateStorage(unittest.TestCase):
     def tearDown(self):
         edb.get_state_db().delete_many({"user_id": self.user_id})
 
-    def test_state_enum_contains_vehicle_and_payment(self):
-        self.assertEqual(esas.StateName.VEHICLE.value, "VEHICLE")
-        self.assertEqual(esas.StateName.PAYMENT.value, "PAYMENT")
+    def test_state_enum_contains_dock(self):
+        self.assertEqual(esas.StateName.DOCK.value, "DOCK")
 
     def test_state_enum_to_wrapper_mapping(self):
         state_mapping = esas.StateStorage._getStateName2Wrapper()
 
-        self.assertEqual(state_mapping[esas.StateName.VEHICLE], "vehicle")
-        self.assertEqual(state_mapping[esas.StateName.PAYMENT], "payment")
+        self.assertEqual(state_mapping[esas.StateName.DOCK], "dock")
         self.assertEqual(
-            esas.StateStorage.get_state_wrapper(esas.StateName.VEHICLE),
-            "vehicle",
-        )
-        self.assertEqual(
-            esas.StateStorage.get_state_wrapper("PAYMENT"),
-            "payment",
+            esas.StateStorage.get_state_wrapper("DOCK"),
+            "dock",
         )
 
-    def test_upsert_and_get_current_state_for_vehicle(self):
-        vehicle_state = ecwvs.Vehicle({"placeholder": "new vehicle added"})
-        self.state_storage.upsert_state(esas.StateName.VEHICLE, vehicle_state)
+    def test_upsert_and_get_current_state_for_dock(self):
+        dock_state = ecwd.Dock({
+            "dock_id": "dock_123",
+            "dock_name": "Dock A",
+        })
+        self.state_storage.upsert_state(esas.StateName.DOCK, dock_state)
 
-        current_state = self.state_storage.get_current_state(esas.StateName.VEHICLE)
+        current_state = self.state_storage.get_current_state(esas.StateName.DOCK)
         self.assertIsNotNone(current_state)
-        self.assertTrue(isinstance(current_state, ecwvs.Vehicle))
-        self.assertEqual(current_state["placeholder"], "new vehicle added")
-
-    def test_upsert_and_get_current_state_for_payment(self):
-        payment_state = ecwp.Payment({"placeholder": "settled"})
-        self.state_storage.upsert_state(esas.StateName.PAYMENT, payment_state)
-
-        current_state = self.state_storage.get_current_state(esas.StateName.PAYMENT)
-        self.assertIsNotNone(current_state)
-        self.assertTrue(isinstance(current_state, ecwp.Payment))
-        self.assertEqual(current_state["placeholder"], "settled")
+        self.assertTrue(isinstance(current_state, ecwd.Dock))
+        self.assertEqual(current_state["dock_id"], "dock_123")
+        self.assertEqual(current_state["dock_name"], "Dock A")
 
     def test_upsert_state_replaces_existing_state_for_same_state_name(self):
         self.state_storage.upsert_state(
-            esas.StateName.VEHICLE,
-            ecwvs.Vehicle({"placeholder": "old"}),
+            esas.StateName.DOCK,
+            ecwd.Dock({
+                "dock_id": "dock_old",
+                "dock_name": "Old Dock",
+            }),
         )
         self.state_storage.upsert_state(
-            esas.StateName.VEHICLE,
-            ecwvs.Vehicle({"placeholder": "new"}),
+            esas.StateName.DOCK,
+            ecwd.Dock({
+                "dock_id": "dock_new",
+                "dock_name": "New Dock",
+            }),
         )
 
-        current_state = self.state_storage.get_current_state(esas.StateName.VEHICLE)
-        self.assertEqual(current_state["placeholder"], "new")
+        current_state = self.state_storage.get_current_state(esas.StateName.DOCK)
+        self.assertEqual(current_state["dock_id"], "dock_new")
+        self.assertEqual(current_state["dock_name"], "New Dock")
 
-        vehicle_count = edb.get_state_db().count_documents(
-            {"user_id": self.user_id, "metadata.key": "state/vehicle"}
+        dock_count = edb.get_state_db().count_documents(
+            {"user_id": self.user_id, "metadata.key": "state/dock"}
         )
-        self.assertEqual(vehicle_count, 1)
+        self.assertEqual(dock_count, 1)
 
     def test_upsert_state_rejects_dict(self):
         with self.assertRaises(TypeError):
             self.state_storage.upsert_state(
-                esas.StateName.VEHICLE,
+                esas.StateName.DOCK,
                 {"placeholder": "value"},
             )
 
