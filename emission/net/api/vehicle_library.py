@@ -274,7 +274,8 @@ def check_and_get_pending_setup_status(user_uuid):
     Potential responses are defined in the PaymentSetupStatus enum in emission/core/wrapper/payment.py.
     """
     check_setup_status_result = ss.check_pending_setup_status(user_uuid)
-    return {"payment_setup_status": str(check_setup_status_result).split(".")[-1]}  # Convert enum to string representation
+    return {"payment_setup_status": str(check_setup_status_result).split(".")[-1],
+            "is_sandbox": ss.STRIPE_IS_SANDBOX}  # Convert enum to string representation
 
 def get_user_setup_status(user_uuid):
     """
@@ -288,6 +289,7 @@ def get_user_setup_status(user_uuid):
     current_payment_state = ss.get_current_payment_state(user_uuid)
     if current_payment_state is None:
         current_payment_state = ecwp.PaymentStatus.NOT_STARTED
-    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentStatus.NOT_STARTED)).split(".")[-1]}
+    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentStatus.NOT_STARTED)).split(".")[-1],
+            "is_sandbox": ss.STRIPE_IS_SANDBOX}
 
 ## END: Stripe passthrough integration

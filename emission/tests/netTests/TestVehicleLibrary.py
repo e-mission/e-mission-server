@@ -4,6 +4,7 @@ import unittest
 import uuid
 import time
 import logging
+import os
 from unittest.mock import patch
 
 import arrow
@@ -12,6 +13,9 @@ import arrow
 import emission.core.get_database as edb
 import emission.core.wrapper.rental as ecwr
 import emission.core.wrapper.localdate as ecwld
+
+os.environ.setdefault('STRIPE_SECRET_KEY', 'sk_test_dummy')
+
 import emission.net.api.vehicle_library as vl
 import emission.storage.timeseries.abstract_timeseries as esta
 
@@ -43,6 +47,8 @@ class TestVehicleLibrary(unittest.TestCase):
         self.profile_db = edb.get_profile_db()
         self.state_db = edb.get_state_db()
         self.timeseries_db = edb.get_timeseries_db()
+        self._sandbox_patcher = patch.object(vl.ss, 'STRIPE_IS_SANDBOX', True)
+        self._sandbox_patcher.start()
 
         # Clean up any previous test data
 
@@ -59,6 +65,7 @@ class TestVehicleLibrary(unittest.TestCase):
         self.profile_db.delete_many({'user_id': self.test_uuid})
         self.state_db.delete_many({'user_id': self.test_uuid})
         self.timeseries_db.delete_many({'user_id': self.test_uuid, 'metadata.key': vl.VEHICLE_RENTAL_KEY})
+        self._sandbox_patcher.stop()
 
     # ------------------------------------------------------------------
     # Helpers

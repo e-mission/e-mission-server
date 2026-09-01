@@ -13,6 +13,7 @@ APP_URL_PREFIX = os.environ.get("APP_URL_PREFIX")
 STRIPE_SUCCESS_URL = APP_URL_PREFIX + "payment/setup/success" if APP_URL_PREFIX else None
 STRIPE_CANCEL_URL = APP_URL_PREFIX + "payment/setup/cancel" if APP_URL_PREFIX else None
 STRIPE_API_BASE = "https://api.stripe.com"
+STRIPE_IS_SANDBOX = STRIPE_SECRET_KEY.startswith("sk_test")
 # END DO NOT REFACTOR: I do not want to wrap these accesses
 
 logging.debug("About to configure stripe with STRIPE_SECRET_KEY=%s,\

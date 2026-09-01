@@ -10,6 +10,8 @@ import uuid
 import logging
 import time
 
+os.environ.setdefault("STRIPE_SECRET_KEY", "sk_test_dummy")
+
 # Our imports
 import emission.core.deployment_config as ecdc
 import emission.tests.common as etc
@@ -105,21 +107,31 @@ class TestWebserver(unittest.TestCase):
         req = SimpleNamespace(json={"dock_id": "dock-42"})
         expected_result = {"result": "checked_in", "vehicle_id": "bike-1", "dock_id": "dock-42"}
 
+        def _mock_getUUID(_request, return_context=False):
+            if return_context:
+                return {"user_id": test_uuid, "subgroup": None}
+            return test_uuid
+
         with self.mock.patch.object(enacw, "request", req), \
-             self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+             self.mock.patch.object(enacw, "getUUID", side_effect=_mock_getUUID), \
              self.mock.patch.object(enacw.vehicle_library, "check_in_vehicle", return_value=expected_result) as mock_checkin:
             result = enacw.bikeshare_return()
 
-        mock_checkin.assert_called_once_with(test_uuid, "dock-42")
+        mock_checkin.assert_called_once_with(test_uuid, "dock-42", subgroup=None)
         self.assertEqual(result, expected_result)
 
     def test_bikeshare_return_aborts_on_missing_dock_id(self):
         test_uuid = uuid.uuid4()
         req = SimpleNamespace(json={})
 
+        def _mock_getUUID(_request, return_context=False):
+            if return_context:
+                return {"user_id": test_uuid, "subgroup": None}
+            return test_uuid
+
         with self.assertRaises(RuntimeError):
             with self.mock.patch.object(enacw, "request", req), \
-                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw, "getUUID", side_effect=_mock_getUUID), \
                  self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
                 enacw.bikeshare_return()
 
@@ -129,9 +141,14 @@ class TestWebserver(unittest.TestCase):
         test_uuid = uuid.uuid4()
         req = SimpleNamespace(json={"dock_id": "dock-42"})
 
+        def _mock_getUUID(_request, return_context=False):
+            if return_context:
+                return {"user_id": test_uuid, "subgroup": None}
+            return test_uuid
+
         with self.assertRaises(RuntimeError):
             with self.mock.patch.object(enacw, "request", req), \
-                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw, "getUUID", side_effect=_mock_getUUID), \
                  self.mock.patch.object(enacw.vehicle_library, "check_in_vehicle", side_effect=ValueError(403, "No vehicle is currently checked out by this user")), \
                  self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
                 enacw.bikeshare_return()
