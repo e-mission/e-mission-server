@@ -9,7 +9,10 @@ import tzfpy
 import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.rental as ecwr
+import emission.core.wrapper.vehicle as ecwv
 import emission.core.wrapper.localdate as ecwld
+import emission.core.deployment_config as edc
+import emcommon.survey.conditional_surveys as emcsc
 import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
 import emission.net.ext_service.stripe.stripe_service as ss
 import emission.core.wrapper.payment as ecwp
@@ -20,23 +23,25 @@ logger = logging.getLogger(__name__)
 DEFAULT_HOLD_AMOUNT_CENTS = 100
 VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
 
-
-def _compute_rental_fee_dollars(rental_hours):
-    # Keep fee tiers aligned with the client-side vehicle library computeFee().
-    if 0 <= rental_hours <= 5:
-        return 5
-    if 5 < rental_hours <= 24:
-        return 35
-    if 24 < rental_hours <= 72:
-        return 100
-    if 72 < rental_hours <= 144:
-        return 200
-    return 380
+def get_fee_expression():
+    config = edc.get_deployment_config() or {}
+    return config.get('vehicle_rental', {}).get('fee_expression')
 
 
-def _compute_capture_amount_cents(rental_start_ts, now_ts):
-    rental_hours = max(now_ts - rental_start_ts, 0) / (60 * 60)
-    return _compute_rental_fee_dollars(rental_hours) * 100
+def compute_rental_fee(duration_hours, subgroup, vehicle):
+    """
+    Compute the rental fee in dollars for a rental of `duration_hours`, for a
+    user in `subgroup`, using `vehicle`'s own properties (baseMode, vehicle_info, ...).
+    """
+    config = edc.get_deployment_config() or {}
+    fee_expression = config.get('vehicle_rental', {}).get('fee_expression')
+    # default every known vehicle field to None, so the expression can freely
+    # reference e.g. `baseMode` without a NameError when it's not set/snapshotted
+    scope = {prop: None for prop in ecwv.Vehicle.props}
+    scope.update(vehicle or {})
+    scope['duration'] = duration_hours
+    scope['subgroup'] = subgroup
+    return emcsc.scoped_eval(fee_expression, scope)
 
 
 def _get_rental_ts(user_uuid):
@@ -221,7 +226,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     return {'result': 'checked_out', 'vehicle_id': vehicle_id}
 
 
-def check_in_vehicle(user_uuid, dock_code):
+def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     """
     Check in (lock) a vehicle at the dock the user scanned, for the authenticated user.
 
@@ -256,7 +261,9 @@ def check_in_vehicle(user_uuid, dock_code):
     payment_hold_id = payment_hold_info.get('id')
     now = time.time()
     rental_start_ts = rental_state.start_ts
-    capture_amount = _compute_capture_amount_cents(rental_start_ts, now)
+    duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
+    fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
+    capture_amount = round(fee_dollars * 100)
     if payment_hold_id:
         ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
 

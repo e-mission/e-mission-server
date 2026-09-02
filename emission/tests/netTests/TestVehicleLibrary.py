@@ -181,6 +181,38 @@ class TestVehicleLibrary(unittest.TestCase):
                 vl.stations()
 
     # ------------------------------------------------------------------
+    # compute_rental_fee()
+    # ------------------------------------------------------------------
+
+    def test_compute_rental_fee_uses_default_tiers(self):
+        """With no vehicle/subgroup, the default expression follows the base fee tiers."""
+        self.assertEqual(vl.compute_rental_fee(3, None, None), 5)
+        self.assertEqual(vl.compute_rental_fee(10, None, None), 35)
+        self.assertEqual(vl.compute_rental_fee(48, None, None), 100)
+        self.assertEqual(vl.compute_rental_fee(100, None, None), 200)
+        self.assertEqual(vl.compute_rental_fee(200, None, None), 380)
+
+    def test_compute_rental_fee_applies_discount_subgroup(self):
+        """Users in the 'discount' subgroup pay half price."""
+        self.assertEqual(vl.compute_rental_fee(3, 'discount', None), 2.5)
+        self.assertEqual(vl.compute_rental_fee(10, 'discount', None), 17.5)
+
+    def test_compute_rental_fee_applies_ebike_surcharge(self):
+        """E_BIKE vehicles (per baseMode) cost 1.5x the base fee."""
+        self.assertEqual(vl.compute_rental_fee(3, None, {'baseMode': 'E_BIKE'}), 7.5)
+        self.assertEqual(vl.compute_rental_fee(3, None, {'baseMode': 'BIKE'}), 5)
+
+    def test_compute_rental_fee_combines_discount_and_surcharge(self):
+        """Discount and e-bike surcharge multiply together."""
+        self.assertEqual(vl.compute_rental_fee(3, 'discount', {'baseMode': 'E_BIKE'}), 3.75)
+
+    def test_compute_rental_fee_uses_configured_expression(self):
+        """A deployment config can override the fee expression entirely."""
+        fake_config = {'vehicle_rental': {'fee_expression': 'duration * 2'}}
+        with patch.object(vl.edc, 'get_deployment_config', return_value=fake_config):
+            self.assertEqual(vl.compute_rental_fee(10, None, None), 20)
+
+    # ------------------------------------------------------------------
     # checkout_vehicle()
     # ------------------------------------------------------------------
 
