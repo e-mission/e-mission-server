@@ -444,12 +444,13 @@ def bikeshare_checkout():
 
 @post('/library/checkin')
 def bikeshare_return():
-    user_uuid = getUUID(request)
+    user_context = getUUID(request, return_context=True)
     dock_id = request.json.get('dock_id')
     if not dock_id:
         abort(400, "dock_id is required")
     try:
-        return vehicle_library.check_in_vehicle(user_uuid, dock_id)
+        return vehicle_library.check_in_vehicle(
+            user_context['user_id'], dock_id, subgroup=user_context.get('subgroup'))
     except ValueError as e:
         abort(e.args[0], e.args[1])
 

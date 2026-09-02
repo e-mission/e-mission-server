@@ -1,10 +1,14 @@
 from builtins import *
 import json
+import os
 import unittest
 from unittest.mock import patch
 
 import emission.core.wrapper.user as ecwu
 import emission.core.wrapper.payment as ecwp
+
+os.environ.setdefault('STRIPE_SECRET_KEY', 'sk_test_dummy')
+
 import emission.net.ext_service.stripe.stripe_service as stripe_service
 
 
@@ -12,8 +16,11 @@ class TestStripeService(unittest.TestCase):
     def setUp(self):
         self.test_email = f"stripe-{self._testMethodName}@example.com"
         self.test_uuid = ecwu.User.register(self.test_email).uuid
+        self._sandbox_patcher = patch.object(stripe_service, 'STRIPE_IS_SANDBOX', True)
+        self._sandbox_patcher.start()
 
     def tearDown(self):
+        self._sandbox_patcher.stop()
         ecwu.User.unregister(self.test_email)
 
     def test_create_setup_checkout_session_success(self):
