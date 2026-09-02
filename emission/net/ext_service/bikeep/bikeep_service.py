@@ -270,7 +270,7 @@ def lock_dock(dock_id):
         logger.debug(f"Response from locking dock {dock_id}: {response}")
         if response.status_code != 200:
             logger.error(f"Response from locking dock {dock_id}: {response}")
-            logger.error(f"Failed to lock dock {dock_id}, status code: {response.status_code}, response: {response.error_code=}, {response.error_message=}")
+            logger.error(f"Failed to lock dock {dock_id}, status code: {response.status_code}")
         response.raise_for_status()
         data = response.json()
         logger.info(f"Locked dock {dock_id} via Bikeep")
