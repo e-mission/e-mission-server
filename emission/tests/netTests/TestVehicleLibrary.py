@@ -356,6 +356,40 @@ class TestVehicleLibrary(unittest.TestCase):
             vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
         self.assertEqual(ctx.exception.args[0], 403)
 
+    def test_checkin_vehicle_resolves_scanned_code_to_device_id(self):
+        """check_in_vehicle() resolves the scanned dock code to its actual Bikeep
+        device id and uses the resolved id (never the scanned code) for the lock
+        command - but stores/returns the code itself as Vehicle.location and
+        end_dock_id/dock_id, since the client never learns the real device id."""
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_active_rental(rental_start_ts=_now())
+        scanned_code = 'printed-code-123'
+
+        with patch.object(vl.bikeep_service, 'get_device_id_for_code', return_value=ALT_DOCK_ID) as mock_resolve, \
+             patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock, \
+             patch.object(vl.ss, 'capture_hold_payment_intent', return_value={}):
+            result = vl.check_in_vehicle(self.test_uuid, scanned_code)
+
+        mock_resolve.assert_called_once_with(scanned_code)
+        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+        self.assertEqual(result['dock_id'], scanned_code)
+        vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
+        self.assertEqual(vehicle['location'], scanned_code)
+
+    def test_checkin_vehicle_unresolvable_code_returns_404(self):
+        """check_in_vehicle() rejects a scanned code that doesn't match any device,
+        without ever calling lock_dock."""
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_active_rental(rental_start_ts=_now())
+
+        with patch.object(vl.bikeep_service, 'get_device_id_for_code', return_value=None), \
+             patch.object(vl.bikeep_service, 'lock_dock') as mock_lock:
+            with self.assertRaises(ValueError) as ctx:
+                vl.check_in_vehicle(self.test_uuid, 'unknown-code')
+
+        self.assertEqual(ctx.exception.args[0], 404)
+        mock_lock.assert_not_called()
+
     def test_checkin_vehicle_bikeep_failure_does_not_update_db(self):
         """check_in_vehicle() does not update DB if bikeep.lock_dock fails."""
         self._insert_vehicle(

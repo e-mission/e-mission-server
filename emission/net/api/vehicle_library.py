@@ -149,13 +149,18 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
     logging.debug(f"Found matching vehicle {vehicle=} for {vehicle_id}")
     if vehicle is None:
-        raise ValueError(404, "Vehicle %s not found" % vehicle_id)
+        raise ValueError(422, "Vehicle %s not found" % vehicle_id)
 
     now = time.time()
 
-    dock_id = vehicle.get('location')
-    if not dock_id:
+    dock_code = vehicle.get('location')
+    if not dock_code:
         raise ValueError(422, "Vehicle %s has no dock location to unlock" % vehicle_id)
+
+    dock_id = bikeep_service.get_device_id_for_code(dock_code)
+    if dock_id is None:
+        logging.error(f"No dock found for code {dock_code}")
+        raise ValueError(422, "No dock found for code %s" % dock_code)
 
     start_loc, timezone = _get_loc_and_timezone(dock_id)
 
@@ -170,7 +175,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     )
 
     try:
-        logger.debug(f"Unlocking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
+        logger.debug(f"Unlocking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
         bikeep_service.unlock_dock(dock_id)
     except Exception as e:
         logging.error(f"Error occurred while checking out vehicle {vehicle_id} for user {user_uuid}: {e}")
@@ -194,7 +199,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         'start_local_dt': start_local_dt,
         'start_fmt_time': start_fmt_time,
         'start_loc': start_loc,
-        'start_dock_id': dock_id,
+        'start_dock_id': dock_code,
         'end_ts': None,
         'end_local_dt': None,
         'end_fmt_time': None,
@@ -216,9 +221,13 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     return {'result': 'checked_out', 'vehicle_id': vehicle_id}
 
 
-def check_in_vehicle(user_uuid, dock_id):
+def check_in_vehicle(user_uuid, dock_code):
     """
-    Check in (lock) a vehicle at the specified dock for the authenticated user.
+    Check in (lock) a vehicle at the dock the user scanned, for the authenticated user.
+
+    `dock_code` is the human-readable code the user scanned/typed at the dock -
+    never the real Bikeep device id, which must stay server-side - so it's
+    resolved to the actual device id here before any Bikeep call is made.
 
     - Locks the specified dock via bikeep_service.
     - Captures the Stripe hold for the active rental.
@@ -235,7 +244,11 @@ def check_in_vehicle(user_uuid, dock_id):
     if vehicle is None:
         raise ValueError(404, "Vehicle %s not found" % vehicle_id)
 
-    logger.debug(f"Locking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
+    dock_id = bikeep_service.get_device_id_for_code(dock_code)
+    if dock_id is None:
+        raise ValueError(404, "No dock found for code %s" % dock_code)
+
+    logger.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
     bikeep_service.lock_dock(dock_id)
 
     payment_hold_info = rental_state.get('payment_hold_info')
@@ -250,7 +263,7 @@ def check_in_vehicle(user_uuid, dock_id):
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},
         {'$set': {
-            'location': dock_id,
+            'location': dock_code,
             'updated_at': now,
         }},
     )
@@ -263,7 +276,7 @@ def check_in_vehicle(user_uuid, dock_id):
         'end_local_dt': ecwld.LocalDate.get_local_date(now, end_timezone),
         'end_fmt_time': arrow.get(now).to(end_timezone).isoformat(),
         'end_loc': end_loc,
-        'end_dock_id': dock_id,
+        'end_dock_id': dock_code,
     })
 
     import emission.storage.timeseries.builtin_timeseries as estb
@@ -274,8 +287,8 @@ def check_in_vehicle(user_uuid, dock_id):
         updated_rental_state,
     )
 
-    logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} for user {user_uuid}")
-    return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_id}
+    logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} (code {dock_code}) for user {user_uuid}")
+    return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_code}
 
 
 def get_rental_history(user_uuid):
