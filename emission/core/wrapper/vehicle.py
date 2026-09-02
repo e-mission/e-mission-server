@@ -10,7 +10,7 @@ class Vehicle(ecwb.WrapperBase):
     props = {
         "vehicle_id": ecwb.WrapperBase.Access.WORM,  # unique identifier
         "vehicle_name": ecwb.WrapperBase.Access.RW,  # display name/description
-        "location": ecwb.WrapperBase.Access.RW,  # dock/bay/parking spot ID or User UUID
+        "location": ecwb.WrapperBase.Access.RW,  # dock/bay/parking spot ID, or None if checked out
         "bluetooth_major_minor": ecwb.WrapperBase.Access.RW,  # list of Bluetooth identifiers, if applicable
         "baseMode": ecwb.WrapperBase.Access.RW,  # e.g., CAR, BIKE, E_BIKE
         "met_equivalent": ecwb.WrapperBase.Access.RW,
