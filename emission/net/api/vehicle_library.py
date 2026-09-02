@@ -34,7 +34,7 @@ def compute_rental_fee(duration_hours, subgroup, vehicle):
     user in `subgroup`, using `vehicle`'s own properties (baseMode, vehicle_info, ...).
     """
     config = edc.get_deployment_config() or {}
-    fee_expression = config.get('vehicle_rental', {}).get('fee_expression')
+    fee_expression = config.get('vehicle_library', {}).get('fee_expression')
     # default every known vehicle field to None, so the expression can freely
     # reference e.g. `baseMode` without a NameError when it's not set/snapshotted
     scope = {prop: None for prop in ecwv.Vehicle.props}

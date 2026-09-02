@@ -48,7 +48,7 @@ class TestVehicleLibrary(unittest.TestCase):
         self.state_db = edb.get_state_db()
         self.timeseries_db = edb.get_timeseries_db()
         self._default_fee_config = {
-            'vehicle_rental': {
+            'vehicle_library': {
                 'fee_expression': "(5 if duration <= 5 else 35 if duration <= 24 else 100 if duration <= 72 else 200 if duration <= 144 else 380) * (0.5 if subgroup == 'discount' else 1) * (1.5 if baseMode == 'E_BIKE' else 1)",
             }
         }
@@ -219,7 +219,7 @@ class TestVehicleLibrary(unittest.TestCase):
 
     def test_compute_rental_fee_uses_configured_expression(self):
         """A deployment config can override the fee expression entirely."""
-        fake_config = {'vehicle_rental': {'fee_expression': 'duration * 2'}}
+        fake_config = {'vehicle_library': {'fee_expression': 'duration * 2'}}
         with patch.object(vl.edc, 'get_deployment_config', return_value=fake_config):
             self.assertEqual(vl.compute_rental_fee(10, None, None), 20)
 
