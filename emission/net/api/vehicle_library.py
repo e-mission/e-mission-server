@@ -79,12 +79,55 @@ def _get_active_rental_entry(user_uuid):
 
 def stations():
     """
-    Return a list of Bikeep station locations and dock states.
-    Calls bikeep_service.get_locations() and returns the result directly.
+    Return a list of Bikeep station locations and dock states, annotated with
+    how many of our own fleet vehicles are actually available to rent.
+
+    Bikeep's own `devices.available` count means "empty slots ready to accept
+    a bike/locker item" - it says nothing about whether an OCCUPIED slot holds
+    one of our rentable vehicles or a member of the public's personal bike.
+    So for each location we fetch its devices, and count a device as holding
+    a rentable vehicle only if it's LOCKED (something is secured in it) and
+    our Vehicle DB has a vehicle currently parked at that device's id.
     """
     # bottle only supports returning objects, not raw lists, due to vulnerabilities with JSON arrays
     # https://stackoverflow.com/a/40695739
-    return {'stations': bikeep_service.get_locations()}
+    locations, all_devices = bikeep_service.get_locations_and_all_devices()
+    fleet_docks = _fleet_vehicle_docks()
+
+    devices_by_location_id = {}
+    for device in all_devices:
+        location_id = (device.get('location') or {}).get('id')
+        devices_by_location_id.setdefault(location_id, []).append(device)
+
+    for location in locations:
+        location_id = location.get('id')
+        location_devices = [d for d in all_devices
+                            if (d.get('location') or {}).get('id') == location_id]
+        rentable_count = 0
+
+        if location.get('connection') != 'offline':
+            for device in location_devices:
+                state_value = (device.get('state') or {}).get('value')
+                device_code = device.get('code')
+                is_fleet_dock = device_code is not None and str(device_code) in fleet_docks
+                if state_value == 'LOCKED' and is_fleet_dock:
+                    rentable_count += 1
+
+        if not isinstance(location.get('devices'), dict):
+            location['devices'] = {}
+        location['devices']['rentable_vehicles'] = rentable_count
+
+    logger.debug("Fetched stations: %s" % locations)
+    return {'stations': locations}
+
+
+def _fleet_vehicle_docks():
+    """Set of dock/locker codes where one of our fleet vehicles is currently parked."""
+    return {
+        vehicle['location']
+        for vehicle in edb.get_vehicle_db().find({'location': {'$ne': None}})
+        if vehicle.get('location')
+    }
 
 # END: bikeeep passthrough integration
 

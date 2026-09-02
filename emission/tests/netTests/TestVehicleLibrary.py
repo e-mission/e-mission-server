@@ -125,15 +125,58 @@ class TestVehicleLibrary(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_stations_returns_bikeep_locations(self):
-        """stations() delegates to bikeep_service.get_locations() and returns result."""
-        expected = [{'station_id': '1', 'name': 'Main St', 'docks': []}]
-        with patch.object(vl.bikeep_service, 'get_locations', return_value=expected):
+        """stations() returns Bikeep's locations (wrapped), annotated with rentable_vehicles."""
+        expected = [{'id': 'loc-1', 'name': 'Main St', 'devices': {'total': 1, 'available': 0}}]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(expected, [])):
             result = vl.stations()
-        self.assertEqual(result, {'stations': expected})
+        self.assertEqual(len(result['stations']), 1)
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
+
+    def test_stations_counts_only_locked_docks_with_our_fleet_vehicles(self):
+        """A location's rentable_vehicles only counts LOCKED docks holding one of our
+        own vehicles - not empty docks, and not docks holding the public's own bikes
+        (no matching fleet vehicle in our DB). Fleet vehicles are matched by dock
+        code (Vehicle.location), not the real Bikeep device id."""
+        self._insert_vehicle(location='code-ours')
+
+        locations = [{'id': 'loc-1', 'name': 'Main St'}]
+        devices = [
+            {'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}},  # our bike
+            {'id': 'real-id-public', 'code': 'code-public', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}},  # public's own bike
+            {'id': 'real-id-empty', 'code': 'code-empty', 'location': {'id': 'loc-1'}, 'state': {'value': 'UNLOCKED'}},  # empty dock
+        ]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(locations, devices)):
+            result = vl.stations()
+
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 1)
+
+    def test_stations_excludes_checked_out_vehicles(self):
+        """A vehicle with location=None (checked out) doesn't count toward any dock."""
+        self._insert_vehicle(location=None)
+
+        locations = [{'id': 'loc-1', 'name': 'Main St'}]
+        devices = [{'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}}]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(locations, devices)):
+            result = vl.stations()
+
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
+
+    def test_stations_reports_zero_rentable_vehicles_for_offline_locations(self):
+        """An offline location can't reliably report device state, so it should
+        never be reported as having rentable vehicles, even if our fleet has a
+        vehicle recorded there."""
+        self._insert_vehicle(location='code-ours')
+
+        locations = [{'id': 'loc-1', 'name': 'Main St', 'connection': 'offline'}]
+        devices = [{'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}}]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(locations, devices)):
+            result = vl.stations()
+
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
 
     def test_stations_propagates_bikeep_exception(self):
         """stations() propagates exceptions from bikeep_service."""
-        with patch.object(vl.bikeep_service, 'get_locations', side_effect=RuntimeError("API down")):
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', side_effect=RuntimeError("API down")):
             with self.assertRaises(RuntimeError):
                 vl.stations()
 

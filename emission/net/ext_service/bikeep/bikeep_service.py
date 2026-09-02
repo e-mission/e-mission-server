@@ -126,6 +126,89 @@ def get_locations():
         logger.error(f"Error retrieving locations from Bikeep: {e}")
         raise
 
+def get_devices(location_id):
+    """
+    Get all devices (docks/lockers) at a single Bikeep location.
+
+    Returns:
+        list of device dicts, e.g.:
+        {
+            "id": "f1e2d3c4-...",
+            "type": "LOCKER" | "BIKE_DOCK" | ...,
+            "alias": "1",
+            "code": "222222",  # human-readable code printed/scanned at the device
+            "state": {"value": "LOCKED" | "UNLOCKED" | ..., "changed_at": "..."},
+        }
+
+    Raises:
+        RequestException: if Bikeep API fails
+    """
+    url = f"{BIKEEP_API_URL}/device/v1/locations/{location_id}/devices"
+    headers = _get_headers()
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json().get('data', [])
+        logger.debug(f"Retrieved {len(data)} devices for location {location_id} from Bikeep")
+        return data
+    except Timeout:
+        logger.error(f"Timeout retrieving devices for location {location_id} from Bikeep")
+        raise
+    except ConnectionError:
+        logger.error(f"Connection error retrieving devices for location {location_id} from Bikeep")
+        raise
+    except RequestException as e:
+        logger.error(f"Error retrieving devices for location {location_id} from Bikeep: {e}")
+        raise
+
+
+_all_devices_cache = []
+_all_devices_cache_expiry_ts = 0
+
+def get_locations_and_all_devices():
+    """
+    Get all devices for all Bikeep locations.
+
+    Returns:
+        tuple of (locations, all_devices)
+        locations: list of location dicts
+        all_devices: list of all device dicts across all locations
+    """
+    locations = get_locations()
+    all_devices = []
+    for location in locations:
+        try:
+            location_id = location.get('id')
+            if not location_id:
+                continue
+            all_devices.extend(get_devices(location_id))
+        except Exception as e:
+            logger.warning(f"Could not fetch devices for location {location_id}: {e}")
+
+    global _all_devices_cache, _all_devices_cache_expiry_ts
+    _all_devices_cache = all_devices
+    _all_devices_cache_expiry_ts = time.time() + 600  # 10 minutes
+
+    return locations, all_devices
+
+
+def get_device_id_for_code(code):
+    """
+    Resolve a scanned/printed device "code" to the actual Bikeep device "id"
+    needed for lock/unlock commands. Returns None if no device matches.
+    """
+    if _all_devices_cache and time.time() < _all_devices_cache_expiry_ts:
+        all_devices = _all_devices_cache
+    else:
+        _, all_devices = get_locations_and_all_devices()
+
+    for device in all_devices:
+        if device.get('code') == code:
+            return device.get('id')
+    return None
+
+
 def get_location(device_id):
     """
     Get a location object for a Bikeep device.
