@@ -264,7 +264,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
     fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
     capture_amount = round(fee_dollars * 100)
-    if payment_hold_id:
+    if payment_hold_id and capture_amount > 0:
         ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
 
     vehicle_db.update_one(
