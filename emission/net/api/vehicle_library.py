@@ -34,7 +34,7 @@ def compute_rental_fee(duration_hours, subgroup, vehicle):
     user in `subgroup`, using `vehicle`'s own properties (baseMode, vehicle_info, ...).
     """
     config = edc.get_deployment_config() or {}
-    fee_expression = config.get('vehicle_rental', {}).get('fee_expression')
+    fee_expression = config.get('vehicle_library', {}).get('fee_expression')
     # default every known vehicle field to None, so the expression can freely
     # reference e.g. `baseMode` without a NameError when it's not set/snapshotted
     scope = {prop: None for prop in ecwv.Vehicle.props}
@@ -264,7 +264,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
     fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
     capture_amount = round(fee_dollars * 100)
-    if payment_hold_id:
+    if payment_hold_id and capture_amount > 0:
         ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
 
     vehicle_db.update_one(
