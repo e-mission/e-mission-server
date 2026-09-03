@@ -47,6 +47,15 @@ class TestVehicleLibrary(unittest.TestCase):
         self.profile_db = edb.get_profile_db()
         self.state_db = edb.get_state_db()
         self.timeseries_db = edb.get_timeseries_db()
+        self._default_fee_config = {
+            'vehicle_rental': {
+                'fee_expression': "(5 if duration <= 5 else 35 if duration <= 24 else 100 if duration <= 72 else 200 if duration <= 144 else 380) * (0.5 if subgroup == 'discount' else 1) * (1.5 if baseMode == 'E_BIKE' else 1)",
+            }
+        }
+        self._fee_config_patcher = patch.object(vl.edc, 'get_deployment_config', return_value=self._default_fee_config)
+        self._fee_config_patcher.start()
+        self._dock_code_patcher = patch.object(vl.bikeep_service, 'get_device_id_for_code', side_effect=lambda dock_code: dock_code)
+        self._dock_code_patcher.start()
         self._sandbox_patcher = patch.object(vl.ss, 'STRIPE_IS_SANDBOX', True)
         self._sandbox_patcher.start()
 
@@ -65,6 +74,8 @@ class TestVehicleLibrary(unittest.TestCase):
         self.profile_db.delete_many({'user_id': self.test_uuid})
         self.state_db.delete_many({'user_id': self.test_uuid})
         self.timeseries_db.delete_many({'user_id': self.test_uuid, 'metadata.key': vl.VEHICLE_RENTAL_KEY})
+        self._dock_code_patcher.stop()
+        self._fee_config_patcher.stop()
         self._sandbox_patcher.stop()
 
     # ------------------------------------------------------------------
@@ -125,17 +136,92 @@ class TestVehicleLibrary(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_stations_returns_bikeep_locations(self):
-        """stations() delegates to bikeep_service.get_locations() and returns result."""
-        expected = [{'station_id': '1', 'name': 'Main St', 'docks': []}]
-        with patch.object(vl.bikeep_service, 'get_locations', return_value=expected):
+        """stations() returns Bikeep's locations (wrapped), annotated with rentable_vehicles."""
+        expected = [{'id': 'loc-1', 'name': 'Main St', 'devices': {'total': 1, 'available': 0}}]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(expected, [])):
             result = vl.stations()
-        self.assertEqual(result, {'stations': expected})
+        self.assertEqual(len(result['stations']), 1)
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
+
+    def test_stations_counts_only_locked_docks_with_our_fleet_vehicles(self):
+        """A location's rentable_vehicles only counts LOCKED docks holding one of our
+        own vehicles - not empty docks, and not docks holding the public's own bikes
+        (no matching fleet vehicle in our DB). Fleet vehicles are matched by dock
+        code (Vehicle.location), not the real Bikeep device id."""
+        self._insert_vehicle(location='code-ours')
+
+        locations = [{'id': 'loc-1', 'name': 'Main St'}]
+        devices = [
+            {'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}},  # our bike
+            {'id': 'real-id-public', 'code': 'code-public', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}},  # public's own bike
+            {'id': 'real-id-empty', 'code': 'code-empty', 'location': {'id': 'loc-1'}, 'state': {'value': 'UNLOCKED'}},  # empty dock
+        ]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(locations, devices)):
+            result = vl.stations()
+
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 1)
+
+    def test_stations_excludes_checked_out_vehicles(self):
+        """A vehicle with location=None (checked out) doesn't count toward any dock."""
+        self._insert_vehicle(location=None)
+
+        locations = [{'id': 'loc-1', 'name': 'Main St'}]
+        devices = [{'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}}]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(locations, devices)):
+            result = vl.stations()
+
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
+
+    def test_stations_reports_zero_rentable_vehicles_for_offline_locations(self):
+        """An offline location can't reliably report device state, so it should
+        never be reported as having rentable vehicles, even if our fleet has a
+        vehicle recorded there."""
+        self._insert_vehicle(location='code-ours')
+
+        locations = [{'id': 'loc-1', 'name': 'Main St', 'connection': 'offline'}]
+        devices = [{'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}}]
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(locations, devices)):
+            result = vl.stations()
+
+        self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
 
     def test_stations_propagates_bikeep_exception(self):
         """stations() propagates exceptions from bikeep_service."""
-        with patch.object(vl.bikeep_service, 'get_locations', side_effect=RuntimeError("API down")):
+        with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', side_effect=RuntimeError("API down")):
             with self.assertRaises(RuntimeError):
                 vl.stations()
+
+    # ------------------------------------------------------------------
+    # compute_rental_fee()
+    # ------------------------------------------------------------------
+
+    def test_compute_rental_fee_uses_default_tiers(self):
+        """With no vehicle/subgroup, the default expression follows the base fee tiers."""
+        self.assertEqual(vl.compute_rental_fee(3, None, None), 5)
+        self.assertEqual(vl.compute_rental_fee(10, None, None), 35)
+        self.assertEqual(vl.compute_rental_fee(48, None, None), 100)
+        self.assertEqual(vl.compute_rental_fee(100, None, None), 200)
+        self.assertEqual(vl.compute_rental_fee(200, None, None), 380)
+
+    def test_compute_rental_fee_applies_discount_subgroup(self):
+        """Users in the 'discount' subgroup pay half price."""
+        self.assertEqual(vl.compute_rental_fee(3, 'discount', None), 2.5)
+        self.assertEqual(vl.compute_rental_fee(10, 'discount', None), 17.5)
+
+    def test_compute_rental_fee_applies_ebike_surcharge(self):
+        """E_BIKE vehicles (per baseMode) cost 1.5x the base fee."""
+        self.assertEqual(vl.compute_rental_fee(3, None, {'baseMode': 'E_BIKE'}), 7.5)
+        self.assertEqual(vl.compute_rental_fee(3, None, {'baseMode': 'BIKE'}), 5)
+
+    def test_compute_rental_fee_combines_discount_and_surcharge(self):
+        """Discount and e-bike surcharge multiply together."""
+        self.assertEqual(vl.compute_rental_fee(3, 'discount', {'baseMode': 'E_BIKE'}), 3.75)
+
+    def test_compute_rental_fee_uses_configured_expression(self):
+        """A deployment config can override the fee expression entirely."""
+        fake_config = {'vehicle_rental': {'fee_expression': 'duration * 2'}}
+        with patch.object(vl.edc, 'get_deployment_config', return_value=fake_config):
+            self.assertEqual(vl.compute_rental_fee(10, None, None), 20)
 
     # ------------------------------------------------------------------
     # checkout_vehicle()
@@ -312,6 +398,40 @@ class TestVehicleLibrary(unittest.TestCase):
         with self.assertRaises(ValueError) as ctx:
             vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
         self.assertEqual(ctx.exception.args[0], 403)
+
+    def test_checkin_vehicle_resolves_scanned_code_to_device_id(self):
+        """check_in_vehicle() resolves the scanned dock code to its actual Bikeep
+        device id and uses the resolved id (never the scanned code) for the lock
+        command - but stores/returns the code itself as Vehicle.location and
+        end_dock_id/dock_id, since the client never learns the real device id."""
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_active_rental(rental_start_ts=_now())
+        scanned_code = 'printed-code-123'
+
+        with patch.object(vl.bikeep_service, 'get_device_id_for_code', return_value=ALT_DOCK_ID) as mock_resolve, \
+             patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock, \
+             patch.object(vl.ss, 'capture_hold_payment_intent', return_value={}):
+            result = vl.check_in_vehicle(self.test_uuid, scanned_code)
+
+        mock_resolve.assert_called_once_with(scanned_code)
+        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+        self.assertEqual(result['dock_id'], scanned_code)
+        vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
+        self.assertEqual(vehicle['location'], scanned_code)
+
+    def test_checkin_vehicle_unresolvable_code_returns_404(self):
+        """check_in_vehicle() rejects a scanned code that doesn't match any device,
+        without ever calling lock_dock."""
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_active_rental(rental_start_ts=_now())
+
+        with patch.object(vl.bikeep_service, 'get_device_id_for_code', return_value=None), \
+             patch.object(vl.bikeep_service, 'lock_dock') as mock_lock:
+            with self.assertRaises(ValueError) as ctx:
+                vl.check_in_vehicle(self.test_uuid, 'unknown-code')
+
+        self.assertEqual(ctx.exception.args[0], 404)
+        mock_lock.assert_not_called()
 
     def test_checkin_vehicle_bikeep_failure_does_not_update_db(self):
         """check_in_vehicle() does not update DB if bikeep.lock_dock fails."""

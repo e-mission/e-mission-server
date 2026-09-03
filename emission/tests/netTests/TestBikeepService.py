@@ -210,5 +210,28 @@ class TestBikeepServiceMocked(unittest.TestCase):
         with self.assertRaises(Exception):
             bikeep.get_location("unknown-id")
 
+    # ------------------------------------------------------------------
+    # get_device_id_for_code()
+    # ------------------------------------------------------------------
+
+    def test_get_device_id_for_code_resolves_known_code(self):
+        """get_device_id_for_code() maps a scanned code to its real device id,
+        by scanning all locations' devices."""
+        with mock.patch.object(bikeep, 'get_locations', return_value=[{'id': 'loc-1'}]), \
+             mock.patch.object(bikeep, 'get_devices', return_value=[
+                 {'id': 'real-device-id-1', 'code': 'printed-code-1'},
+                 {'id': 'real-device-id-2', 'code': 'printed-code-2'},
+             ]):
+            self.assertEqual(bikeep.get_device_id_for_code('printed-code-1'), 'real-device-id-1')
+            self.assertEqual(bikeep.get_device_id_for_code('printed-code-2'), 'real-device-id-2')
+
+    def test_get_device_id_for_code_unknown_code_returns_none(self):
+        """get_device_id_for_code() returns None for a code that matches no device."""
+        with mock.patch.object(bikeep, 'get_locations', return_value=[{'id': 'loc-1'}]), \
+             mock.patch.object(bikeep, 'get_devices', return_value=[
+                 {'id': 'real-device-id-1', 'code': 'printed-code-1'},
+             ]):
+            self.assertIsNone(bikeep.get_device_id_for_code('no-such-code'))
+
 if __name__ == "__main__":
     unittest.main()

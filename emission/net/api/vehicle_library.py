@@ -9,7 +9,10 @@ import tzfpy
 import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.rental as ecwr
+import emission.core.wrapper.vehicle as ecwv
 import emission.core.wrapper.localdate as ecwld
+import emission.core.deployment_config as edc
+import emcommon.survey.conditional_surveys as emcsc
 import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
 import emission.net.ext_service.stripe.stripe_service as ss
 import emission.core.wrapper.payment as ecwp
@@ -20,23 +23,25 @@ logger = logging.getLogger(__name__)
 DEFAULT_HOLD_AMOUNT_CENTS = 100
 VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
 
-
-def _compute_rental_fee_dollars(rental_hours):
-    # Keep fee tiers aligned with the client-side vehicle library computeFee().
-    if 0 <= rental_hours <= 5:
-        return 5
-    if 5 < rental_hours <= 24:
-        return 35
-    if 24 < rental_hours <= 72:
-        return 100
-    if 72 < rental_hours <= 144:
-        return 200
-    return 380
+def get_fee_expression():
+    config = edc.get_deployment_config() or {}
+    return config.get('vehicle_rental', {}).get('fee_expression')
 
 
-def _compute_capture_amount_cents(rental_start_ts, now_ts):
-    rental_hours = max(now_ts - rental_start_ts, 0) / (60 * 60)
-    return _compute_rental_fee_dollars(rental_hours) * 100
+def compute_rental_fee(duration_hours, subgroup, vehicle):
+    """
+    Compute the rental fee in dollars for a rental of `duration_hours`, for a
+    user in `subgroup`, using `vehicle`'s own properties (baseMode, vehicle_info, ...).
+    """
+    config = edc.get_deployment_config() or {}
+    fee_expression = config.get('vehicle_rental', {}).get('fee_expression')
+    # default every known vehicle field to None, so the expression can freely
+    # reference e.g. `baseMode` without a NameError when it's not set/snapshotted
+    scope = {prop: None for prop in ecwv.Vehicle.props}
+    scope.update(vehicle or {})
+    scope['duration'] = duration_hours
+    scope['subgroup'] = subgroup
+    return emcsc.scoped_eval(fee_expression, scope)
 
 
 def _get_rental_ts(user_uuid):
@@ -79,12 +84,55 @@ def _get_active_rental_entry(user_uuid):
 
 def stations():
     """
-    Return a list of Bikeep station locations and dock states.
-    Calls bikeep_service.get_locations() and returns the result directly.
+    Return a list of Bikeep station locations and dock states, annotated with
+    how many of our own fleet vehicles are actually available to rent.
+
+    Bikeep's own `devices.available` count means "empty slots ready to accept
+    a bike/locker item" - it says nothing about whether an OCCUPIED slot holds
+    one of our rentable vehicles or a member of the public's personal bike.
+    So for each location we fetch its devices, and count a device as holding
+    a rentable vehicle only if it's LOCKED (something is secured in it) and
+    our Vehicle DB has a vehicle currently parked at that device's id.
     """
     # bottle only supports returning objects, not raw lists, due to vulnerabilities with JSON arrays
     # https://stackoverflow.com/a/40695739
-    return {'stations': bikeep_service.get_locations()}
+    locations, all_devices = bikeep_service.get_locations_and_all_devices()
+    fleet_docks = _fleet_vehicle_docks()
+
+    devices_by_location_id = {}
+    for device in all_devices:
+        location_id = (device.get('location') or {}).get('id')
+        devices_by_location_id.setdefault(location_id, []).append(device)
+
+    for location in locations:
+        location_id = location.get('id')
+        location_devices = [d for d in all_devices
+                            if (d.get('location') or {}).get('id') == location_id]
+        rentable_count = 0
+
+        if location.get('connection') != 'offline':
+            for device in location_devices:
+                state_value = (device.get('state') or {}).get('value')
+                device_code = device.get('code')
+                is_fleet_dock = device_code is not None and str(device_code) in fleet_docks
+                if state_value == 'LOCKED' and is_fleet_dock:
+                    rentable_count += 1
+
+        if not isinstance(location.get('devices'), dict):
+            location['devices'] = {}
+        location['devices']['rentable_vehicles'] = rentable_count
+
+    logger.debug("Fetched stations: %s" % locations)
+    return {'stations': locations}
+
+
+def _fleet_vehicle_docks():
+    """Set of dock/locker codes where one of our fleet vehicles is currently parked."""
+    return {
+        vehicle['location']
+        for vehicle in edb.get_vehicle_db().find({'location': {'$ne': None}})
+        if vehicle.get('location')
+    }
 
 # END: bikeeep passthrough integration
 
@@ -106,13 +154,18 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
     logging.debug(f"Found matching vehicle {vehicle=} for {vehicle_id}")
     if vehicle is None:
-        raise ValueError(404, "Vehicle %s not found" % vehicle_id)
+        raise ValueError(422, "Vehicle %s not found" % vehicle_id)
 
     now = time.time()
 
-    dock_id = vehicle.get('location')
-    if not dock_id:
+    dock_code = vehicle.get('location')
+    if not dock_code:
         raise ValueError(422, "Vehicle %s has no dock location to unlock" % vehicle_id)
+
+    dock_id = bikeep_service.get_device_id_for_code(dock_code)
+    if dock_id is None:
+        logging.error(f"No dock found for code {dock_code}")
+        raise ValueError(422, "No dock found for code %s" % dock_code)
 
     start_loc, timezone = _get_loc_and_timezone(dock_id)
 
@@ -127,7 +180,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     )
 
     try:
-        logger.debug(f"Unlocking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
+        logger.debug(f"Unlocking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
         bikeep_service.unlock_dock(dock_id)
     except Exception as e:
         logging.error(f"Error occurred while checking out vehicle {vehicle_id} for user {user_uuid}: {e}")
@@ -151,7 +204,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         'start_local_dt': start_local_dt,
         'start_fmt_time': start_fmt_time,
         'start_loc': start_loc,
-        'start_dock_id': dock_id,
+        'start_dock_id': dock_code,
         'end_ts': None,
         'end_local_dt': None,
         'end_fmt_time': None,
@@ -173,9 +226,13 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     return {'result': 'checked_out', 'vehicle_id': vehicle_id}
 
 
-def check_in_vehicle(user_uuid, dock_id):
+def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     """
-    Check in (lock) a vehicle at the specified dock for the authenticated user.
+    Check in (lock) a vehicle at the dock the user scanned, for the authenticated user.
+
+    `dock_code` is the human-readable code the user scanned/typed at the dock -
+    never the real Bikeep device id, which must stay server-side - so it's
+    resolved to the actual device id here before any Bikeep call is made.
 
     - Locks the specified dock via bikeep_service.
     - Captures the Stripe hold for the active rental.
@@ -192,7 +249,11 @@ def check_in_vehicle(user_uuid, dock_id):
     if vehicle is None:
         raise ValueError(404, "Vehicle %s not found" % vehicle_id)
 
-    logger.debug(f"Locking dock {dock_id} for vehicle {vehicle_id} for user {user_uuid}")
+    dock_id = bikeep_service.get_device_id_for_code(dock_code)
+    if dock_id is None:
+        raise ValueError(404, "No dock found for code %s" % dock_code)
+
+    logger.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
     bikeep_service.lock_dock(dock_id)
 
     payment_hold_info = rental_state.get('payment_hold_info')
@@ -200,14 +261,16 @@ def check_in_vehicle(user_uuid, dock_id):
     payment_hold_id = payment_hold_info.get('id')
     now = time.time()
     rental_start_ts = rental_state.start_ts
-    capture_amount = _compute_capture_amount_cents(rental_start_ts, now)
+    duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
+    fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
+    capture_amount = round(fee_dollars * 100)
     if payment_hold_id:
         ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
 
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},
         {'$set': {
-            'location': dock_id,
+            'location': dock_code,
             'updated_at': now,
         }},
     )
@@ -220,7 +283,7 @@ def check_in_vehicle(user_uuid, dock_id):
         'end_local_dt': ecwld.LocalDate.get_local_date(now, end_timezone),
         'end_fmt_time': arrow.get(now).to(end_timezone).isoformat(),
         'end_loc': end_loc,
-        'end_dock_id': dock_id,
+        'end_dock_id': dock_code,
     })
 
     import emission.storage.timeseries.builtin_timeseries as estb
@@ -231,8 +294,8 @@ def check_in_vehicle(user_uuid, dock_id):
         updated_rental_state,
     )
 
-    logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} for user {user_uuid}")
-    return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_id}
+    logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} (code {dock_code}) for user {user_uuid}")
+    return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_code}
 
 
 def get_rental_history(user_uuid):
