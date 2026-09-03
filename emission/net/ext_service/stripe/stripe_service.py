@@ -139,7 +139,7 @@ def check_pending_setup_status(uuid):
     payment_info = payment_db.get_current_state(esas.StateName.PAYMENT)
     if payment_info is None:
         payment_info = ecwp.Payment()
-    if payment_info.payment_setup_status is None:
+    if payment_info.get('payment_setup_status') is None:
         payment_info.payment_setup_status = ecwp.PaymentSetupStatus.NOT_STARTED
 
     # There is nothing pending, so nothing that we need to read from the server
