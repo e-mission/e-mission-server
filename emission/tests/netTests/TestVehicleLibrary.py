@@ -47,6 +47,15 @@ class TestVehicleLibrary(unittest.TestCase):
         self.profile_db = edb.get_profile_db()
         self.state_db = edb.get_state_db()
         self.timeseries_db = edb.get_timeseries_db()
+        self._default_fee_config = {
+            'vehicle_rental': {
+                'fee_expression': "(5 if duration <= 5 else 35 if duration <= 24 else 100 if duration <= 72 else 200 if duration <= 144 else 380) * (0.5 if subgroup == 'discount' else 1) * (1.5 if baseMode == 'E_BIKE' else 1)",
+            }
+        }
+        self._fee_config_patcher = patch.object(vl.edc, 'get_deployment_config', return_value=self._default_fee_config)
+        self._fee_config_patcher.start()
+        self._dock_code_patcher = patch.object(vl.bikeep_service, 'get_device_id_for_code', side_effect=lambda dock_code: dock_code)
+        self._dock_code_patcher.start()
         self._sandbox_patcher = patch.object(vl.ss, 'STRIPE_IS_SANDBOX', True)
         self._sandbox_patcher.start()
 
@@ -65,6 +74,8 @@ class TestVehicleLibrary(unittest.TestCase):
         self.profile_db.delete_many({'user_id': self.test_uuid})
         self.state_db.delete_many({'user_id': self.test_uuid})
         self.timeseries_db.delete_many({'user_id': self.test_uuid, 'metadata.key': vl.VEHICLE_RENTAL_KEY})
+        self._dock_code_patcher.stop()
+        self._fee_config_patcher.stop()
         self._sandbox_patcher.stop()
 
     # ------------------------------------------------------------------
