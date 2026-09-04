@@ -34,6 +34,7 @@ def create_setup_checkout_session(uuid):
     logging.debug("Creating stripe setup checkout session for user %s" % uuid)
     payment_db = esas.StateStorage.get_state_storage(uuid)
     payment_info = payment_db.get_current_state(esas.StateName.PAYMENT)
+    logging.debug(f"DEBUG: Retrieved current payment info for user {uuid}: {payment_info}")
     if payment_info is None:
         logging.debug(f"DEBUG: No current payment session found for user {uuid}, creating a new session")
         curr_payment_session = ecwp.Payment({"payment_setup_status": ecwp.PaymentSetupStatus.NOT_STARTED})
@@ -45,6 +46,7 @@ def create_setup_checkout_session(uuid):
     logging.debug(f"DEBUG: Current payment setup status for user {uuid}: {curr_payment_setup_status}")
 
     # If there is an existing pending session, use it. Otherwise create a new one.
+    api_checkout_session_status = None
     if curr_payment_setup_status == ecwp.PaymentSetupStatus.WAITING_FOR_USER:
         logging.debug(f"DEBUG: Current payment setup status is WAITING_FOR_USER for user {uuid}, checking session status")
         # We get this from the API instead of the database because the database does not store the session status
@@ -56,7 +58,9 @@ def create_setup_checkout_session(uuid):
             return api_checkout_session_status
 
     # We need to create a new checkout session
-    assert curr_payment_setup_status in [ecwp.PaymentSetupStatus.NOT_STARTED, ecwp.PaymentSetupStatus.SUCCEEDED] or (api_checkout_session_status is not None and api_checkout_session_status.get("status") != "open"), "Unexpected payment setup status"
+    assert curr_payment_setup_status in [ecwp.PaymentSetupStatus.NOT_STARTED, ecwp.PaymentSetupStatus.SUCCEEDED] or \
+        (api_checkout_session_status is not None and api_checkout_session_status.get("status") != "open"),\
+        f"Unexpected payment setup status {curr_payment_setup_status}, api_checkout_session_status: {api_checkout_session_status}"
     logging.debug(f"DEBUG: Current setup checkout session is not open for user {uuid}, creating a new session")
     api_checkout_session_status = invoke_setup_checkout_session_api(uuid, stripe_customer_id)
     payment_to_insert = ecwp.Payment()
@@ -69,16 +73,20 @@ def create_setup_checkout_session(uuid):
 def _get_or_create_customer_id(uuid, payment_info):
     stripe_customer_id = payment_info.get("stripe_customer_id")
     if stripe_customer_id:
+        logging.debug(f"DEBUG: Found existing stripe customer ID for user {uuid}: {stripe_customer_id}")
         return stripe_customer_id
 
     curr_user = ecwu.User.fromUUID(uuid)
+    logging.debug(f"DEBUG: Creating new stripe customer for user {uuid}")
     username = curr_user.create_and_store_username()
+    logging.debug(f"DEBUG: Created username for new stripe customer for user {uuid}: {username}")
 
     customer = stripe.Customer.create(
         metadata={"username": username},
         description=username,
     )
     json_customer = json.loads(str(customer))
+    logging.debug(f"DEBUG: Stripe customer result for user {uuid}: {json_customer}")
     return json_customer["id"]
 
 
@@ -155,33 +163,36 @@ def check_pending_setup_status(uuid):
     # User has asked us to sync the value to the server.
     # We need to call the API to get the current status of the session.
     setup_checkout_session_status = invoke_get_checkout_session_status_api(uuid)
+    logging.debug(f"DEBUG: Retrieved setup checkout session status for user {uuid}: {setup_checkout_session_status}")
     if setup_checkout_session_status is None:
         logging.debug(f"saved state is {payment_info.payment_setup_status}, but no session status found on server; resetting state")
         setup_checkout_session_status = {}
         payment_info = ecwp.Payment()
         payment_info.payment_setup_status = ecwp.PaymentSetupStatus.NOT_STARTED
-
-    if setup_checkout_session_status.get("status") == "open":
-        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.WAITING_FOR_USER
-
-    if setup_checkout_session_status.get("status") == "expired":
-        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.EXPIRED
-
-    if setup_checkout_session_status.get("setup_intent") is None or \
-       setup_checkout_session_status.get("setup_intent", {}).get("payment_method") is None:
-        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.FAILED
     else:
-        # At this point, we should have a valid setup checkout session and can use it freely
-        stripe_customer_id = payment_info.get("stripe_customer_id")
-        payment_method_id = setup_checkout_session_status.get("setup_intent", {}).get("payment_method")
-        assert stripe_customer_id is not None, f"Expected stripe_customer_id for completed setup session for user {uuid}"
-        stripe.PaymentMethod.attach(payment_method_id, customer=stripe_customer_id)
-        payment_info.payment_setup = setup_checkout_session_status.get("setup_intent")
-        payment_info.payment_setup_status = ecwp.PaymentSetupStatus.SUCCEEDED
-        del payment_info.pending_setup_session
-        logging.debug(f"About to save the updated payment info for {uuid=}: {payment_info}")
+        logging.debug(f"DEBUG: Syncing existing {setup_checkout_session_status=} for user {uuid} to payment info")
+        if setup_checkout_session_status.get("status") == "open":
+            payment_info.payment_setup_status = ecwp.PaymentSetupStatus.WAITING_FOR_USER
+            logging.debug(f"DEBUG: Updated payment setup status to WAITING_FOR_USER for user {uuid}")
+        elif setup_checkout_session_status.get("status") == "expired":
+            payment_info.payment_setup_status = ecwp.PaymentSetupStatus.EXPIRED
+            logging.debug(f"DEBUG: Updated payment setup status to EXPIRED for user {uuid}")
+        elif setup_checkout_session_status.get("setup_intent") is None or \
+        setup_checkout_session_status.get("setup_intent", {}).get("payment_method") is None:
+            payment_info.payment_setup_status = ecwp.PaymentSetupStatus.FAILED
+            logging.debug(f"DEBUG: Updated payment setup status to FAILED for user {uuid}")
+        else:
+            # At this point, we should have a valid setup checkout session and can use it freely
+            stripe_customer_id = payment_info.get("stripe_customer_id")
+            payment_method_id = setup_checkout_session_status.get("setup_intent", {}).get("payment_method")
+            assert stripe_customer_id is not None, f"Expected stripe_customer_id for completed setup session for user {uuid}"
+            stripe.PaymentMethod.attach(payment_method_id, customer=stripe_customer_id)
+            payment_info.payment_setup = setup_checkout_session_status.get("setup_intent")
+            payment_info.payment_setup_status = ecwp.PaymentSetupStatus.SUCCEEDED
+            del payment_info.pending_setup_session
+            logging.debug(f"About to save the updated payment info for {uuid=}: {payment_info}")
 
-    logging.debug(f"DEBUG: About to save the updated payment info for user {uuid}: {payment_info}")
+    logging.debug(f"DEBUG: For {uuid=}, sync complete: {setup_checkout_session_status=} {payment_info=}")
     esas.StateStorage.get_state_storage(uuid).upsert_state(esas.StateName.PAYMENT, payment_info)
     logging.debug(f"DEBUG: Returning from check_pending_setup_status for user {uuid}")
     return payment_info.payment_setup_status
