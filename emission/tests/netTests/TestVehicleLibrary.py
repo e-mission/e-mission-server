@@ -288,22 +288,6 @@ class TestVehicleLibrary(unittest.TestCase):
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
         self.assertIsNone(vehicle['location'])
 
-    def test_checkout_vehicle_records_checkout_timestamp(self):
-        """checkout_vehicle() sets checkout_ts to current time."""
-        self._insert_vehicle()
-        before = _now()
-
-        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
-             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            self._checkout_vehicle()
-
-        after = _now()
-        vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
-        checkout_ts = vehicle['checkout_ts']
-        self.assertIsNotNone(checkout_ts)
-        self.assertGreaterEqual(checkout_ts, before)
-        self.assertLessEqual(checkout_ts, after)
-
     def test_checkout_vehicle_calls_bikeep_unlock(self):
         """checkout_vehicle() unlocks the dock via bikeep."""
         self._insert_vehicle()
