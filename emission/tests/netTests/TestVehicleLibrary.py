@@ -191,6 +191,53 @@ class TestVehicleLibrary(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 vl.stations()
 
+    def test_blank_state_check_pending_setup_and_stations_do_not_raise(self):
+        """Blank payment state and blank vehicle DB should not cause exceptions when querying setup status or stations."""
+        blank_user_uuid = uuid.uuid4()
+        existing_vehicles = [dict(vehicle) for vehicle in self.mock_db.find()]
+
+        try:
+            self.mock_db.delete_many({})
+            self.state_db.delete_many({'user_id': blank_user_uuid})
+            self.profile_db.delete_many({'user_id': blank_user_uuid})
+            self.timeseries_db.delete_many({'user_id': blank_user_uuid, 'metadata.key': vl.VEHICLE_RENTAL_KEY})
+
+            with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=([], [])):
+                setup_status = vl.check_and_get_pending_setup_status(blank_user_uuid)
+                stations_result = vl.stations()
+
+            self.assertIsInstance(setup_status, dict)
+            self.assertIn('payment_setup_status', setup_status)
+            self.assertIn('is_sandbox', setup_status)
+            self.assertEqual(stations_result, {'stations': []})
+        finally:
+            self.mock_db.delete_many({})
+            if existing_vehicles:
+                self.mock_db.insert_many(existing_vehicles)
+
+    def test_blank_vehicle_db_with_bikeep_stations_returns_zero_rentable_vehicles(self):
+        """If Bikeep reports stations but our vehicle DB is blank, stations() should still return them with zero rentable vehicles."""
+        existing_vehicles = [dict(vehicle) for vehicle in self.mock_db.find()]
+        bikeep_locations = [{'id': 'loc-1', 'name': 'Main St'}]
+        bikeep_devices = [
+            {'id': 'real-id-ours', 'code': 'code-ours', 'location': {'id': 'loc-1'}, 'state': {'value': 'LOCKED'}},
+            {'id': 'real-id-empty', 'code': 'code-empty', 'location': {'id': 'loc-1'}, 'state': {'value': 'UNLOCKED'}},
+        ]
+
+        try:
+            self.mock_db.delete_many({})
+
+            with patch.object(vl.bikeep_service, 'get_locations_and_all_devices', return_value=(bikeep_locations, bikeep_devices)):
+                result = vl.stations()
+
+            self.assertEqual(len(result['stations']), 1)
+            self.assertEqual(result['stations'][0]['id'], 'loc-1')
+            self.assertEqual(result['stations'][0]['devices']['rentable_vehicles'], 0)
+        finally:
+            self.mock_db.delete_many({})
+            if existing_vehicles:
+                self.mock_db.insert_many(existing_vehicles)
+
     # ------------------------------------------------------------------
     # compute_rental_fee()
     # ------------------------------------------------------------------
@@ -240,22 +287,6 @@ class TestVehicleLibrary(unittest.TestCase):
         # Verify vehicle location is now unavailable (not docked)
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
         self.assertIsNone(vehicle['location'])
-
-    def test_checkout_vehicle_records_checkout_timestamp(self):
-        """checkout_vehicle() sets checkout_ts to current time."""
-        self._insert_vehicle()
-        before = _now()
-
-        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
-             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            self._checkout_vehicle()
-
-        after = _now()
-        vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
-        checkout_ts = vehicle['checkout_ts']
-        self.assertIsNotNone(checkout_ts)
-        self.assertGreaterEqual(checkout_ts, before)
-        self.assertLessEqual(checkout_ts, after)
 
     def test_checkout_vehicle_calls_bikeep_unlock(self):
         """checkout_vehicle() unlocks the dock via bikeep."""

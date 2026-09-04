@@ -71,7 +71,7 @@ def _get_loc_and_timezone(dock_id):
 def _get_active_rental_entry(user_uuid):
     active_entries = _get_rental_ts(user_uuid).find_entries(
         [VEHICLE_RENTAL_KEY],
-        extra_query_list=[{"data.rental_status": "active"}],
+        extra_query_list=[{"data.rental_status": {"$in": [ecwr.RentalStatus.ACTIVE, ecwr.RentalStatus.INITIALIZING]}}],
     )
     if len(active_entries) == 0:
         return None
@@ -156,12 +156,49 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     if vehicle is None:
         raise ValueError(422, "Vehicle %s not found" % vehicle_id)
 
+    # We now need to consider the cold start problem for the bike library.
+    # The bike library admin needs to initially check in the bikes to "seed" the library
+    # However, if they lock the dock using the bikeep app, or an admin override, then our app cannot unlock it
+    # because we are a different user.
+    #
+    # To fix this, we could provide a mechanism to lock the docks from our admin dashboard using our user credentials
+    # but that is more work, and may also be more confusing given the multiplicity of dashboards.
+    #
+    # So we will implement a "pairing" mechanism instead. If the current "location" of the vehicle is
+    # UNINITIALIZED, then we will create a rental object in the INITIALIZING state
+    # without communicating with bikeep, and without placing any hold on the credit card.
+
     now = time.time()
 
     dock_code = vehicle.get('location')
     if not dock_code:
         raise ValueError(422, "Vehicle %s has no dock location to unlock" % vehicle_id)
 
+    if dock_code == "UNINITIALIZED":
+        timezone = "UTC"
+        start_fmt_time = arrow.get(now).to(timezone).isoformat()
+        start_local_dt = ecwld.LocalDate.get_local_date(now, timezone)
+
+        rental_state = ecwr.Rental({
+            'vehicle_id': vehicle.get('vehicle_id'),
+            'vehicle_name': vehicle.get('vehicle_name'),
+            'payment_hold_info': None,
+            'rental_status': ecwr.RentalStatus.INITIALIZING,
+            'start_ts': now,
+            'start_local_dt': start_local_dt,
+            'start_fmt_time': start_fmt_time,
+            'start_loc': geojson.Point((0.0, 0.0)),
+            'start_dock_id': None,
+            'end_ts': None,
+            'end_local_dt': None,
+            'end_fmt_time': None,
+            'end_loc': None,
+            'end_dock_id': None,
+        })
+        _get_rental_ts(user_uuid).insert_data(user_uuid, VEHICLE_RENTAL_KEY, rental_state)
+        return {'result': 'checked_out', 'vehicle_id': vehicle_id}
+
+    # Real checkout
     dock_id = bikeep_service.get_device_id_for_code(dock_code)
     if dock_id is None:
         logging.error(f"No dock found for code {dock_code}")
@@ -199,7 +236,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         'vehicle_id': vehicle.get('vehicle_id'),
         'vehicle_name': vehicle.get('vehicle_name'),
         'payment_hold_info': hold_info,
-        'rental_status': 'active',
+        'rental_status': ecwr.RentalStatus.ACTIVE,
         'start_ts': now,
         'start_local_dt': start_local_dt,
         'start_fmt_time': start_fmt_time,
@@ -217,7 +254,6 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         {'vehicle_id': vehicle_id},
         {'$set': {
             'location': None, # TODO: Should we have this be the UUID instead?
-            'checkout_ts': now,
             'updated_at': now,
         }},
     )
@@ -247,25 +283,31 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     vehicle_db = edb.get_vehicle_db()
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
     if vehicle is None:
+        logger.error(f"Vehicle {vehicle_id} not found")
         raise ValueError(404, "Vehicle %s not found" % vehicle_id)
 
     dock_id = bikeep_service.get_device_id_for_code(dock_code)
     if dock_id is None:
+        logger.error(f"Dock not found for code {dock_code}")
         raise ValueError(404, "No dock found for code %s" % dock_code)
 
     logger.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
     bikeep_service.lock_dock(dock_id)
 
-    payment_hold_info = rental_state.get('payment_hold_info')
-    assert payment_hold_info is not None, "Bike was rented without a hold, unsure what to capture"
-    payment_hold_id = payment_hold_info.get('id')
     now = time.time()
-    rental_start_ts = rental_state.start_ts
-    duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
-    fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
-    capture_amount = round(fee_dollars * 100)
-    if payment_hold_id and capture_amount > 0:
-        ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
+    if rental_state.rental_status == ecwr.RentalStatus.INITIALIZING:
+        logger.info(f"Initializing rental for vehicle {rental_state.vehicle_id}, no payment needed")
+    else:
+        payment_hold_info = rental_state.get('payment_hold_info')
+        assert payment_hold_info is not None, "Bike was rented without a hold, unsure what to capture"
+        payment_hold_id = payment_hold_info.get('id')
+        rental_start_ts = rental_state.start_ts
+        duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
+        logging.debug(f"Rental duration (hours): {duration_hours}")
+        fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
+        capture_amount = round(fee_dollars * 100)
+        if payment_hold_id and capture_amount > 0:
+            ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
 
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},
@@ -278,7 +320,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     end_loc, end_timezone = _get_loc_and_timezone(dock_id)
     updated_rental_state = ecwr.Rental({
         **rental_state,
-        'rental_status': 'completed',
+        'rental_status': ecwr.RentalStatus.COMPLETED,
         'end_ts': now,
         'end_local_dt': ecwld.LocalDate.get_local_date(now, end_timezone),
         'end_fmt_time': arrow.get(now).to(end_timezone).isoformat(),

@@ -4,6 +4,7 @@ import os
 import unittest
 from unittest.mock import patch
 
+import emission.core.get_database as edb
 import emission.core.wrapper.user as ecwu
 import emission.core.wrapper.payment as ecwp
 
@@ -198,6 +199,25 @@ class TestStripeService(unittest.TestCase):
         saved_payment = stripe_service.get_current_payment_state(self.test_uuid)
         self.assertEqual(saved_payment.get('stripe_customer_id'), 'cus_saved_123')
         self.assertEqual(saved_payment.get('payment_setup_status'), ecwp.PaymentSetupStatus.SUCCEEDED.value)
+
+    def test_check_pending_setup_status_cold_start_persists_not_started_payment(self):
+        payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
+        payment_db.delete_state(stripe_service.esas.StateName.PAYMENT)
+
+        with patch.object(stripe_service, 'invoke_get_checkout_session_status_api', return_value=None) as mock_status:
+            result = stripe_service.check_pending_setup_status(self.test_uuid)
+
+        self.assertEqual(result, ecwp.PaymentSetupStatus.NOT_STARTED)
+        mock_status.assert_called_once_with(self.test_uuid)
+
+        state_doc = edb.get_state_db().find_one({
+            'user_id': self.test_uuid,
+            'metadata.key': 'state/payment',
+        })
+        self.assertIsNotNone(state_doc)
+
+        saved_payment = stripe_service.get_current_payment_state(self.test_uuid)
+        self.assertEqual(saved_payment.get('payment_setup_status'), ecwp.PaymentSetupStatus.NOT_STARTED.value)
 
     def test_create_hold_payment_intent_requires_succeeded_setup(self):
         payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)

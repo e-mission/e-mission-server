@@ -974,6 +974,8 @@ class Bottle(object):
         return decorator(callback) if callback else decorator
 
     def default_error_handler(self, res):
+        if isinstance(res, HTTPError):
+            return tob(res.status+" \n" +str(res.exception)+" \n"+res.traceback)
         return tob(template(ERROR_PAGE_TEMPLATE, e=res, template_settings=dict(name='__ERROR_PAGE_TEMPLATE')))
 
     def _handle(self, environ):

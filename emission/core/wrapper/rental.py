@@ -4,7 +4,13 @@ Tracks vehicle location (dock/bay/parking spot ID or user UUID if checked out) a
 """
 from builtins import *
 import logging
+import enum
 import emission.core.wrapper.wrapperbase as ecwb
+
+class RentalStatus(str, enum.Enum):
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    INITIALIZING = "initializing"
 
 class Rental(ecwb.WrapperBase):
     props = {
@@ -24,7 +30,7 @@ class Rental(ecwb.WrapperBase):
         "rental_status": ecwb.WrapperBase.Access.RW,
     }
 
-    enums = {}
+    enums = { "rental_status": RentalStatus }
     geojson = ['start_loc', 'end_loc']
     nullable = ['end_loc']
     local_dates = ['start_local_dt', 'end_local_dt']
