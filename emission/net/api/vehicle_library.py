@@ -301,13 +301,15 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
         payment_hold_info = rental_state.get('payment_hold_info')
         assert payment_hold_info is not None, "Bike was rented without a hold, unsure what to capture"
         payment_hold_id = payment_hold_info.get('id')
+        if not payment_hold_id:
+            raise ValueError("No payment hold found for vehicle %s" % vehicle_id)
+
         rental_start_ts = rental_state.start_ts
         duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
         logging.debug(f"Rental duration (hours): {duration_hours}")
         fee_dollars = compute_rental_fee(duration_hours, subgroup, rental_state.get('vehicle_info'))
         capture_amount = round(fee_dollars * 100)
-        if payment_hold_id and capture_amount > 0:
-            ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
+        ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
 
     vehicle_db.update_one(
         {'vehicle_id': vehicle_id},

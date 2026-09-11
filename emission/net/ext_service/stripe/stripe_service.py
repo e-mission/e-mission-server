@@ -264,27 +264,30 @@ def create_hold_payment_intent(uuid, amount_cents, currency="usd", metadata=None
     return json_payment_intent
 
 
-def capture_hold_payment_intent(payment_intent_id, amount_to_capture_cents=None):
+def capture_hold_payment_intent(payment_intent_id, amount_to_capture_cents):
     """
     Capture a previously authorized Stripe PaymentIntent hold.
-
-    If amount_to_capture_cents is provided, performs a partial capture.
     """
     if not payment_intent_id:
         raise ValueError("payment_intent_id is required")
+    if amount_to_capture_cents is None:
+        raise ValueError("amount_to_capture_cents is required")
 
-    payload = {}
-    if amount_to_capture_cents is not None:
-        if int(amount_to_capture_cents) <= 0:
-            raise ValueError("amount_to_capture_cents must be a positive integer")
-        payload["amount_to_capture"] = int(amount_to_capture_cents)
+    if int(amount_to_capture_cents) > 0:
+        payload = {"amount_to_capture": int(amount_to_capture_cents)}
 
-    logging.info(f"Invoking stripe PaymentIntent.capture for {payment_intent_id=} with {payload=}")
-    captured_intent = stripe.PaymentIntent.capture(payment_intent_id, **payload)
-    json_captured_intent = json.loads(str(captured_intent))
+        logging.info(f"Invoking stripe PaymentIntent.capture for {payment_intent_id=} with {payload=}")
+        captured_intent = stripe.PaymentIntent.capture(payment_intent_id, **payload)
+        json_captured_intent = json.loads(str(captured_intent))
 
-    logging.debug(f"Received stripe PaymentIntent.capture response: {json_captured_intent}")
-    return json_captured_intent
+        logging.debug(f"Received stripe PaymentIntent.capture response: {json_captured_intent}")
+        return json_captured_intent
+    else:
+        # We are not going to capture anything (potentially because the user had renters regret and returned the bike
+        # So let us cancel the pending intent. This ensures that we won't have "uncaptured" transactions cluttering up
+        # the stripe dashboard and large holds on people's credit cards that they may want to use for something else
+        cancel_hold_payment_intent(payment_intent_id)
+        return None
 
 
 def cancel_hold_payment_intent(payment_intent_id):
