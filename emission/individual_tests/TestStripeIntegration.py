@@ -3,6 +3,7 @@ import json
 import os
 import unittest
 import uuid
+import logging
 
 import stripe
 
@@ -39,7 +40,7 @@ class TestStripeIntegration(unittest.TestCase):
                 pass
         ecwu.User.unregister(self.test_email)
 
-    def _setup_payment_method(self):
+    def _setup_payment_method(self, card_token="tok_visa"):
         customer = stripe.Customer.create(
             description=f"e-mission integration customer {self.test_uuid}",
         )
@@ -49,7 +50,7 @@ class TestStripeIntegration(unittest.TestCase):
 
         payment_method = stripe.PaymentMethod.create(
             type="card",
-            card={"token": "tok_visa"},
+            card={"token": card_token},
         )
         payment_method_json = json.loads(str(payment_method))
         payment_method_id = payment_method_json["id"]
@@ -154,6 +155,53 @@ class TestStripeIntegration(unittest.TestCase):
 
         cancelled = stripe_service.cancel_hold_payment_intent(payment_intent_id)
         self.assertEqual(cancelled.get("status"), "canceled")
+
+    def test_two_captures_against_single_hold(self):
+        self._setup_payment_method()
+
+        hold_intent = self._create_hold_intent(500)
+        payment_intent_id = hold_intent["id"]
+
+        first_capture = stripe_service.capture_hold_payment_intent(payment_intent_id, 150)
+        self.assertEqual(first_capture.get("id"), payment_intent_id)
+        self.assertEqual(first_capture.get("amount_received"), 150)
+
+        after_first_capture = json.loads(str(stripe.PaymentIntent.retrieve(payment_intent_id)))
+        self.assertEqual(after_first_capture.get("status"), "succeeded")
+
+        with self.assertRaises(stripe.error.InvalidRequestError) as second_capture_err:
+            stripe_service.capture_hold_payment_intent(payment_intent_id, 100)
+
+        logging.debug(f"Second capture error context: {second_capture_err}")
+        err_str = str(second_capture_err.exception)
+        self.assertTrue(
+            "succeeded" in err_str or "unexpected state" in err_str or "cannot be captured" in err_str or "remainder of the authorized amount has been released" in err_str,
+            msg=f"Unexpected Stripe error for second capture: {err_str}",
+        )
+
+    def test_bad_test_cards_raise_during_hold_or_capture(self):
+        bad_card_cases = [
+            ("tok_chargeCustomerFail", ["declined", "card_declined"]),
+            ("tok_visa_chargeCustomerFailLostCard", ["lost_card", "declined", "card_declined"]),
+        ]
+
+        for card_token, expected_fragments in bad_card_cases:
+            with self.subTest(card_token=card_token):
+                self._setup_payment_method(card_token=card_token)
+
+                def attempt_hold_and_capture():
+                    hold_intent = self._create_hold_intent(250)
+                    stripe_service.capture_hold_payment_intent(hold_intent["id"], 125)
+
+                with self.assertRaises(Exception) as err_ctx:
+                    attempt_hold_and_capture()
+
+                err_str = str(err_ctx.exception)
+                print(f"Stripe error for {card_token}: {type(err_ctx.exception)} -> {err_str}")
+                self.assertTrue(
+                    any(fragment in err_str for fragment in expected_fragments),
+                    msg=f"Unexpected Stripe error for {card_token}: {err_str}",
+                )
 
 
 if __name__ == '__main__':

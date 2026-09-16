@@ -421,6 +421,33 @@ class TestVehicleLibrary(unittest.TestCase):
 
         mock_capture.assert_called_once_with('pi_hold_456', 3500)
 
+    def test_checkin_vehicle_capture_failure_does_not_update_db(self):
+        """check_in_vehicle() leaves vehicle and rental state unchanged if Stripe capture fails."""
+        self._insert_vehicle(
+            location=str(self.test_uuid),
+        )
+        self._insert_active_rental(payment_hold_info={'id': 'pi_hold_declined'}, rental_start_ts=_now())
+
+        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock, \
+             patch.object(
+                 vl.ss,
+                 'capture_hold_payment_intent',
+                 side_effect=ValueError(424, 'Error occurred while capturing payment intent: Your card was declined.'),
+             ):
+            with self.assertRaises(ValueError) as err_ctx:
+                vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+
+        self.assertEqual(err_ctx.exception.args[0], 424)
+        self.assertIn('capturing payment intent', err_ctx.exception.args[1])
+        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+
+        vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
+        self.assertEqual(vehicle['location'], str(self.test_uuid))
+
+        rental_entry = self._get_latest_rental_entry()
+        self.assertEqual(rental_entry['data']['rental_status'], 'active')
+        self.assertIsNone(rental_entry['data'].get('end_ts'))
+
     def test_checkin_vehicle_nothing_checked_out_returns_403(self):
         """check_in_vehicle() rejects if user has no vehicle checked out."""
         # Vehicle is at a dock, not checked out by this user
