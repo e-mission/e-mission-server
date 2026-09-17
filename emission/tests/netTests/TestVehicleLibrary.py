@@ -282,7 +282,7 @@ class TestVehicleLibrary(unittest.TestCase):
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
             result = self._checkout_vehicle()
 
-        self.assertEqual(result['result'], 'checked_out')
+        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
 
         # Verify vehicle location is now unavailable (not docked)
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
@@ -305,10 +305,16 @@ class TestVehicleLibrary(unittest.TestCase):
         with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('dock unreachable')), \
              patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel:
-            with self.assertRaises(RuntimeError):
+            with self.assertRaises(ValueError) as err_ctx:
                 self._checkout_vehicle()
 
+        self.assertEqual(err_ctx.exception.args[0], 424)
+        self.assertIn('Failed to unlock dock for vehicle', err_ctx.exception.args[1])
+        self.assertIn('dock unreachable', err_ctx.exception.args[1])
         mock_cancel.assert_called_once_with('pi_hold_123')
+
+        rental_entry = self._get_latest_rental_entry()
+        self.assertEqual(rental_entry['data']['rental_status'], 'cancelled')
 
     def test_checkout_vehicle_raises_original_error_when_cancel_also_fails(self):
         """checkout_vehicle() still raises the checkout error even if cancel itself fails."""
@@ -317,8 +323,15 @@ class TestVehicleLibrary(unittest.TestCase):
         with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('dock unreachable')), \
              patch.object(vl.ss, 'cancel_hold_payment_intent', side_effect=RuntimeError('stripe unreachable')):
-            with self.assertRaisesRegex(RuntimeError, 'dock unreachable'):
+            with self.assertRaises(ValueError) as err_ctx:
                 self._checkout_vehicle()
+
+        self.assertEqual(err_ctx.exception.args[0], 424)
+        self.assertIn('Failed to cancel hold after dock unlock failure', err_ctx.exception.args[1])
+        self.assertIn('stripe unreachable', err_ctx.exception.args[1])
+
+        rental_entry = self._get_latest_rental_entry()
+        self.assertEqual(rental_entry['data']['rental_status'], 'held')
 
     def test_checkout_vehicle_persists_active_rental_entry(self):
         """checkout_vehicle() stores the active vehicle-user mapping in manual/vehicle_rental."""
@@ -428,18 +441,17 @@ class TestVehicleLibrary(unittest.TestCase):
         )
         self._insert_active_rental(payment_hold_info={'id': 'pi_hold_declined'}, rental_start_ts=_now())
 
-        with patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock, \
-             patch.object(
-                 vl.ss,
-                 'capture_hold_payment_intent',
-                 side_effect=ValueError(424, 'Error occurred while capturing payment intent: Your card was declined.'),
-             ):
+        with patch.object(
+            vl.ss,
+            'capture_hold_payment_intent',
+            side_effect=ValueError(424, 'declined by issuer'),
+        ):
             with self.assertRaises(ValueError) as err_ctx:
                 vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
         self.assertEqual(err_ctx.exception.args[0], 424)
-        self.assertIn('capturing payment intent', err_ctx.exception.args[1])
-        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+        self.assertIn(f'Failed to capture payment for vehicle {VEHICLE_ID}', err_ctx.exception.args[1])
+        self.assertIn("capture_err=ValueError(424, 'declined by issuer')", err_ctx.exception.args[1])
 
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
         self.assertEqual(vehicle['location'], str(self.test_uuid))
@@ -498,16 +510,21 @@ class TestVehicleLibrary(unittest.TestCase):
         )
         self._insert_active_rental(rental_start_ts=_now())
 
-        with patch.object(vl.bikeep_service, 'lock_dock', side_effect=RuntimeError("lock failed")):
-            with self.assertRaises(RuntimeError):
+        with patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}), \
+             patch.object(vl.bikeep_service, 'lock_dock', side_effect=RuntimeError("lock failed")):
+            with self.assertRaises(ValueError) as err_ctx:
                 vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+
+        self.assertEqual(err_ctx.exception.args[0], 424)
+        self.assertIn(f'Failed to lock dock for vehicle {VEHICLE_ID} for user {self.test_uuid}', err_ctx.exception.args[1])
+        self.assertIn("lock_err=RuntimeError('lock failed')", err_ctx.exception.args[1])
 
         # Vehicle should remain unchanged in DB
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
         self.assertEqual(vehicle['location'], str(self.test_uuid))
 
         rental_entry = self._get_latest_rental_entry()
-        self.assertEqual(rental_entry['data']['rental_status'], 'active')
+        self.assertEqual(rental_entry['data']['rental_status'], 'captured')
 
     def test_get_rental_history_returns_user_rental_entries(self):
         """get_rental_history() returns entries from manual/vehicle_rental for the user."""

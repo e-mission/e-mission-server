@@ -276,12 +276,25 @@ def capture_hold_payment_intent(payment_intent_id, amount_to_capture_cents):
     if int(amount_to_capture_cents) > 0:
         payload = {"amount_to_capture": int(amount_to_capture_cents)}
 
-        logging.info(f"Invoking stripe PaymentIntent.capture for {payment_intent_id=} with {payload=}")
-        captured_intent = stripe.PaymentIntent.capture(payment_intent_id, **payload)
-        json_captured_intent = json.loads(str(captured_intent))
+        try:
+            logging.info(f"Invoking stripe PaymentIntent.capture for {payment_intent_id=} with {payload=}")
+            captured_intent = stripe.PaymentIntent.capture(payment_intent_id, **payload)
+            json_captured_intent = json.loads(str(captured_intent))
 
-        logging.debug(f"Received stripe PaymentIntent.capture response: {json_captured_intent}")
-        return json_captured_intent
+            logging.debug(f"Received stripe PaymentIntent.capture response: {json_captured_intent}")
+            return json_captured_intent
+        except stripe.error.CardError as e:
+            logging.error(
+                f"Invalid Card for payment intent {payment_intent_id}: {e}, "
+                f"stripe_response={getattr(e, 'json_body', None)}"
+            )
+            raise ValueError(424, "Error occurred while capturing payment intent: %s" % e)
+        except stripe.error.StripeError as e:
+            logging.error(
+                f"Stripe error occurred while capturing payment intent {payment_intent_id}: {e}, "
+                f"stripe_response={getattr(e, 'json_body', None)}"
+            )
+            raise ValueError(424, "Stripe error occurred while capturing payment intent: %s" % e)
     else:
         # We are not going to capture anything (potentially because the user had renters regret and returned the bike
         # So let us cancel the pending intent. This ensures that we won't have "uncaptured" transactions cluttering up
