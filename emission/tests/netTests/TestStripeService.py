@@ -239,11 +239,38 @@ class TestStripeService(unittest.TestCase):
             'amount_capturable': 0,
         }
 
-        with patch.object(stripe_service.stripe.PaymentIntent, 'capture', return_value=json.dumps(fake_capture)) as mock_capture:
+        with patch.object(stripe_service.stripe.PaymentIntent, 'capture', return_value=json.dumps(fake_capture)) as mock_capture, \
+             patch.object(stripe_service, 'cancel_hold_payment_intent') as mock_cancel:
             result = stripe_service.capture_hold_payment_intent('pi_hold_123', amount_to_capture_cents=900)
 
         self.assertEqual(result, fake_capture)
         mock_capture.assert_called_once_with('pi_hold_123', amount_to_capture=900)
+        mock_cancel.assert_not_called()
+
+    def test_capture_hold_payment_intent_translates_declined_card_error(self):
+        card_error = stripe_service.stripe.error.CardError(
+            message='Your card was declined.',
+            param='payment_method',
+            code='card_declined',
+        )
+
+        with patch.object(stripe_service.stripe.PaymentIntent, 'capture', side_effect=card_error) as mock_capture, \
+             patch.object(stripe_service, 'cancel_hold_payment_intent') as mock_cancel:
+            with self.assertRaises(ValueError) as err_ctx:
+                stripe_service.capture_hold_payment_intent('pi_hold_declined', amount_to_capture_cents=900)
+
+        self.assertEqual(err_ctx.exception.args[0], 424)
+        self.assertIn('Error occurred while capturing payment intent', err_ctx.exception.args[1])
+        self.assertIn('declined', err_ctx.exception.args[1].lower())
+        mock_capture.assert_called_once_with('pi_hold_declined', amount_to_capture=900)
+        mock_cancel.assert_not_called()
+
+    def test_capture_hold_payment_intent_requires_amount(self):
+        with patch.object(stripe_service.stripe.PaymentIntent, 'capture') as mock_capture:
+            with self.assertRaisesRegex(ValueError, 'amount_to_capture_cents is required'):
+                stripe_service.capture_hold_payment_intent('pi_hold_123', None)
+
+        mock_capture.assert_not_called()
 
     def test_cancel_hold_payment_intent_calls_stripe_cancel(self):
         fake_cancel = {

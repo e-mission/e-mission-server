@@ -8,9 +8,14 @@ import enum
 import emission.core.wrapper.wrapperbase as ecwb
 
 class RentalStatus(str, enum.Enum):
-    ACTIVE = "active"
-    COMPLETED = "completed"
     INITIALIZING = "initializing"
+    ACTIVE = "active"
+    CAPTURED = "captured"
+    COMPLETED = "completed"
+    STARTED = "started"
+    HELD = "held"
+    UNLOCKED = "unlocked"
+    CANCELLED = "cancelled"
 
 class Rental(ecwb.WrapperBase):
     props = {
