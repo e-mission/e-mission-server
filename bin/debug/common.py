@@ -50,6 +50,9 @@ def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
         ats_db = edb.get_analysis_timeseries_db()
         udb = edb.get_uuid_db()
         psdb = edb.get_pipeline_state_db()
+        modeldb = edb.get_model_db()
+        statedb = edb.get_state_db()
+        aggdb = edb.get_agg_metrics_db()
         logging.debug("db_array not passed in, looking up databases")
 
     timeseries_del_result = ts_db.delete_many({"user_id": curr_uuid})
@@ -74,6 +77,18 @@ def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
     logging.info("For uuid %s, deleting entries from the user_db" % curr_uuid)
     user_db_del_result = udb.delete_many({"uuid": curr_uuid})
     logging.info("result = %s" % user_db_del_result)
+
+    logging.info("For uuid %s, deleting entries from the model_db" % curr_uuid)
+    model_db_del_result = modeldb.delete_many({"user_id": curr_uuid})
+    logging.info("result = %s" % model_db_del_result)
+
+    logging.info("For uuid %s, deleting entries from the state_db" % curr_uuid)
+    state_db_del_result = statedb.delete_many({"user_id": curr_uuid})
+    logging.info("result = %s" % state_db_del_result)
+
+    logging.info("For uuid %s, deleting entries from the agg_metrics_db" % curr_uuid)
+    agg_db_del_result = aggdb.delete_many({"user_id": curr_uuid})
+    logging.info("result = %s" % agg_db_del_result)
 
     if is_purge_state:
         logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
