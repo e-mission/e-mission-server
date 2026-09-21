@@ -101,6 +101,9 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         entries = esta.TimeSeries.get_time_series(self.test_uuid).find_entries([vl.VEHICLE_RENTAL_KEY])
         return None if len(entries) == 0 else ecwe.Entry(entries[-1])
 
+    def _rental_entries(self):
+        return esta.TimeSeries.get_time_series(self.test_uuid).find_entries([vl.VEHICLE_RENTAL_KEY])
+
     def _latest_rental_status(self):
         return self._latest_rental_entry().data.rental_status
 
@@ -139,6 +142,29 @@ class TestVehicleLibraryFSM(unittest.TestCase):
 
         self.assertEqual(result['result'], 'checked_in')
         self.assertEqual(self._latest_rental_status(), 'completed')
+        mock_capture.assert_not_called()
+        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+
+    def test_initializing_checkout_then_checkin_updates_single_entry(self):
+        self._insert_vehicle(location='UNINITIALIZED')
+
+        checkout_result = self._checkout_vehicle()
+        checkout_entries = self._rental_entries()
+
+        self.assertEqual(checkout_result['result'], ecwr.RentalStatus.INITIALIZING)
+        self.assertEqual(len(checkout_entries), 1)
+        checkout_entry_id = checkout_entries[0]['_id']
+        self.assertEqual(checkout_entries[0]['data']['rental_status'], 'initializing')
+
+        with patch.object(vl.ss, 'capture_hold_payment_intent') as mock_capture, \
+             patch.object(vl.bikeep_service, 'lock_dock', return_value={}) as mock_lock:
+            checkin_result = vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+
+        final_entries = self._rental_entries()
+        self.assertEqual(checkin_result['result'], 'checked_in')
+        self.assertEqual(len(final_entries), 1)
+        self.assertEqual(final_entries[0]['_id'], checkout_entry_id)
+        self.assertEqual(final_entries[0]['data']['rental_status'], 'completed')
         mock_capture.assert_not_called()
         mock_lock.assert_called_once_with(ALT_DOCK_ID)
 

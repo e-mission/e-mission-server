@@ -386,7 +386,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
             ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
             logger.info(f"Successfully captured payment for vehicle {vehicle_id}, amount {capture_amount}")
             new_rental_state.rental_status = ecwr.RentalStatus.CAPTURED
-            _update_rental_state(user_uuid, rental_entry, new_rental_state)
+            _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
         except Exception as capture_err:
             logger.error(f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
             raise ValueError(424, f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
@@ -396,7 +396,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
         logger.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
         bikeep_service.lock_dock(dock_id)
         new_rental_state.rental_status = ecwr.RentalStatus.COMPLETED
-        _update_rental_state(user_uuid, rental_entry, new_rental_state)
+        _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
     except Exception as lock_err:
         logger.error(f"Failed to lock dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
         raise ValueError(424, f"Failed to lock dock for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
