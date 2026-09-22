@@ -1,5 +1,6 @@
 # Standard imports
 from builtins import *
+import importlib
 import unittest
 import uuid
 import time
@@ -237,6 +238,57 @@ class TestVehicleLibrary(unittest.TestCase):
             self.mock_db.delete_many({})
             if existing_vehicles:
                 self.mock_db.insert_many(existing_vehicles)
+
+    def test_modules_start_without_library_specific_env_vars(self):
+        """vehicle_library and its Stripe/Bikeep dependencies should import cleanly
+        even when library-specific env vars are unset."""
+        env_keys = [
+            'STRIPE_SECRET_KEY',
+            'STRIPE_IS_SANDBOX',
+            'APP_URL_PREFIX',
+            'BIKEEP_CLIENT_ID',
+            'BIKEEP_CLIENT_SECRET',
+        ]
+        saved_env = {key: os.environ.get(key) for key in env_keys}
+
+        self._dock_code_patcher.stop()
+        self._fee_config_patcher.stop()
+        self._sandbox_patcher.stop()
+
+        try:
+            for key in env_keys:
+                os.environ.pop(key, None)
+
+            stripe_service = importlib.import_module('emission.net.ext_service.stripe.stripe_service')
+            bikeep_service = importlib.import_module('emission.net.ext_service.bikeep.bikeep_service')
+
+            stripe_service = importlib.reload(stripe_service)
+            bikeep_service = importlib.reload(bikeep_service)
+            importlib.reload(vl)
+
+            self.assertIsNone(stripe_service.STRIPE_SECRET_KEY)
+            self.assertTrue(stripe_service.STRIPE_IS_SANDBOX)
+            self.assertIsNone(stripe_service.STRIPE_SUCCESS_URL)
+            self.assertIsNone(stripe_service.STRIPE_CANCEL_URL)
+            self.assertTrue(hasattr(bikeep_service, 'lock_dock'))
+            self.assertTrue(hasattr(vl, 'checkout_vehicle'))
+        finally:
+            for key, value in saved_env.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
+
+            importlib.reload(importlib.import_module('emission.net.ext_service.stripe.stripe_service'))
+            importlib.reload(importlib.import_module('emission.net.ext_service.bikeep.bikeep_service'))
+            importlib.reload(vl)
+
+            self._fee_config_patcher = patch.object(vl.edc, 'get_deployment_config', return_value=self._default_fee_config)
+            self._fee_config_patcher.start()
+            self._dock_code_patcher = patch.object(vl.bikeep_service, 'get_device_id_for_code', side_effect=lambda dock_code: dock_code)
+            self._dock_code_patcher.start()
+            self._sandbox_patcher = patch.object(vl.ss, 'STRIPE_IS_SANDBOX', True)
+            self._sandbox_patcher.start()
 
     # ------------------------------------------------------------------
     # compute_rental_fee()
