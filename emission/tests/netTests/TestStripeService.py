@@ -253,8 +253,16 @@ class TestStripeService(unittest.TestCase):
             param='payment_method',
             code='card_declined',
         )
+        card_error.json_body = {
+            'error': {
+                'code': 'card_declined',
+                'decline_code': 'generic_decline',
+                'message': 'Your card was declined.',
+            }
+        }
 
-        with patch.object(stripe_service.stripe.PaymentIntent, 'capture', side_effect=card_error) as mock_capture, \
+        with self.assertLogs(level='ERROR') as log_ctx, \
+             patch.object(stripe_service.stripe.PaymentIntent, 'capture', side_effect=card_error) as mock_capture, \
              patch.object(stripe_service, 'cancel_hold_payment_intent') as mock_cancel:
             with self.assertRaises(ValueError) as err_ctx:
                 stripe_service.capture_hold_payment_intent('pi_hold_declined', amount_to_capture_cents=900)
@@ -262,6 +270,8 @@ class TestStripeService(unittest.TestCase):
         self.assertEqual(err_ctx.exception.args[0], 424)
         self.assertIn('Error occurred while capturing payment intent', err_ctx.exception.args[1])
         self.assertIn('declined', err_ctx.exception.args[1].lower())
+        self.assertTrue(any('stripe_response=' in message for message in log_ctx.output))
+        self.assertTrue(any('generic_decline' in message for message in log_ctx.output))
         mock_capture.assert_called_once_with('pi_hold_declined', amount_to_capture=900)
         mock_cancel.assert_not_called()
 
