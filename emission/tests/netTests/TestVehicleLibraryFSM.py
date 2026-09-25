@@ -320,7 +320,17 @@ class TestVehicleLibraryFSMCheckoutUnit(unittest.TestCase):
             self.entries = entries
 
         def find_entries(self, key_list, extra_query_list=None):
-            return self.entries
+            if extra_query_list is None:
+                return self.entries
+            matching_entries = self.entries
+            for extra_query in extra_query_list:
+                if "data.rental_status" in extra_query:
+                    allowed_statuses = extra_query["data.rental_status"].get("$in", [])
+                    matching_entries = [
+                        entry for entry in matching_entries
+                        if entry["data"].get("rental_status") in allowed_statuses
+                    ]
+            return matching_entries
 
         def insert_data(self, user_uuid, key, rental_state):
             rental_entry_id = f"rental-{len(self.entries) + 1}"
