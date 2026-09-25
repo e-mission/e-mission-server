@@ -79,10 +79,15 @@ def _get_active_rental_entry(user_uuid):
 
 
 def _get_most_recent_rental(user_uuid):
+    """
+    Return the most recent vehicle rental entry that is associated with the given user,
+    ignoring CANCELLED rentals.
+    """
     rental_entries = _get_rental_ts(user_uuid).find_entries([VEHICLE_RENTAL_KEY])
-    if len(rental_entries) == 0:
+    non_cancelled_entries = [e for e in rental_entries if e['data'].get('rental_status') != ecwr.RentalStatus.CANCELLED]
+    if len(non_cancelled_entries) == 0:
         return None
-    return ecwr.Rental(rental_entries[-1]['data'])
+    return ecwr.Rental(non_cancelled_entries[-1]['data'])
 
 
 def _update_rental_state(user_uuid, rental_entry_id, new_rental_state):
