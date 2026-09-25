@@ -363,5 +363,7 @@ class TestVehicleLibraryFSMCheckoutUnit(unittest.TestCase):
             result = vl.checkout_vehicle(user_uuid, VEHICLE_ID, vl.DEFAULT_HOLD_AMOUNT_CENTS)
 
         self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+        self.assertEqual(len(fake_rental_ts.entries), 2)
+        self.assertEqual(fake_rental_ts.entries[0]['data']['rental_status'], ecwr.RentalStatus.CANCELLED)
         self.assertEqual(fake_rental_ts.entries[-1]['data']['rental_status'], ecwr.RentalStatus.ACTIVE)
         mock_vehicle_db.update_one.assert_called_once()
