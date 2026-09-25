@@ -3,7 +3,7 @@ import os
 import time
 import unittest
 import uuid
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import arrow
 
@@ -195,6 +195,32 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         self.assertEqual(recorded_statuses[0], ecwr.RentalStatus.STARTED)
         self.assertEqual(self._latest_rental_status(), 'cancelled')
 
+    def test_checkout_after_cancelled_rental_is_allowed(self):
+        self._insert_vehicle()
+        self._insert_rental(ecwr.RentalStatus.CANCELLED, payment_hold_info={'id': 'pi_cancelled'})
+        recorded_statuses, record_and_update = self._recorded_update_statuses()
+
+        existing_entries = self._rental_entries()
+        self.assertEqual(len(existing_entries), 1)
+        self.assertEqual(existing_entries[0]['data']['rental_status'], ecwr.RentalStatus.CANCELLED)
+
+        with patch.object(vl, '_update_rental_state', side_effect=record_and_update), \
+             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
+            result = self._checkout_vehicle()
+
+        rental_entries = self._rental_entries()
+        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+        self.assertEqual(recorded_statuses[:3], [
+            ecwr.RentalStatus.STARTED,
+            ecwr.RentalStatus.HELD,
+            ecwr.RentalStatus.ACTIVE,
+        ])
+        self.assertEqual(len(rental_entries), 2)
+        self.assertEqual(rental_entries[0]['data']['rental_status'], ecwr.RentalStatus.CANCELLED)
+        self.assertEqual(rental_entries[-1]['data']['rental_status'], ecwr.RentalStatus.ACTIVE)
+        self.assertEqual(self._latest_rental_status(), 'active')
+
     def test_fsm_edges_started_to_held_to_active(self):
         self._insert_vehicle()
         recorded_statuses, record_and_update = self._recorded_update_statuses()
@@ -312,68 +338,3 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         self.assertEqual(ctx.exception.args[0], 424)
         self.assertEqual(recorded_statuses, [ecwr.RentalStatus.CAPTURED])
         self.assertEqual(self._latest_rental_status(), 'captured')
-
-
-class TestVehicleLibraryFSMCheckoutUnit(unittest.TestCase):
-    class _FakeRentalTS:
-        def __init__(self, entries):
-            self.entries = entries
-
-        def find_entries(self, key_list, extra_query_list=None):
-            if extra_query_list is None:
-                return self.entries
-            matching_entries = self.entries
-            for extra_query in extra_query_list:
-                if "data.rental_status" in extra_query:
-                    allowed_statuses = extra_query["data.rental_status"].get("$in", [])
-                    matching_entries = [
-                        entry for entry in matching_entries
-                        if entry["data"].get("rental_status") in allowed_statuses
-                    ]
-            return matching_entries
-
-        def insert_data(self, user_uuid, key, rental_state):
-            rental_entry_id = f"rental-{len(self.entries) + 1}"
-            self.entries.append({'_id': rental_entry_id, 'data': dict(rental_state)})
-            return rental_entry_id
-
-        def update_entry(self, rental_entry_id, new_rental_state):
-            for entry in self.entries:
-                if entry['_id'] == rental_entry_id:
-                    entry['data'] = dict(new_rental_state)
-                    return
-            raise AssertionError(f"Unable to find rental entry {rental_entry_id}")
-
-    def test_checkout_after_cancelled_rental_is_allowed(self):
-        user_uuid = uuid.uuid4()
-        fake_rental_ts = self._FakeRentalTS([
-            {'_id': 'cancelled-rental', 'data': {
-                'vehicle_id': VEHICLE_ID,
-                'vehicle_name': 'fsm vehicle',
-                'rental_status': ecwr.RentalStatus.CANCELLED,
-            }},
-        ])
-        mock_vehicle_db = MagicMock()
-        mock_vehicle_db.find_one.return_value = {
-            'vehicle_id': VEHICLE_ID,
-            'vehicle_name': 'fsm vehicle',
-            'location': DOCK_ID,
-        }
-
-        def update_rental_state(user_uuid, rental_entry_id, new_rental_state):
-            fake_rental_ts.update_entry(rental_entry_id, new_rental_state)
-
-        with patch.object(vl.edb, 'get_vehicle_db', return_value=mock_vehicle_db), \
-             patch.object(vl, '_get_rental_ts', return_value=fake_rental_ts), \
-             patch.object(vl, '_update_rental_state', side_effect=update_rental_state), \
-             patch.object(vl, '_get_loc_and_timezone', return_value=(vl.geojson.Point((0.0, 0.0)), 'UTC')), \
-             patch.object(vl.bikeep_service, 'get_device_id_for_code', return_value=DOCK_ID), \
-             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
-             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
-            result = vl.checkout_vehicle(user_uuid, VEHICLE_ID, vl.DEFAULT_HOLD_AMOUNT_CENTS)
-
-        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
-        self.assertEqual(len(fake_rental_ts.entries), 2)
-        self.assertEqual(fake_rental_ts.entries[0]['data']['rental_status'], ecwr.RentalStatus.CANCELLED)
-        self.assertEqual(fake_rental_ts.entries[-1]['data']['rental_status'], ecwr.RentalStatus.ACTIVE)
-        mock_vehicle_db.update_one.assert_called_once()
