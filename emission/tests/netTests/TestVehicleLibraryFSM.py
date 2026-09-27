@@ -195,6 +195,32 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         self.assertEqual(recorded_statuses[0], ecwr.RentalStatus.STARTED)
         self.assertEqual(self._latest_rental_status(), 'cancelled')
 
+    def test_checkout_after_cancelled_rental_is_allowed(self):
+        self._insert_vehicle()
+        self._insert_rental(ecwr.RentalStatus.CANCELLED, payment_hold_info={'id': 'pi_cancelled'})
+        recorded_statuses, record_and_update = self._recorded_update_statuses()
+
+        existing_entries = self._rental_entries()
+        self.assertEqual(len(existing_entries), 1)
+        self.assertEqual(existing_entries[0]['data']['rental_status'], ecwr.RentalStatus.CANCELLED)
+
+        with patch.object(vl, '_update_rental_state', side_effect=record_and_update), \
+             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
+            result = self._checkout_vehicle()
+
+        rental_entries = self._rental_entries()
+        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+        self.assertEqual(recorded_statuses[:3], [
+            ecwr.RentalStatus.STARTED,
+            ecwr.RentalStatus.HELD,
+            ecwr.RentalStatus.ACTIVE,
+        ])
+        self.assertEqual(len(rental_entries), 2)
+        self.assertEqual(rental_entries[0]['data']['rental_status'], ecwr.RentalStatus.CANCELLED)
+        self.assertEqual(rental_entries[-1]['data']['rental_status'], ecwr.RentalStatus.ACTIVE)
+        self.assertEqual(self._latest_rental_status(), 'active')
+
     def test_fsm_edges_started_to_held_to_active(self):
         self._insert_vehicle()
         recorded_statuses, record_and_update = self._recorded_update_statuses()
