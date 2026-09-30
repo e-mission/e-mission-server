@@ -103,6 +103,31 @@ class TestStripeIntegration(unittest.TestCase):
         self._log_stripe_result("stripe payment intent after zero capture", refreshed)
         self.assertEqual(refreshed.get("status"), "canceled")
 
+    def test_payment_intent_latest_charge_keys_present(self):
+        self._setup_payment_method()
+
+        hold_intent = self._create_hold_intent(250)
+        retrieved = json.loads(str(stripe.PaymentIntent.retrieve(hold_intent["id"], expand=["latest_charge"])))
+        latest_charge = retrieved.get("latest_charge") or {}
+
+        self.assertIsInstance(latest_charge, dict)
+
+        payment_intent_keys = sorted(retrieved.keys())
+        print(f"payment_intent_keys: {payment_intent_keys}")
+
+        latest_charge_keys = sorted(latest_charge.keys())
+        print(f"latest_charge_keys: {latest_charge_keys}")
+        self.assertTrue(latest_charge_keys)
+
+        pm_details = latest_charge.get("payment_method_details") or {}
+        pm_details_keys = sorted(pm_details.keys()) if isinstance(pm_details, dict) else []
+        print(f"pm_details_keys: {pm_details_keys}")
+
+        card_details = pm_details.get("card") if isinstance(pm_details, dict) else None
+        card_details_keys = sorted(card_details.keys()) if isinstance(card_details, dict) else []
+        print(f"card_details_keys: {card_details_keys}")
+        print(f"capture_before: {card_details.get('capture_before') if isinstance(card_details, dict) else None}")
+
     def test_capture_amount_partial(self):
         self._setup_payment_method()
 
