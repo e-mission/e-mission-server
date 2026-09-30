@@ -257,7 +257,7 @@ def create_hold_payment_intent(uuid, amount_cents, currency="usd", metadata=None
         payload["customer"] = stripe_customer_id
 
     logging.info(f"Invoking stripe PaymentIntent.create with {payload=}")
-    payment_intent = stripe.PaymentIntent.create(**payload)
+    payment_intent = stripe.PaymentIntent.create(**payload, expand=["latest_charge"])
     json_payment_intent = json.loads(str(payment_intent))
 
     logging.debug(f"Received stripe PaymentIntent.create response: {json_payment_intent}")

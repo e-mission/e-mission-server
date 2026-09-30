@@ -274,6 +274,17 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         new_rental_state['rental_status'] = ecwr.RentalStatus.HELD
         new_rental_state['payment_hold_info'] = hold_info
         _update_rental_state(user_uuid, new_rental_id, new_rental_state)
+        payment_hold_expires_at = (
+            hold_info.get('latest_charge', {})
+            .get('payment_method_details', {})
+            .get('card', {})
+            .get('capture_before')
+        )
+        edb.get_profile_db().update_one(
+            {'user_id': user_uuid},
+            {'$set': {'payment_hold_expires_at': payment_hold_expires_at}},
+            upsert=True,
+        )
     except ValueError as e:
         logging.error(f"Error occurred while creating hold payment intent for user {user_uuid}: {e}")
         new_rental_state['rental_status'] = ecwr.RentalStatus.CANCELLED
@@ -295,6 +306,11 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
             # But it is still a good idea to save some rental object because the user tried to do something
             # and they want to see the result
             _update_rental_state(user_uuid, new_rental_id, new_rental_state)
+            edb.get_profile_db().update_one(
+                {'user_id': user_uuid},
+                {'$set': {'payment_hold_expires_at': None}},
+                upsert=True,
+            )
         except Exception as cancel_err:
             # TODO: figure out what we should do here
             logging.error(f"Failed to cancel hold {hold_info.get('id')} after checkout failure: {cancel_err}")
@@ -390,6 +406,11 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
         try:
             ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
             logger.info(f"Successfully captured payment for vehicle {vehicle_id}, amount {capture_amount}")
+            edb.get_profile_db().update_one(
+                {'user_id': user_uuid},
+                {'$set': {'payment_hold_expires_at': None}},
+                upsert=True,
+            )
             new_rental_state.rental_status = ecwr.RentalStatus.CAPTURED
             _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
         except Exception as capture_err:

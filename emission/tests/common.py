@@ -222,7 +222,8 @@ def configLogging():
     :return: None
     """
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
-                    level=logging.DEBUG)
+                    level=logging.DEBUG,
+                    force=True)
 
 def setupTokenListAuth(self):
     token_list_conf_file = open(self.token_list_conf_path, "w")
