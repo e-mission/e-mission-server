@@ -7,9 +7,6 @@ import logging
 
 import stripe
 
-# Ensure stripe_service import does not crash if env var is absent.
-os.environ.setdefault("STRIPE_SECRET_KEY", "")
-
 import emission.core.wrapper.payment as ecwp
 import emission.core.wrapper.user as ecwu
 import emission.net.ext_service.stripe.stripe_service as stripe_service
@@ -40,11 +37,19 @@ class TestStripeIntegration(unittest.TestCase):
                 pass
         ecwu.User.unregister(self.test_email)
 
+    def _log_stripe_result(self, label, result):
+        try:
+            payload = result if isinstance(result, dict) else json.loads(str(result))
+        except Exception:
+            payload = str(result)
+        logging.info(f"{label}: {payload}")
+
     def _setup_payment_method(self, card_token="tok_visa"):
         customer = stripe.Customer.create(
             description=f"e-mission integration customer {self.test_uuid}",
         )
         customer_json = json.loads(str(customer))
+        self._log_stripe_result("stripe customer create", customer_json)
         customer_id = customer_json["id"]
         self._created_customer_ids.append(customer_id)
 
@@ -53,9 +58,11 @@ class TestStripeIntegration(unittest.TestCase):
             card={"token": card_token},
         )
         payment_method_json = json.loads(str(payment_method))
+        self._log_stripe_result("stripe payment method create", payment_method_json)
         payment_method_id = payment_method_json["id"]
 
-        stripe.PaymentMethod.attach(payment_method_id, customer=customer_id)
+        attached_payment_method = stripe.PaymentMethod.attach(payment_method_id, customer=customer_id)
+        self._log_stripe_result("stripe payment method attach", attached_payment_method)
 
         payment_db = stripe_service.esas.StateStorage.get_state_storage(self.test_uuid)
         payment_db.delete_state(stripe_service.esas.StateName.PAYMENT)
@@ -76,6 +83,7 @@ class TestStripeIntegration(unittest.TestCase):
             amount_cents,
             metadata={"source": "TestStripeIntegration"},
         )
+        self._log_stripe_result("stripe hold payment intent", hold_intent)
         self.assertEqual(hold_intent["amount"], amount_cents)
         self.assertEqual(hold_intent["capture_method"], "manual")
         self.assertEqual(hold_intent["status"], "requires_capture")
@@ -88,10 +96,37 @@ class TestStripeIntegration(unittest.TestCase):
         payment_intent_id = hold_intent["id"]
 
         result = stripe_service.capture_hold_payment_intent(payment_intent_id, 0)
+        self._log_stripe_result("stripe capture result zero", result)
         self.assertIsNone(result)
 
         refreshed = json.loads(str(stripe.PaymentIntent.retrieve(payment_intent_id)))
+        self._log_stripe_result("stripe payment intent after zero capture", refreshed)
         self.assertEqual(refreshed.get("status"), "canceled")
+
+    def test_payment_intent_latest_charge_keys_present(self):
+        self._setup_payment_method()
+
+        hold_intent = self._create_hold_intent(250)
+        retrieved = json.loads(str(stripe.PaymentIntent.retrieve(hold_intent["id"], expand=["latest_charge"])))
+        latest_charge = retrieved.get("latest_charge") or {}
+
+        self.assertIsInstance(latest_charge, dict)
+
+        payment_intent_keys = sorted(retrieved.keys())
+        print(f"payment_intent_keys: {payment_intent_keys}")
+
+        latest_charge_keys = sorted(latest_charge.keys())
+        print(f"latest_charge_keys: {latest_charge_keys}")
+        self.assertTrue(latest_charge_keys)
+
+        pm_details = latest_charge.get("payment_method_details") or {}
+        pm_details_keys = sorted(pm_details.keys()) if isinstance(pm_details, dict) else []
+        print(f"pm_details_keys: {pm_details_keys}")
+
+        card_details = pm_details.get("card") if isinstance(pm_details, dict) else None
+        card_details_keys = sorted(card_details.keys()) if isinstance(card_details, dict) else []
+        print(f"card_details_keys: {card_details_keys}")
+        print(f"capture_before: {card_details.get('capture_before') if isinstance(card_details, dict) else None}")
 
     def test_capture_amount_partial(self):
         self._setup_payment_method()
@@ -102,10 +137,12 @@ class TestStripeIntegration(unittest.TestCase):
         payment_intent_id = hold_intent["id"]
 
         result = stripe_service.capture_hold_payment_intent(payment_intent_id, capture_amount)
+        self._log_stripe_result("stripe partial capture result", result)
         self.assertEqual(result.get("id"), payment_intent_id)
         self.assertEqual(result.get("amount_received"), capture_amount)
 
         refreshed = json.loads(str(stripe.PaymentIntent.retrieve(payment_intent_id)))
+        self._log_stripe_result("stripe payment intent after partial capture", refreshed)
         self.assertEqual(refreshed.get("status"), "succeeded")
 
         with self.assertRaisesRegex(
@@ -122,10 +159,12 @@ class TestStripeIntegration(unittest.TestCase):
         payment_intent_id = hold_intent["id"]
 
         result = stripe_service.capture_hold_payment_intent(payment_intent_id, max_amount)
+        self._log_stripe_result("stripe max capture result", result)
         self.assertEqual(result.get("id"), payment_intent_id)
         self.assertEqual(result.get("amount_received"), max_amount)
 
         refreshed = json.loads(str(stripe.PaymentIntent.retrieve(payment_intent_id)))
+        self._log_stripe_result("stripe payment intent after max capture", refreshed)
         self.assertEqual(refreshed.get("status"), "succeeded")
 
         with self.assertRaisesRegex(
@@ -141,19 +180,22 @@ class TestStripeIntegration(unittest.TestCase):
         hold_intent = self._create_hold_intent(max_amount)
         payment_intent_id = hold_intent["id"]
 
-        with self.assertRaises(stripe.error.InvalidRequestError) as err_ctx:
+        with self.assertRaises(ValueError) as err_ctx:
             stripe_service.capture_hold_payment_intent(payment_intent_id, max_amount + 1)
 
         err_str = str(err_ctx.exception)
+        logging.debug(f"stripe above-max capture error: {err_str}")
         self.assertTrue(
             "amount_to_capture" in err_str or "greater than" in err_str,
             msg=f"Unexpected Stripe error for above-max capture: {err_str}",
         )
 
         refreshed = json.loads(str(stripe.PaymentIntent.retrieve(payment_intent_id)))
+        self._log_stripe_result("stripe payment intent after failed above-max capture", refreshed)
         self.assertEqual(refreshed.get("status"), "requires_capture")
 
         cancelled = stripe_service.cancel_hold_payment_intent(payment_intent_id)
+        self._log_stripe_result("stripe cancel after failed above-max capture", cancelled)
         self.assertEqual(cancelled.get("status"), "canceled")
 
     def test_two_captures_against_single_hold(self):
@@ -163,16 +205,18 @@ class TestStripeIntegration(unittest.TestCase):
         payment_intent_id = hold_intent["id"]
 
         first_capture = stripe_service.capture_hold_payment_intent(payment_intent_id, 150)
+        self._log_stripe_result("stripe first capture result", first_capture)
         self.assertEqual(first_capture.get("id"), payment_intent_id)
         self.assertEqual(first_capture.get("amount_received"), 150)
 
         after_first_capture = json.loads(str(stripe.PaymentIntent.retrieve(payment_intent_id)))
+        self._log_stripe_result("stripe payment intent after first capture", after_first_capture)
         self.assertEqual(after_first_capture.get("status"), "succeeded")
 
-        with self.assertRaises(stripe.error.InvalidRequestError) as second_capture_err:
+        with self.assertRaises(ValueError) as second_capture_err:
             stripe_service.capture_hold_payment_intent(payment_intent_id, 100)
 
-        logging.debug(f"Second capture error context: {second_capture_err}")
+        logging.debug(f"stripe second capture error: {second_capture_err.exception}")
         err_str = str(second_capture_err.exception)
         self.assertTrue(
             "succeeded" in err_str or "unexpected state" in err_str or "cannot be captured" in err_str or "remainder of the authorized amount has been released" in err_str,
@@ -197,7 +241,7 @@ class TestStripeIntegration(unittest.TestCase):
                     attempt_hold_and_capture()
 
                 err_str = str(err_ctx.exception)
-                print(f"Stripe error for {card_token}: {type(err_ctx.exception)} -> {err_str}")
+                logging.debug(f"stripe error for {card_token}: {type(err_ctx.exception)} -> {err_str}")
                 self.assertTrue(
                     any(fragment in err_str for fragment in expected_fragments),
                     msg=f"Unexpected Stripe error for {card_token}: {err_str}",

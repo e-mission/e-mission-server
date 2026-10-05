@@ -389,7 +389,17 @@ class TestVehicleLibrary(unittest.TestCase):
         """checkout_vehicle() stores the active vehicle-user mapping in manual/vehicle_rental."""
         self._insert_vehicle()
 
-        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={
+            'id': 'pi_hold_123',
+            'latest_charge': {
+                'id': 'ch_hold_123',
+                'payment_method_details': {
+                    'card': {
+                        'capture_before': 1234567890,
+                    },
+                },
+            },
+        }), \
              patch.object(vl.bikeep_service, 'unlock_dock', return_value={}):
             self._checkout_vehicle()
 
@@ -398,6 +408,10 @@ class TestVehicleLibrary(unittest.TestCase):
         rental_state = rental_entry['data']
         self.assertEqual(rental_state['vehicle_id'], VEHICLE_ID)
         self.assertEqual(rental_state['payment_hold_info']['id'], 'pi_hold_123')
+        self.assertEqual(
+            rental_state['payment_hold_info']['latest_charge']['payment_method_details']['card']['capture_before'],
+            1234567890,
+        )
         self.assertEqual(rental_state['rental_status'], 'active')
         self.assertIsNotNone(rental_state['start_ts'])
         self.assertIsNone(rental_state.get('end_ts'))
@@ -408,6 +422,10 @@ class TestVehicleLibrary(unittest.TestCase):
         self.assertIsNone(rental_state.get('end_local_dt'))
         self.assertIsNone(rental_state.get('end_fmt_time'))
         self.assertIsNone(rental_state.get('end_dock_id'))
+
+        profile = self.profile_db.find_one({'user_id': self.test_uuid})
+        self.assertIsNotNone(profile)
+        self.assertEqual(profile.get('payment_hold_expires_at'), 1234567890)
 
     # ------------------------------------------------------------------
     # check_in_vehicle()
