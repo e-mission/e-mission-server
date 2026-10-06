@@ -73,6 +73,7 @@ def _get_active_rental_entry(user_uuid):
         [VEHICLE_RENTAL_KEY],
         extra_query_list=[{"data.rental_status": {"$in": [ecwr.RentalStatus.ACTIVE, ecwr.RentalStatus.INITIALIZING]}}],
     )
+    logger.debug(f"Found {len(active_entries)} active rental entries for user {user_uuid}")
     if len(active_entries) == 0:
         return None
     return ecwe.Entry(active_entries[-1])
@@ -274,7 +275,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         new_rental_state['rental_status'] = ecwr.RentalStatus.HELD
         new_rental_state['payment_hold_info'] = hold_info
         _update_rental_state(user_uuid, new_rental_id, new_rental_state)
-        payment_hold_expires_at = (
+        payment_hold_expires_ts = (
             hold_info.get('latest_charge', {})
             .get('payment_method_details', {})
             .get('card', {})
@@ -282,7 +283,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         )
         edb.get_profile_db().update_one(
             {'user_id': user_uuid},
-            {'$set': {'payment_hold_expires_at': payment_hold_expires_at}},
+            {'$set': {'payment_hold_expires_ts': payment_hold_expires_ts}},
             upsert=True,
         )
     except ValueError as e:
@@ -308,7 +309,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
             _update_rental_state(user_uuid, new_rental_id, new_rental_state)
             edb.get_profile_db().update_one(
                 {'user_id': user_uuid},
-                {'$set': {'payment_hold_expires_at': None}},
+                {'$set': {'payment_hold_expires_ts': None}},
                 upsert=True,
             )
         except Exception as cancel_err:
@@ -352,9 +353,12 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     - Captures the Stripe hold for the active rental.
     - Updates the active rental entry and Vehicle mapping to point back to the dock.
     """
+    logger.info(f"Checking in vehicle for user {user_uuid} at dock code {dock_code}")
     rental_entry = _get_active_rental_entry(user_uuid)
     if rental_entry is None:
         raise ValueError(403, "No vehicle is currently checked out by this user")
+    else:
+        logger.info(f"Terminating rental started at {rental_entry.data.start_fmt_time} for user {user_uuid}")
     curr_rental_state = rental_entry.data
 
     vehicle_id = curr_rental_state.vehicle_id
@@ -363,12 +367,15 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     if vehicle is None:
         logger.error(f"Vehicle {vehicle_id} not found")
         raise ValueError(404, "Vehicle %s not found" % vehicle_id)
+    else:
+        logger.info(f"Found vehicle {vehicle_id}")
 
     # Let's map the dock before capturing payment so that we don't end up in
     # one of the error states (e.g. captured-but-not-locked) just because the
     # user put in the wrong station code.
 
     dock_id = bikeep_service.get_device_id_for_code(dock_code)
+    logger.info(f"Resolved dock code {dock_code} to device id {dock_id}")
     if dock_id is None:
         logger.error(f"Dock not found for code {dock_code}")
         raise ValueError(404, "No dock found for code %s" % dock_code)
@@ -408,7 +415,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
             logger.info(f"Successfully captured payment for vehicle {vehicle_id}, amount {capture_amount}")
             edb.get_profile_db().update_one(
                 {'user_id': user_uuid},
-                {'$set': {'payment_hold_expires_at': None}},
+                {'$set': {'payment_hold_expires_ts': None}},
                 upsert=True,
             )
             new_rental_state.rental_status = ecwr.RentalStatus.CAPTURED
