@@ -38,11 +38,11 @@ class TestRenewPaymentHolds(unittest.TestCase):
                 'metadata.key': vl.VEHICLE_RENTAL_KEY,
             })
 
-    def _insert_profile(self, user_uuid, payment_hold_expires_at):
+    def _insert_profile(self, user_uuid, payment_hold_expires_ts):
         self.user_ids.append(user_uuid)
         self.profile_db.insert_one({
             'user_id': user_uuid,
-            'payment_hold_expires_at': payment_hold_expires_at,
+            'payment_hold_expires_ts': payment_hold_expires_ts,
         })
 
     def _insert_active_rental(self, user_uuid, payment_hold_info, vehicle_id='test-vehicle-001', rental_start_ts=None):
@@ -114,7 +114,7 @@ class TestRenewPaymentHolds(unittest.TestCase):
         })
 
         profile = self.profile_db.find_one({'user_id': renewed_user})
-        self.assertEqual(profile['payment_hold_expires_at'], new_expires_at)
+        self.assertEqual(profile['payment_hold_expires_ts'], new_expires_at)
 
     def test_renew_expiring_holds_counts_failures(self):
         now = int(time.time())
