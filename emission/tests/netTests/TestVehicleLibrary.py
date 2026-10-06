@@ -425,7 +425,7 @@ class TestVehicleLibrary(unittest.TestCase):
 
         profile = self.profile_db.find_one({'user_id': self.test_uuid})
         self.assertIsNotNone(profile)
-        self.assertEqual(profile.get('payment_hold_expires_at'), 1234567890)
+        self.assertEqual(profile.get('payment_hold_expires_ts'), 1234567890)
 
     # ------------------------------------------------------------------
     # check_in_vehicle()

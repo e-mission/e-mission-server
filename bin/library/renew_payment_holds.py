@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Renew Stripe payment holds that will expire within the next day.
 
-For each user with a non-null `payment_hold_expires_at` in the profile DB,
+For each user with a non-null `payment_hold_expires_ts` in the profile DB,
 if the hold expires within 24 hours this script will:
 
 1. Create a new hold for the current active rental.
@@ -32,12 +32,12 @@ def renew_hold_for_user(user_uuid):
         logging.warning(f'Skipping {user_uuid}: no profile found')
         return False
 
-    payment_hold_expires_at = profile.get('payment_hold_expires_at')
-    if payment_hold_expires_at is None:
+    payment_hold_expires_ts = profile.get('payment_hold_expires_ts')
+    if payment_hold_expires_ts is None:
         return False
 
     now = time.time()
-    if payment_hold_expires_at > now + RENEWAL_WINDOW_SECS:
+    if payment_hold_expires_ts > now + RENEWAL_WINDOW_SECS:
         return False
 
     rental_entry = vl._get_active_rental_entry(user_uuid)
@@ -97,7 +97,7 @@ def renew_hold_for_user(user_uuid):
     vl._update_rental_state(user_uuid, rental_entry['_id'], rental_state)
     edb.get_profile_db().update_one(
         {'user_id': user_uuid},
-        {'$set': {'payment_hold_expires_at': new_expires_at}},
+        {'$set': {'payment_hold_expires_ts': new_expires_at}},
         upsert=True,
     )
     logging.info(
@@ -110,7 +110,7 @@ def renew_hold_for_user(user_uuid):
 def renew_expiring_holds():
     profile_db = edb.get_profile_db()
     due_profiles = profile_db.find({
-        'payment_hold_expires_at': {
+        'payment_hold_expires_ts': {
             '$ne': None,
             '$exists': True,
         }
