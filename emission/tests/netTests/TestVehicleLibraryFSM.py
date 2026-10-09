@@ -151,6 +151,23 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         mock_unlock.assert_called_once_with(DOCK_ID)
         mock_lock.assert_called_once_with(ALT_DOCK_ID)
 
+    def test_setup_status_reports_actual_payment_state(self):
+        for status in vl.ecwp.PaymentSetupStatus:
+            with self.subTest(status=status), \
+                 patch.object(vl.ss, 'get_current_payment_state', return_value={'payment_setup_status': status}) as mock_state, \
+                 patch.object(vl.ss, 'check_pending_setup_status', return_value=status) as mock_pending:
+                for status_function in [vl.get_user_setup_status, vl.check_and_get_pending_setup_status]:
+                    result = status_function(self.test_uuid)
+                    self.assertEqual(result['payment_setup_status'], status.name)
+                mock_state.assert_called_once_with(self.test_uuid)
+                mock_pending.assert_called_once_with(self.test_uuid)
+
+    def test_setup_status_without_payment_state_is_not_started(self):
+        for state in [None, {}]:
+            with self.subTest(state=state), patch.object(vl.ss, 'get_current_payment_state', return_value=state):
+                result = vl.get_user_setup_status(self.test_uuid)
+                self.assertEqual(result['payment_setup_status'], 'NOT_STARTED')
+
     def test_trusted_unlock_failure_cancels_rental_without_stripe(self):
         self._insert_vehicle()
         self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 0}
