@@ -132,6 +132,84 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         mock_hold.assert_not_called()
         mock_unlock.assert_not_called()
 
+    def test_trusted_checkout_and_return_without_payment(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 0}
+        with patch.object(vl.ss, 'create_hold_payment_intent') as mock_hold, \
+             patch.object(vl.ss, 'capture_hold_payment_intent') as mock_capture, \
+             patch.object(vl.bikeep_service, 'unlock_dock') as mock_unlock, \
+             patch.object(vl.bikeep_service, 'lock_dock') as mock_lock:
+            result = vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 0, subgroup='trusted')
+            self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+            self.assertTrue(self._latest_rental_entry().data.get('payment_exempt'))
+            self.assertIsNone(self.profile_db.find_one({'user_id': self.test_uuid}))
+            self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 1}
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID, subgroup='trusted')
+        self.assertEqual(self._latest_rental_status(), 'completed')
+        mock_hold.assert_not_called()
+        mock_capture.assert_not_called()
+        mock_unlock.assert_called_once_with(DOCK_ID)
+        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+
+    def test_trusted_unlock_failure_cancels_rental_without_stripe(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 0}
+        with patch.object(vl.ss, 'create_hold_payment_intent') as mock_hold, \
+             patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel, \
+             patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('unlock failed')):
+            with self.assertRaises(ValueError) as ctx:
+                vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 0, subgroup='trusted')
+        self.assertEqual(ctx.exception.args[0], 424)
+        self.assertEqual(self._latest_rental_status(), 'cancelled')
+        mock_hold.assert_not_called()
+        mock_cancel.assert_not_called()
+        self.assertEqual(self.mock_db.find_one({'vehicle_id': VEHICLE_ID})['location'], DOCK_ID)
+
+    def test_free_users_still_require_a_hold(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'free': 1, 'trusted': 0}
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_free'}) as mock_hold, \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 38000, subgroup='free')
+        self.assertEqual(mock_hold.call_args.args[:2], (self.test_uuid, 100))
+        self.assertFalse(self._latest_rental_entry().data.get('payment_exempt'))
+
+    def test_client_cannot_bypass_configured_hold_with_zero(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'public': 380}
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_public'}) as mock_hold, \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 0, subgroup='public')
+        self.assertEqual(mock_hold.call_args.args[:2], (self.test_uuid, 38000))
+        self.assertFalse(self._latest_rental_entry().data.get('payment_exempt'))
+
+    def test_hold_map_uses_dollars_and_zero_implies_exemption(self):
+        amounts = {'public': 380, 'discount': 190, 'free': 1, 'trusted': 0}
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = amounts
+        for subgroup, amount in amounts.items():
+            with self.subTest(subgroup=subgroup):
+                self.assertEqual(vl.get_hold_amount_cents(subgroup), amount * 100)
+                self.assertEqual(vl.is_payment_exempt(subgroup), amount == 0)
+
+    def test_hold_map_rejects_unknown_subgroups_and_invalid_amounts(self):
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'public': 380}
+        for subgroup in ['unknown', None]:
+            with self.subTest(subgroup=subgroup), self.assertRaises(ValueError) as ctx:
+                vl.get_hold_amount_cents(subgroup)
+            self.assertEqual(ctx.exception.args[0], 403)
+        for amount in [-1, '0', None, True, float('inf'), float('nan'), 0.001]:
+            self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'public': amount}
+            with self.subTest(amount=amount), self.assertRaises(ValueError) as ctx:
+                vl.get_hold_amount_cents('public')
+            self.assertEqual(ctx.exception.args[0], 422)
+
+    def test_trusted_subgroup_does_not_excuse_a_missing_hold_on_an_ordinary_rental(self):
+        self._insert_vehicle(location=None)
+        self._insert_rental(ecwr.RentalStatus.ACTIVE)
+        with self.assertRaises(ValueError) as ctx:
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID, subgroup='trusted')
+        self.assertEqual(ctx.exception.args[0], 409)
+
     def test_fsm_edge_initializing_to_completed(self):
         self._insert_vehicle(location='UNINITIALIZED')
         self._insert_rental(ecwr.RentalStatus.INITIALIZING, payment_hold_info=None)

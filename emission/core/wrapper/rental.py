@@ -22,6 +22,7 @@ class Rental(ecwb.WrapperBase):
         "vehicle_id": ecwb.WrapperBase.Access.WORM,  # unique identifier
         "vehicle_name": ecwb.WrapperBase.Access.WORM,  # display name/description
         "payment_hold_info": ecwb.WrapperBase.Access.WORM,  # Stripe PaymentIntent id for the active hold
+        "payment_exempt": ecwb.WrapperBase.Access.WORM,
         "start_ts": ecwb.WrapperBase.Access.WORM,
         "start_local_dt": ecwb.WrapperBase.Access.WORM,
         "start_fmt_time": ecwb.WrapperBase.Access.WORM,

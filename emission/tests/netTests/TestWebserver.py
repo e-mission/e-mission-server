@@ -83,7 +83,7 @@ class TestWebserver(unittest.TestCase):
 
         with self.assertRaises(RuntimeError):
             with self.mock.patch.object(enacw, "request", req), \
-                 self.mock.patch.object(enacw, "getUUID", return_value=test_uuid), \
+                 self.mock.patch.object(enacw, "getUUID", return_value={'user_id': test_uuid}), \
                  self.mock.patch.object(enacw.vehicle_library, "checkout_vehicle", side_effect=ValueError(404, "Vehicle bike-1 not found")), \
                  self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
                 enacw.bikeshare_checkout()
@@ -101,6 +101,16 @@ class TestWebserver(unittest.TestCase):
                 enacw.bikeshare_checkout()
 
         mock_abort.assert_called_once_with(400, "hold_amount_cents is required")
+
+    def test_bikeshare_checkout_uses_authenticated_subgroup(self):
+        test_uuid = uuid.uuid4()
+        req = SimpleNamespace(json={"vehicle_id": "bike-1", "hold_amount_cents": 0, "subgroup": "trusted"})
+        with self.mock.patch.object(enacw, "request", req), \
+             self.mock.patch.object(enacw, "getUUID", return_value={'user_id': test_uuid, 'subgroup': 'public'}) as mock_uuid, \
+             self.mock.patch.object(enacw.vehicle_library, "checkout_vehicle") as mock_checkout:
+            enacw.bikeshare_checkout()
+        mock_uuid.assert_called_once_with(req, return_context=True)
+        mock_checkout.assert_called_once_with(test_uuid, 'bike-1', 0, subgroup='public')
 
     def test_bikeshare_return_calls_checkin_with_uuid_and_dock(self):
         test_uuid = uuid.uuid4()

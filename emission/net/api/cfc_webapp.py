@@ -430,7 +430,7 @@ def bikeshare_finalize_setup():
 
 @post('/library/checkout')
 def bikeshare_checkout():
-    user_uuid = getUUID(request)
+    user_context = getUUID(request, return_context=True)
     vehicle_id = request.json.get('vehicle_id')
     if not vehicle_id:
         abort(400, "vehicle_id is required")
@@ -438,7 +438,9 @@ def bikeshare_checkout():
     if hold_amount_cents is None:
         abort(400, "hold_amount_cents is required")
     try:
-        return vehicle_library.checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents)
+        return vehicle_library.checkout_vehicle(
+            user_context['user_id'], vehicle_id, hold_amount_cents,
+            subgroup=user_context.get('subgroup'))
     except ValueError as e:
         abort(e.args[0], e.args[1])
 
