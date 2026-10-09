@@ -77,18 +77,31 @@ class TestWebserver(unittest.TestCase):
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
         self.assertNotEqual(enacw.resolve_auth("dynamic"),"skip")
 
-    def test_bikeshare_checkout_aborts_on_checkout_value_error(self):
+    def test_bikeshare_checkout_lets_api_errors_reach_the_error_handler(self):
         test_uuid = uuid.uuid4()
         req = SimpleNamespace(json={"vehicle_id": "bike-1", "hold_amount_cents": 250})
+        api_error = enacw.ApiError(404, 'VEHICLE_NOT_FOUND', "Vehicle bike-1 not found")
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(enacw.ApiError) as ctx:
             with self.mock.patch.object(enacw, "request", req), \
                  self.mock.patch.object(enacw, "getUUID", return_value={'user_id': test_uuid}), \
-                 self.mock.patch.object(enacw.vehicle_library, "checkout_vehicle", side_effect=ValueError(404, "Vehicle bike-1 not found")), \
-                 self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
+                 self.mock.patch.object(enacw.vehicle_library, "checkout_vehicle", side_effect=api_error):
                 enacw.bikeshare_checkout()
 
-        mock_abort.assert_called_once_with(404, "Vehicle bike-1 not found")
+        self.assertIs(ctx.exception, api_error)
+
+    def test_json_error_handler_returns_api_error_status_and_code(self):
+        resp = SimpleNamespace(content_type=None, status=None)
+        api_error = enacw.ApiError(424, 'UNLOCK_FAILED', "The dock did not unlock")
+        # this is how bottle passes an exception raised by a route to the error handler
+        err = enacw.HTTPError(500, "Internal Server Error", api_error, "Traceback: secret detail")
+        with self.mock.patch.object(enacw, "request", SimpleNamespace(method="POST", path="/library/checkout")), \
+             self.mock.patch.object(enacw, "response", resp):
+            body = enacw.json_error_handler(err)
+        self.assertEqual(json.loads(body), {'error': "The dock did not unlock", 'code': 'UNLOCK_FAILED'})
+        self.assertEqual(resp.status, 424)
+        self.assertEqual(resp.content_type, 'application/json')
+        self.assertNotIn('secret detail', body)
 
     def test_json_error_handler_returns_abort_message_as_json(self):
         resp = SimpleNamespace(content_type=None)
@@ -182,23 +195,23 @@ class TestWebserver(unittest.TestCase):
 
         mock_abort.assert_called_once_with(400, "dock_id is required")
 
-    def test_bikeshare_return_aborts_on_checkin_value_error(self):
+    def test_bikeshare_return_lets_api_errors_reach_the_error_handler(self):
         test_uuid = uuid.uuid4()
         req = SimpleNamespace(json={"dock_id": "dock-42"})
+        api_error = enacw.ApiError(409, 'NO_ACTIVE_RENTAL', "You do not have a vehicle checked out")
 
         def _mock_getUUID(_request, return_context=False):
             if return_context:
                 return {"user_id": test_uuid, "subgroup": None}
             return test_uuid
 
-        with self.assertRaises(RuntimeError):
+        with self.assertRaises(enacw.ApiError) as ctx:
             with self.mock.patch.object(enacw, "request", req), \
                  self.mock.patch.object(enacw, "getUUID", side_effect=_mock_getUUID), \
-                 self.mock.patch.object(enacw.vehicle_library, "check_in_vehicle", side_effect=ValueError(403, "No vehicle is currently checked out by this user")), \
-                 self.mock.patch.object(enacw, "abort", side_effect=RuntimeError("abort called")) as mock_abort:
+                 self.mock.patch.object(enacw.vehicle_library, "check_in_vehicle", side_effect=api_error):
                 enacw.bikeshare_return()
 
-        mock_abort.assert_called_once_with(403, "No vehicle is currently checked out by this user")
+        self.assertIs(ctx.exception, api_error)
 
     def test_bikeshare_rental_history_calls_library_with_uuid(self):
         test_uuid = uuid.uuid4()
