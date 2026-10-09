@@ -534,10 +534,8 @@ def get_user_setup_status(user_uuid):
     - If a pending session exists, polls the Stripe API for its status.
     - Returns the current status of the setup process to the client.
     """
-    current_payment_state = ss.get_current_payment_state(user_uuid)
-    if current_payment_state is None:
-        current_payment_state = ecwp.PaymentStatus.NOT_STARTED
-    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentStatus.NOT_STARTED)).split(".")[-1],
+    current_payment_state = ss.get_current_payment_state(user_uuid) or {}
+    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentSetupStatus.NOT_STARTED)).split(".")[-1],
             "is_sandbox": ss.STRIPE_IS_SANDBOX}
 
 ## END: Stripe passthrough integration

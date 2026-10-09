@@ -84,7 +84,8 @@ def json_error_handler(res):
         logging.error("%s for %s %s:\n%s" % (res.status, request.method, request.path, res.traceback))
     return json.dumps({'error': str(res.body)})
 
-app.default_error_handler = json_error_handler
+# Bottle.__setattr__ refuses to overwrite an attribute, which breaks importlib.reload of this module
+app.__dict__['default_error_handler'] = json_error_handler
 
 # On MacOS, the current working directory is always in the python path However,
 # on ubuntu, it looks like the script directory (api in our case) is in the
