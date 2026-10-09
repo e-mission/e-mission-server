@@ -403,6 +403,82 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         ])
         self.assertEqual(self._latest_rental_status(), 'held')
 
+    def _checkout_with_stuck_hold(self):
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_stuck'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('unlock failed')), \
+             patch.object(vl.ss, 'cancel_hold_payment_intent', side_effect=RuntimeError('cancel failed')):
+            with self.assertRaises(vl.ApiError):
+                self._checkout_vehicle()
+        self.assertEqual(self._latest_rental_status(), 'held')
+        self.assertTrue(self._latest_rental_entry().data.get('checkout_failed'))
+
+    def test_retry_after_stuck_hold_releases_it_and_checks_out(self):
+        self._insert_vehicle()
+        self._checkout_with_stuck_hold()
+
+        with patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel, \
+             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_new'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            result = self._checkout_vehicle()
+
+        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+        mock_cancel.assert_called_once_with('pi_stuck')
+        statuses = [e['data']['rental_status'] for e in self._rental_entries()]
+        self.assertEqual(statuses, ['cancelled', 'active'])
+
+    def test_retry_after_stuck_hold_fails_again_if_hold_still_cannot_be_released(self):
+        self._insert_vehicle()
+        self._checkout_with_stuck_hold()
+
+        with patch.object(vl.ss, 'cancel_hold_payment_intent', side_effect=RuntimeError('cancel failed')), \
+             patch.object(vl.ss, 'create_hold_payment_intent') as mock_hold:
+            with self.assertRaises(vl.ApiError) as ctx:
+                self._checkout_vehicle()
+
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'UNLOCK_FAILED_HOLD_STUCK'))
+        self.assertEqual(self._latest_rental_status(), 'held')
+        mock_hold.assert_not_called()
+
+    def test_in_progress_held_checkout_is_not_treated_as_abandoned(self):
+        self._insert_vehicle()
+        self._insert_rental(ecwr.RentalStatus.HELD, payment_hold_info={'id': 'pi_in_progress'})
+
+        with patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel:
+            with self.assertRaises(vl.ApiError) as ctx:
+                self._checkout_vehicle()
+
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (409, 'ACTIVE_RENTAL_EXISTS'))
+        mock_cancel.assert_not_called()
+
+    def test_abandoned_held_checkout_with_expired_hold_is_cancelled_without_stripe(self):
+        self._insert_vehicle()
+        expired_hold = {'id': 'pi_expired', 'latest_charge': {'payment_method_details': {'card': {'capture_before': _now() - 60}}}}
+        self._insert_rental(ecwr.RentalStatus.HELD, payment_hold_info=expired_hold)
+
+        with patch.object(vl, 'ABANDONED_CHECKOUT_SECS', 0), \
+             patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel, \
+             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_new'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            result = self._checkout_vehicle()
+
+        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+        mock_cancel.assert_not_called()
+
+    def test_abandoned_started_checkout_does_not_block_a_new_one(self):
+        self._insert_vehicle()
+        self._insert_rental(ecwr.RentalStatus.STARTED)
+
+        with patch.object(vl, 'ABANDONED_CHECKOUT_SECS', 0), \
+             patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel, \
+             patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_new'}), \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            result = self._checkout_vehicle()
+
+        self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+        mock_cancel.assert_not_called()
+        statuses = [e['data']['rental_status'] for e in self._rental_entries()]
+        self.assertEqual(statuses, ['cancelled', 'active'])
+
     def test_fsm_edges_active_to_captured_to_completed(self):
         self._insert_vehicle(location=str(self.test_uuid))
         self._insert_rental(ecwr.RentalStatus.ACTIVE, payment_hold_info={'id': 'pi_hold_123'})
@@ -447,3 +523,21 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'LOCK_FAILED'))
         self.assertEqual(recorded_statuses, [ecwr.RentalStatus.CAPTURED])
         self.assertEqual(self._latest_rental_status(), 'captured')
+
+    def test_fsm_edge_captured_to_completed_on_retry_without_recapturing(self):
+        self._insert_vehicle(location=str(self.test_uuid))
+        self._insert_rental(ecwr.RentalStatus.ACTIVE, payment_hold_info={'id': 'pi_hold_123'})
+
+        with patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123'}) as mock_capture, \
+             patch.object(vl.bikeep_service, 'lock_dock', side_effect=[RuntimeError('lock failed'), {}]) as mock_lock:
+            with self.assertRaises(vl.ApiError):
+                vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+            self.assertEqual(self._latest_rental_status(), 'captured')
+
+            result = vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
+
+        self.assertEqual(result['result'], 'checked_in')
+        self.assertEqual(self._latest_rental_status(), 'completed')
+        mock_capture.assert_called_once()
+        self.assertEqual(mock_lock.call_count, 2)
+        self.assertEqual(self.mock_db.find_one({'vehicle_id': VEHICLE_ID})['location'], ALT_DOCK_ID)
