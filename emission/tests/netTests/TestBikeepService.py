@@ -16,8 +16,6 @@ from unittest import mock
 # Module under test
 import emission.net.ext_service.bikeep.bikeep_service as bikeep
 
-logger = logging.getLogger(__name__)
-
 
 TEST_DEVICE_ID = os.environ.get("BIKEEP_TEST_DEVICE_ID", "mock-dock-1")
 TEST_CAMERA_DEVICE_ID = os.environ.get("BIKEEP_TEST_CAMERA_DEVICE_ID", "mock-camera-1")
@@ -137,14 +135,14 @@ class TestBikeepServiceMocked(unittest.TestCase):
 
         self.assertIsInstance(locations, list)
         self.assertGreater(len(locations), 0, "Expected at least one station from the API")
-        logger.info(f"Bikeep returned {len(locations)} location(s)")
+        logging.info(f"Bikeep returned {len(locations)} location(s)")
 
     def test_list_locations_count(self):
         """Log and assert the station count is a positive integer."""
         locations = bikeep.get_locations()
         count = len(locations)
 
-        logger.info(f"Location count: {count}")
+        logging.info(f"Location count: {count}")
         self.assertIsInstance(count, int)
         self.assertGreater(count, 0)
 
@@ -157,7 +155,7 @@ class TestBikeepServiceMocked(unittest.TestCase):
         devices = [s.get("devices", []) for s in locations]
         device_count = sum(d.get("total", 0) for d in devices)
 
-        logger.info(f"Device count: {device_count}")
+        logging.info(f"Device count: {device_count}")
         self.assertIsInstance(device_count, int)
         self.assertGreater(device_count, 0)
 
@@ -168,7 +166,7 @@ class TestBikeepServiceMocked(unittest.TestCase):
         """take_photo() succeeds with mocked Bikeep API."""
         result = bikeep.take_photo(TEST_CAMERA_DEVICE_ID)
 
-        logger.info(f"Take photo result: {result}")
+        logging.info(f"Take photo result: {result}")
         self.assertIsInstance(result, dict)
 
     # ------------------------------------------------------------------
@@ -177,11 +175,11 @@ class TestBikeepServiceMocked(unittest.TestCase):
     def test_lock_then_unlock_device(self):
         """Lock followed immediately by unlock against mocked Bikeep API."""
         lock_result = bikeep.lock_dock(TEST_DEVICE_ID)
-        logger.info(f"Lock result: {lock_result}")
+        logging.info(f"Lock result: {lock_result}")
         self.assertIsInstance(lock_result, dict)
 
         unlock_result = bikeep.unlock_dock(TEST_DEVICE_ID)
-        logger.info(f"Unlock result: {unlock_result}")
+        logging.info(f"Unlock result: {unlock_result}")
         self.assertIsInstance(unlock_result, dict)
 
     # ------------------------------------------------------------------
