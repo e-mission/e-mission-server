@@ -24,6 +24,9 @@ DEFAULT_HOLD_AMOUNT_CENTS = 100
 VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
 # a STARTED/HELD checkout older than this can't still be in progress, so it was abandoned partway
 ABANDONED_CHECKOUT_SECS = 5 * 60
+LOCK_CONFIRM_POLL_SECS = 2
+# Android's HTTP client gives up after 60s, so stop waiting for the latch well before then
+LOCK_CONFIRM_MAX_SECS = 45
 
 def get_fee_expression():
     config = edc.get_deployment_config() or {}
@@ -120,6 +123,32 @@ def _update_rental_state(user_uuid, rental_entry_id, new_rental_state):
         rental_entry_id,
         new_rental_state,
     )
+
+
+def _state_changed_ts(state):
+    changed_at = state.get('changed_at')
+    return arrow.get(changed_at).timestamp() if changed_at else None
+
+
+def _wait_for_dock_to_latch(dock_id, lock_sent_ts):
+    """
+    A lock command only arms the dock; it latches once the user lowers the arm over the bike.
+    Poll until the dock leaves LOCKING: LOCKED means latched, UNLOCKED means it gave up.
+    """
+    deadline = time.time() + LOCK_CONFIRM_MAX_SECS
+    while True:
+        state = bikeep_service.get_device_state(dock_id)
+        value = state.get('value')
+        if value == 'LOCKED':
+            return
+        changed_ts = _state_changed_ts(state)
+        # an UNLOCKED from before the command is just the dock not having picked it up yet
+        if value == 'UNLOCKED' and changed_ts is not None and changed_ts >= lock_sent_ts:
+            raise RuntimeError(f"Dock {dock_id} went back to UNLOCKED without latching")
+        if time.time() >= deadline:
+            bikeep_service.unlock_dock(dock_id)
+            raise RuntimeError(f"Dock {dock_id} still {value} after {LOCK_CONFIRM_MAX_SECS}s")
+        time.sleep(LOCK_CONFIRM_POLL_SECS)
 
 
 def _cancel_abandoned_checkouts(user_uuid):
@@ -515,7 +544,9 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
 
     try:
         logging.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
+        lock_sent_ts = time.time()
         bikeep_service.lock_dock(dock_id)
+        _wait_for_dock_to_latch(dock_id, lock_sent_ts)
         new_rental_state.rental_status = ecwr.RentalStatus.COMPLETED
         _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
     except Exception as lock_err:
