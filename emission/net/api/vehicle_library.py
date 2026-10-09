@@ -35,15 +35,10 @@ def get_hold_amount_cents(subgroup):
     hold_amounts = config.get('vehicle_library', {}).get('hold_amount_by_subgroup')
     if hold_amounts is None:
         return None
-    if subgroup not in hold_amounts:
-        raise ApiError(500, 'HOLD_NOT_CONFIGURED', "No payment hold configured for subgroup %s" % subgroup)
-    amount = hold_amounts[subgroup]
-    if isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0:
-        raise ApiError(500, 'INVALID_HOLD_CONFIG', "Invalid payment hold configured for subgroup %s" % subgroup)
-    amount_cents = amount * 100
-    if not math.isfinite(amount_cents) or (amount > 0 and round(amount_cents) == 0):
-        raise ApiError(500, 'INVALID_HOLD_CONFIG', "Invalid payment hold configured for subgroup %s" % subgroup)
-    return round(amount_cents)
+    amount = hold_amounts.get(subgroup)
+    if not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0:
+        raise ApiError(500, 'INVALID_HOLD_CONFIG', "Missing or invalid payment hold configured for subgroup %s" % subgroup)
+    return round(amount * 100)
 
 
 def is_payment_exempt(subgroup):
