@@ -132,6 +132,103 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         mock_hold.assert_not_called()
         mock_unlock.assert_not_called()
 
+    def test_trusted_checkout_and_return_without_payment(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 0}
+        with patch.object(vl.ss, 'create_hold_payment_intent') as mock_hold, \
+             patch.object(vl.ss, 'capture_hold_payment_intent') as mock_capture, \
+             patch.object(vl.bikeep_service, 'unlock_dock') as mock_unlock, \
+             patch.object(vl.bikeep_service, 'lock_dock') as mock_lock:
+            result = vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 0, subgroup='trusted')
+            self.assertEqual(result['result'], ecwr.RentalStatus.ACTIVE)
+            self.assertTrue(self._latest_rental_entry().data.get('payment_exempt'))
+            self.assertIsNone(self.profile_db.find_one({'user_id': self.test_uuid}))
+            self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 1}
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID, subgroup='trusted')
+        self.assertEqual(self._latest_rental_status(), 'completed')
+        mock_hold.assert_not_called()
+        mock_capture.assert_not_called()
+        mock_unlock.assert_called_once_with(DOCK_ID)
+        mock_lock.assert_called_once_with(ALT_DOCK_ID)
+
+    def test_setup_status_reports_actual_payment_state(self):
+        for status in vl.ecwp.PaymentSetupStatus:
+            with self.subTest(status=status), \
+                 patch.object(vl.ss, 'get_current_payment_state', return_value={'payment_setup_status': status}) as mock_state, \
+                 patch.object(vl.ss, 'check_pending_setup_status', return_value=status) as mock_pending:
+                for status_function in [vl.get_user_setup_status, vl.check_and_get_pending_setup_status]:
+                    result = status_function(self.test_uuid)
+                    self.assertEqual(result['payment_setup_status'], status.name)
+                mock_state.assert_called_once_with(self.test_uuid)
+                mock_pending.assert_called_once_with(self.test_uuid)
+
+    def test_setup_status_without_payment_state_is_not_started(self):
+        for state in [None, {}]:
+            with self.subTest(state=state), patch.object(vl.ss, 'get_current_payment_state', return_value=state):
+                result = vl.get_user_setup_status(self.test_uuid)
+                self.assertEqual(result['payment_setup_status'], 'NOT_STARTED')
+
+    def test_trusted_unlock_failure_cancels_rental_without_stripe(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'trusted': 0}
+        with patch.object(vl.ss, 'create_hold_payment_intent') as mock_hold, \
+             patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel, \
+             patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('unlock failed')):
+            with self.assertRaises(vl.ApiError) as ctx:
+                vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 0, subgroup='trusted')
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'UNLOCK_FAILED'))
+        self.assertEqual(self._latest_rental_status(), 'cancelled')
+        mock_hold.assert_not_called()
+        mock_cancel.assert_not_called()
+        self.assertEqual(self.mock_db.find_one({'vehicle_id': VEHICLE_ID})['location'], DOCK_ID)
+
+    def test_free_users_still_require_a_hold(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'free': 1, 'trusted': 0}
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_free'}) as mock_hold, \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 38000, subgroup='free')
+        self.assertEqual(mock_hold.call_args.args[:2], (self.test_uuid, 100))
+        self.assertFalse(self._latest_rental_entry().data.get('payment_exempt'))
+
+    def test_client_cannot_bypass_configured_hold_with_zero(self):
+        self._insert_vehicle()
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'public': 380}
+        with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_public'}) as mock_hold, \
+             patch.object(vl.bikeep_service, 'unlock_dock'):
+            vl.checkout_vehicle(self.test_uuid, VEHICLE_ID, 0, subgroup='public')
+        self.assertEqual(mock_hold.call_args.args[:2], (self.test_uuid, 38000))
+        self.assertFalse(self._latest_rental_entry().data.get('payment_exempt'))
+
+    def test_hold_map_uses_dollars_and_zero_implies_exemption(self):
+        amounts = {'public': 380, 'discount': 190, 'free': 1, 'trusted': 0}
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = amounts
+        for subgroup, amount in amounts.items():
+            with self.subTest(subgroup=subgroup):
+                self.assertEqual(vl.get_hold_amount_cents(subgroup), amount * 100)
+                self.assertEqual(vl.is_payment_exempt(subgroup), amount == 0)
+
+    def test_hold_map_rejects_unknown_subgroups_and_invalid_amounts(self):
+        self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'public': 380}
+        for subgroup in ['unknown', None]:
+            with self.subTest(subgroup=subgroup):
+                with self.assertRaises(vl.ApiError) as ctx:
+                    vl.get_hold_amount_cents(subgroup)
+                self.assertEqual(ctx.exception.status, 500)
+        for amount in [-1, '0', None, float('inf'), float('nan')]:
+            self._default_fee_config['vehicle_library']['hold_amount_by_subgroup'] = {'public': amount}
+            with self.subTest(amount=amount):
+                with self.assertRaises(vl.ApiError) as ctx:
+                    vl.get_hold_amount_cents('public')
+                self.assertEqual(ctx.exception.status, 500)
+
+    def test_trusted_subgroup_does_not_excuse_a_missing_hold_on_an_ordinary_rental(self):
+        self._insert_vehicle(location=None)
+        self._insert_rental(ecwr.RentalStatus.ACTIVE)
+        with self.assertRaises(vl.ApiError) as ctx:
+            vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID, subgroup='trusted')
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (500, 'PAYMENT_HOLD_MISSING'))
+
     def test_fsm_edge_initializing_to_completed(self):
         self._insert_vehicle(location='UNINITIALIZED')
         self._insert_rental(ecwr.RentalStatus.INITIALIZING, payment_hold_info=None)
@@ -174,7 +271,7 @@ class TestVehicleLibraryFSM(unittest.TestCase):
 
         with patch.object(vl, '_update_rental_state', side_effect=record_and_update), \
              patch.object(vl.ss, 'create_hold_payment_intent', side_effect=ValueError(402, 'hold failed')):
-            with self.assertRaises(ValueError):
+            with self.assertRaises(vl.ApiError):
                 self._checkout_vehicle()
 
         self.assertGreaterEqual(len(recorded_statuses), 1)
@@ -188,7 +285,7 @@ class TestVehicleLibraryFSM(unittest.TestCase):
 
         with patch.object(vl, '_update_rental_state', side_effect=record_and_update), \
              patch.object(vl.ss, 'create_hold_payment_intent', side_effect=ValueError(402, 'hold failed')):
-            with self.assertRaises(ValueError):
+            with self.assertRaises(vl.ApiError):
                 self._checkout_vehicle()
 
         self.assertGreaterEqual(len(recorded_statuses), 1)
@@ -245,14 +342,26 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         with patch.object(vl, '_update_rental_state', side_effect=record_and_update), \
              patch.object(vl.ss, 'create_hold_payment_intent', side_effect=ValueError(402, 'hold failed')), \
              patch.object(vl.bikeep_service, 'unlock_dock') as mock_unlock:
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises(vl.ApiError) as ctx:
                 self._checkout_vehicle()
 
-        self.assertEqual(ctx.exception.args[0], 422)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (402, 'PAYMENT_HOLD_FAILED'))
         self.assertEqual(recorded_statuses[:2], [
             ecwr.RentalStatus.STARTED,
             ecwr.RentalStatus.CANCELLED,
         ])
+        self.assertEqual(self._latest_rental_status(), 'cancelled')
+        mock_unlock.assert_not_called()
+
+    def test_declined_card_cancels_rental_with_payment_hold_failed(self):
+        self._insert_vehicle()
+        # stripe signals a declined card with its own exception types, not ValueError
+        with patch.object(vl.ss, 'create_hold_payment_intent', side_effect=RuntimeError('card declined')), \
+             patch.object(vl.bikeep_service, 'unlock_dock') as mock_unlock:
+            with self.assertRaises(vl.ApiError) as ctx:
+                self._checkout_vehicle()
+
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (402, 'PAYMENT_HOLD_FAILED'))
         self.assertEqual(self._latest_rental_status(), 'cancelled')
         mock_unlock.assert_not_called()
 
@@ -264,10 +373,10 @@ class TestVehicleLibraryFSM(unittest.TestCase):
              patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('unlock failed')), \
              patch.object(vl.ss, 'cancel_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'canceled'}) as mock_cancel:
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises(vl.ApiError) as ctx:
                 self._checkout_vehicle()
 
-        self.assertEqual(ctx.exception.args[0], 424)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'UNLOCK_FAILED'))
         self.assertEqual(recorded_statuses[:3], [
             ecwr.RentalStatus.STARTED,
             ecwr.RentalStatus.HELD,
@@ -284,10 +393,10 @@ class TestVehicleLibraryFSM(unittest.TestCase):
              patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('unlock failed')), \
              patch.object(vl.ss, 'cancel_hold_payment_intent', side_effect=RuntimeError('cancel failed')):
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises(vl.ApiError) as ctx:
                 self._checkout_vehicle()
 
-        self.assertEqual(ctx.exception.args[0], 424)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'UNLOCK_FAILED_HOLD_STUCK'))
         self.assertEqual(recorded_statuses[:2], [
             ecwr.RentalStatus.STARTED,
             ecwr.RentalStatus.HELD,
@@ -317,10 +426,10 @@ class TestVehicleLibraryFSM(unittest.TestCase):
 
         with patch.object(vl.ss, 'capture_hold_payment_intent', side_effect=ValueError(424, 'capture failed')), \
              patch.object(vl.bikeep_service, 'lock_dock') as mock_lock:
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises(vl.ApiError) as ctx:
                 vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
-        self.assertEqual(ctx.exception.args[0], 424)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'PAYMENT_CAPTURE_FAILED'))
         self.assertEqual(self._latest_rental_status(), 'active')
         mock_lock.assert_not_called()
 
@@ -332,9 +441,9 @@ class TestVehicleLibraryFSM(unittest.TestCase):
         with patch.object(vl, '_update_rental_state', side_effect=record_and_update), \
              patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}), \
              patch.object(vl.bikeep_service, 'lock_dock', side_effect=RuntimeError('lock failed')):
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises(vl.ApiError) as ctx:
                 vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
-        self.assertEqual(ctx.exception.args[0], 424)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (424, 'LOCK_FAILED'))
         self.assertEqual(recorded_statuses, [ecwr.RentalStatus.CAPTURED])
         self.assertEqual(self._latest_rental_status(), 'captured')

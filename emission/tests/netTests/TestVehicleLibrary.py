@@ -357,12 +357,12 @@ class TestVehicleLibrary(unittest.TestCase):
         with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('dock unreachable')), \
              patch.object(vl.ss, 'cancel_hold_payment_intent') as mock_cancel:
-            with self.assertRaises(ValueError) as err_ctx:
+            with self.assertRaises(vl.ApiError) as err_ctx:
                 self._checkout_vehicle()
 
-        self.assertEqual(err_ctx.exception.args[0], 424)
-        self.assertIn('Failed to unlock dock for vehicle', err_ctx.exception.args[1])
-        self.assertIn('dock unreachable', err_ctx.exception.args[1])
+        self.assertEqual((err_ctx.exception.status, err_ctx.exception.code), (424, 'UNLOCK_FAILED'))
+        self.assertIn('Failed to unlock dock for vehicle', err_ctx.exception.message)
+        self.assertIn('dock unreachable', err_ctx.exception.message)
         mock_cancel.assert_called_once_with('pi_hold_123')
 
         rental_entry = self._get_latest_rental_entry()
@@ -375,12 +375,12 @@ class TestVehicleLibrary(unittest.TestCase):
         with patch.object(vl.ss, 'create_hold_payment_intent', return_value={'id': 'pi_hold_123'}), \
              patch.object(vl.bikeep_service, 'unlock_dock', side_effect=RuntimeError('dock unreachable')), \
              patch.object(vl.ss, 'cancel_hold_payment_intent', side_effect=RuntimeError('stripe unreachable')):
-            with self.assertRaises(ValueError) as err_ctx:
+            with self.assertRaises(vl.ApiError) as err_ctx:
                 self._checkout_vehicle()
 
-        self.assertEqual(err_ctx.exception.args[0], 424)
-        self.assertIn('Failed to cancel hold after dock unlock failure', err_ctx.exception.args[1])
-        self.assertIn('stripe unreachable', err_ctx.exception.args[1])
+        self.assertEqual((err_ctx.exception.status, err_ctx.exception.code), (424, 'UNLOCK_FAILED_HOLD_STUCK'))
+        self.assertIn('Failed to cancel hold after dock unlock failure', err_ctx.exception.message)
+        self.assertIn('stripe unreachable', err_ctx.exception.message)
 
         rental_entry = self._get_latest_rental_entry()
         self.assertEqual(rental_entry['data']['rental_status'], 'held')
@@ -516,12 +516,12 @@ class TestVehicleLibrary(unittest.TestCase):
             'capture_hold_payment_intent',
             side_effect=ValueError(424, 'declined by issuer'),
         ):
-            with self.assertRaises(ValueError) as err_ctx:
+            with self.assertRaises(vl.ApiError) as err_ctx:
                 vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
-        self.assertEqual(err_ctx.exception.args[0], 424)
-        self.assertIn(f'Failed to capture payment for vehicle {VEHICLE_ID}', err_ctx.exception.args[1])
-        self.assertIn("capture_err=ValueError(424, 'declined by issuer')", err_ctx.exception.args[1])
+        self.assertEqual((err_ctx.exception.status, err_ctx.exception.code), (424, 'PAYMENT_CAPTURE_FAILED'))
+        self.assertIn(f'Failed to capture payment for vehicle {VEHICLE_ID}', err_ctx.exception.message)
+        self.assertIn("capture_err=ValueError(424, 'declined by issuer')", err_ctx.exception.message)
 
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})
         self.assertEqual(vehicle['location'], str(self.test_uuid))
@@ -530,14 +530,14 @@ class TestVehicleLibrary(unittest.TestCase):
         self.assertEqual(rental_entry['data']['rental_status'], 'active')
         self.assertIsNone(rental_entry['data'].get('end_ts'))
 
-    def test_checkin_vehicle_nothing_checked_out_returns_403(self):
+    def test_checkin_vehicle_nothing_checked_out_returns_409(self):
         """check_in_vehicle() rejects if user has no vehicle checked out."""
         # Vehicle is at a dock, not checked out by this user
         self._insert_vehicle(location=DOCK_ID)
 
-        with self.assertRaises(ValueError) as ctx:
+        with self.assertRaises(vl.ApiError) as ctx:
             vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
-        self.assertEqual(ctx.exception.args[0], 403)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (409, 'NO_ACTIVE_RENTAL'))
 
     def test_checkin_vehicle_resolves_scanned_code_to_device_id(self):
         """check_in_vehicle() resolves the scanned dock code to its actual Bikeep
@@ -567,10 +567,10 @@ class TestVehicleLibrary(unittest.TestCase):
 
         with patch.object(vl.bikeep_service, 'get_device_id_for_code', return_value=None), \
              patch.object(vl.bikeep_service, 'lock_dock') as mock_lock:
-            with self.assertRaises(ValueError) as ctx:
+            with self.assertRaises(vl.ApiError) as ctx:
                 vl.check_in_vehicle(self.test_uuid, 'unknown-code')
 
-        self.assertEqual(ctx.exception.args[0], 404)
+        self.assertEqual((ctx.exception.status, ctx.exception.code), (404, 'DOCK_NOT_FOUND'))
         mock_lock.assert_not_called()
 
     def test_checkin_vehicle_bikeep_failure_does_not_update_db(self):
@@ -582,12 +582,12 @@ class TestVehicleLibrary(unittest.TestCase):
 
         with patch.object(vl.ss, 'capture_hold_payment_intent', return_value={'id': 'pi_hold_123', 'status': 'succeeded'}), \
              patch.object(vl.bikeep_service, 'lock_dock', side_effect=RuntimeError("lock failed")):
-            with self.assertRaises(ValueError) as err_ctx:
+            with self.assertRaises(vl.ApiError) as err_ctx:
                 vl.check_in_vehicle(self.test_uuid, ALT_DOCK_ID)
 
-        self.assertEqual(err_ctx.exception.args[0], 424)
-        self.assertIn(f'Failed to lock dock for vehicle {VEHICLE_ID} for user {self.test_uuid}', err_ctx.exception.args[1])
-        self.assertIn("lock_err=RuntimeError('lock failed')", err_ctx.exception.args[1])
+        self.assertEqual((err_ctx.exception.status, err_ctx.exception.code), (424, 'LOCK_FAILED'))
+        self.assertIn(f'Failed to lock dock for vehicle {VEHICLE_ID} for user {self.test_uuid}', err_ctx.exception.message)
+        self.assertIn("lock_err=RuntimeError('lock failed')", err_ctx.exception.message)
 
         # Vehicle should remain unchanged in DB
         vehicle = self.mock_db.find_one({'vehicle_id': VEHICLE_ID})

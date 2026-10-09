@@ -30,6 +30,7 @@ import emission.net.api.timeline as timeline
 import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
 import emission.net.api.vehicle_library as vehicle_library
+from emission.net.api.api_error import ApiError
 
 import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
@@ -66,6 +67,25 @@ BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 
 print("Finished configuring logging for %s" % logging.getLogger())
 app = app()
+
+def json_error_handler(res):
+    # Bottle never sends an HTTPError's own body, so return abort()'s message as JSON; keep tracebacks server-side
+    response.content_type = 'application/json'
+    # bottle wraps exceptions raised by a route in HTTPError(500, exception=...)
+    api_error = res.exception if isinstance(res.exception, ApiError) else None
+    if api_error is not None:
+        response.status = api_error.status
+        if api_error.status >= 500:
+            logging.error("%s %s for %s %s: %s\n%s" % (api_error.status, api_error.code, request.method, request.path, api_error.message, res.traceback))
+        else:
+            logging.warning("%s %s for %s %s: %s" % (api_error.status, api_error.code, request.method, request.path, api_error.message))
+        return json.dumps({'error': api_error.message, 'code': api_error.code})
+    if res.traceback:
+        logging.error("%s for %s %s:\n%s" % (res.status, request.method, request.path, res.traceback))
+    return json.dumps({'error': str(res.body)})
+
+# Bottle.__setattr__ refuses to overwrite an attribute, which breaks importlib.reload of this module
+app.__dict__['default_error_handler'] = json_error_handler
 
 # On MacOS, the current working directory is always in the python path However,
 # on ubuntu, it looks like the script directory (api in our case) is in the
@@ -430,17 +450,16 @@ def bikeshare_finalize_setup():
 
 @post('/library/checkout')
 def bikeshare_checkout():
-    user_uuid = getUUID(request)
+    user_context = getUUID(request, return_context=True)
     vehicle_id = request.json.get('vehicle_id')
     if not vehicle_id:
         abort(400, "vehicle_id is required")
     hold_amount_cents = request.json.get('hold_amount_cents')
     if hold_amount_cents is None:
         abort(400, "hold_amount_cents is required")
-    try:
-        return vehicle_library.checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents)
-    except ValueError as e:
-        abort(e.args[0], e.args[1])
+    return vehicle_library.checkout_vehicle(
+        user_context['user_id'], vehicle_id, hold_amount_cents,
+        subgroup=user_context.get('subgroup'))
 
 @post('/library/checkin')
 def bikeshare_return():
@@ -448,11 +467,8 @@ def bikeshare_return():
     dock_id = request.json.get('dock_id')
     if not dock_id:
         abort(400, "dock_id is required")
-    try:
-        return vehicle_library.check_in_vehicle(
-            user_context['user_id'], dock_id, subgroup=user_context.get('subgroup'))
-    except ValueError as e:
-        abort(e.args[0], e.args[1])
+    return vehicle_library.check_in_vehicle(
+        user_context['user_id'], dock_id, subgroup=user_context.get('subgroup'))
 
 @post('/library/rental_history')
 def bikeshare_rental_history():
@@ -491,6 +507,9 @@ def habiticaProxy():
 
 @error(404)
 def error404(error):
+    # only redirect unknown URLs; an abort(404) from a matched route is a real API error
+    if 'route.handle' in request.environ:
+        return json_error_handler(error)
     response.status = 301
     response.set_header('Location', not_found_redirect)
 

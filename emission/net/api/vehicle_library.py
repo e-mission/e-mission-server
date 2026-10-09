@@ -1,4 +1,5 @@
 import logging
+import math
 import time
 import datetime
 
@@ -17,6 +18,7 @@ import emission.net.ext_service.bikeep.bikeep_service as bikeep_service
 import emission.net.ext_service.stripe.stripe_service as ss
 import emission.core.wrapper.payment as ecwp
 import emission.storage.timeseries.abstract_timeseries as esta
+from emission.net.api.api_error import ApiError
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +28,21 @@ VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
 def get_fee_expression():
     config = edc.get_deployment_config() or {}
     return config.get('vehicle_rental', {}).get('fee_expression')
+
+
+def get_hold_amount_cents(subgroup):
+    config = edc.get_deployment_config() or {}
+    hold_amounts = config.get('vehicle_library', {}).get('hold_amount_by_subgroup')
+    if hold_amounts is None:
+        return None
+    amount = hold_amounts.get(subgroup)
+    if not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0:
+        raise ApiError(500, 'INVALID_HOLD_CONFIG', "Missing or invalid payment hold configured for subgroup %s" % subgroup)
+    return round(amount * 100)
+
+
+def is_payment_exempt(subgroup):
+    return get_hold_amount_cents(subgroup) == 0
 
 
 def compute_rental_fee(duration_hours, subgroup, vehicle):
@@ -165,20 +182,25 @@ def _fleet_vehicle_docks():
 # They handle the reservation and checkout of vehicles, including booking
 # docks via Bikeep and processing payments via Stripe.
 
-def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
+def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents, subgroup=None):
     """
     Check out (unlock) a vehicle for the authenticated user.
 
-    - Places a Stripe hold using the user's saved payment method.
+    - Places a Stripe hold unless the authenticated subgroup is payment-exempt.
     - Persists the active rental mapping in the user's timeseries.
     - Unlocks the vehicle's dock via bikeep_service.
     """
     logging.debug(f"In vehicle_library module with vehicle {vehicle_id} for user {user_uuid} with hold amount {hold_amount_cents}")
     vehicle_db = edb.get_vehicle_db()
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
-    logging.debug(f"Found matching vehicle {vehicle=} for {vehicle_id}")
     if vehicle is None:
-        raise ValueError(404, "Vehicle %s not found" % vehicle_id)
+        logging.error(f"Vehicle {vehicle_id} not found")
+        raise ApiError(404, 'VEHICLE_NOT_FOUND', "Vehicle %s not found" % vehicle_id)
+    logging.debug(f"Found matching vehicle {vehicle=} for {vehicle_id}")
+
+    configured_hold_amount_cents = get_hold_amount_cents(subgroup)
+    if configured_hold_amount_cents is not None:
+        hold_amount_cents = configured_hold_amount_cents
 
     # We now need to consider the cold start problem for the bike library.
     # The bike library admin needs to initially check in the bikes to "seed" the library
@@ -196,7 +218,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
 
     dock_code = vehicle.get('location')
     if not dock_code:
-        raise ValueError(422, "Vehicle %s has no dock location to unlock" % vehicle_id)
+        raise ApiError(409, 'VEHICLE_NOT_AVAILABLE', "Vehicle %s has no dock location to unlock" % vehicle_id)
 
     most_recent_rental = _get_most_recent_rental(user_uuid)
 
@@ -204,7 +226,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     # We are not supporting group rides at this point
     if most_recent_rental is not None and most_recent_rental.rental_status != ecwr.RentalStatus.COMPLETED:
         logging.error(f"User {user_uuid} has an active rental {most_recent_rental}")
-        raise ValueError(422, "User %s has an active rental %s" % (user_uuid, most_recent_rental))
+        raise ApiError(409, 'ACTIVE_RENTAL_EXISTS', "User %s has an active rental %s" % (user_uuid, most_recent_rental))
 
     ## At this point, the inputs for the rental should be valid, and we have
     # recorded the checkout as having started
@@ -234,12 +256,13 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
         # so we can treat this as a validation step like the others
         # No harm, no foul and don't need to muck around with the FSM yet
         logging.error(f"No dock found for code {dock_code}")
-        raise ValueError(404, "No dock found for code %s" % dock_code)
+        raise ApiError(500, 'VEHICLE_DOCK_MISCONFIGURED', "No dock found for code %s" % dock_code)
 
     init_rental_state = ecwr.Rental({
         'vehicle_id': vehicle.get('vehicle_id'),
         'vehicle_name': vehicle.get('vehicle_name'),
         'rental_status': ecwr.RentalStatus.STARTED,
+        'payment_exempt': configured_hold_amount_cents == 0,
     })
     new_rental_id = _get_rental_ts(user_uuid).insert_data(user_uuid, VEHICLE_RENTAL_KEY, init_rental_state)
 
@@ -262,35 +285,38 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     # At this point, we have a record of the rental, and it will be visible to the user on refresh
     # It just needs to go through the FSM properly
 
+    hold_info = None
     try:
-        hold_info = ss.create_hold_payment_intent(
-            user_uuid,
-            hold_amount_cents,
-            metadata={
-                'vehicle_id': vehicle_id,
-                'dock_id': dock_id,
-                'hold_amount_cents': hold_amount_cents,
-            },
-        )
-        new_rental_state['rental_status'] = ecwr.RentalStatus.HELD
-        new_rental_state['payment_hold_info'] = hold_info
-        _update_rental_state(user_uuid, new_rental_id, new_rental_state)
-        payment_hold_expires_ts = (
-            hold_info.get('latest_charge', {})
-            .get('payment_method_details', {})
-            .get('card', {})
-            .get('capture_before')
-        )
-        edb.get_profile_db().update_one(
-            {'user_id': user_uuid},
-            {'$set': {'payment_hold_expires_ts': payment_hold_expires_ts}},
-            upsert=True,
-        )
-    except ValueError as e:
+        if not new_rental_state.get('payment_exempt', False):
+            hold_info = ss.create_hold_payment_intent(
+                user_uuid,
+                hold_amount_cents,
+                metadata={
+                    'vehicle_id': vehicle_id,
+                    'dock_id': dock_id,
+                    'hold_amount_cents': hold_amount_cents,
+                },
+            )
+            new_rental_state['rental_status'] = ecwr.RentalStatus.HELD
+            new_rental_state['payment_hold_info'] = hold_info
+            _update_rental_state(user_uuid, new_rental_id, new_rental_state)
+            payment_hold_expires_ts = (
+                hold_info.get('latest_charge', {})
+                .get('payment_method_details', {})
+                .get('card', {})
+                .get('capture_before')
+            )
+            edb.get_profile_db().update_one(
+                {'user_id': user_uuid},
+                {'$set': {'payment_hold_expires_ts': payment_hold_expires_ts}},
+                upsert=True,
+            )
+    # not just ValueError: stripe raises its own errors (e.g. CardError) for declined cards
+    except Exception as e:
         logging.error(f"Error occurred while creating hold payment intent for user {user_uuid}: {e}")
         new_rental_state['rental_status'] = ecwr.RentalStatus.CANCELLED
         _update_rental_state(user_uuid, new_rental_id, new_rental_state)
-        raise ValueError(422, "Error occurred while creating hold payment intent for user %s: %s" % (user_uuid, e)) 
+        raise ApiError(402, 'PAYMENT_HOLD_FAILED', "Error occurred while creating hold payment intent for user %s: %s" % (user_uuid, e))
 
     try:
         logger.debug(f"Unlocking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
@@ -300,7 +326,8 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
     except Exception as unlock_err:
         logging.error(f"Error occurred while checking out vehicle {vehicle_id} for user {user_uuid}: {unlock_err}")
         try:
-            ss.cancel_hold_payment_intent(hold_info.get('id'))
+            if hold_info is not None:
+                ss.cancel_hold_payment_intent(hold_info.get('id'))
             new_rental_state['rental_status'] = ecwr.RentalStatus.CANCELLED
             # We theoretically don't need this here because a cancelled rental is the same as no rental
             # we reversed the hold and we didn't unlock the dock, so it is essentially a NOP
@@ -317,8 +344,8 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents):
             logging.error(f"Failed to cancel hold {hold_info.get('id')} after checkout failure: {cancel_err}")
             last_saved_rental_state = _get_most_recent_rental(user_uuid)
             assert last_saved_rental_state['rental_status'] == ecwr.RentalStatus.HELD, f"{last_saved_rental_state=}"
-            raise ValueError(424, f"Failed to cancel hold after dock unlock failure, {cancel_err=}")
-        raise ValueError(424, f"Failed to unlock dock for vehicle {vehicle_id} for user {user_uuid}, {unlock_err=}")
+            raise ApiError(424, 'UNLOCK_FAILED_HOLD_STUCK', f"Failed to cancel hold after dock unlock failure, {cancel_err=}")
+        raise ApiError(424, 'UNLOCK_FAILED', f"Failed to unlock dock for vehicle {vehicle_id} for user {user_uuid}, {unlock_err=}")
 
     # At this point, the rental FSM is complete and we are in one of three states:
     # - INITIALIZING: returned
@@ -356,7 +383,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     logger.info(f"Checking in vehicle for user {user_uuid} at dock code {dock_code}")
     rental_entry = _get_active_rental_entry(user_uuid)
     if rental_entry is None:
-        raise ValueError(403, "No vehicle is currently checked out by this user")
+        raise ApiError(409, 'NO_ACTIVE_RENTAL', "No vehicle is currently checked out by this user")
     else:
         logger.info(f"Terminating rental started at {rental_entry.data.start_fmt_time} for user {user_uuid}")
     curr_rental_state = rental_entry.data
@@ -366,7 +393,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
     if vehicle is None:
         logger.error(f"Vehicle {vehicle_id} not found")
-        raise ValueError(404, "Vehicle %s not found" % vehicle_id)
+        raise ApiError(500, 'RENTAL_VEHICLE_MISSING', "Vehicle %s not found" % vehicle_id)
     else:
         logger.info(f"Found vehicle {vehicle_id}")
 
@@ -378,13 +405,14 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     logger.info(f"Resolved dock code {dock_code} to device id {dock_id}")
     if dock_id is None:
         logger.error(f"Dock not found for code {dock_code}")
-        raise ValueError(404, "No dock found for code %s" % dock_code)
+        raise ApiError(404, 'DOCK_NOT_FOUND', "No dock found for code %s" % dock_code)
 
     # Similarly, let us verify that the user has an active hold before proceeding with the return
     # if there is no active hold, we cannot charge anything so we can't allow the user to return the vehicle
     payment_hold_info = curr_rental_state.get('payment_hold_info')
-    if payment_hold_info is None and curr_rental_state.rental_status != ecwr.RentalStatus.INITIALIZING:
-        raise ValueError(409, f"No payment hold found for {vehicle_id=}, {curr_rental_state=}")
+    payment_exempt = curr_rental_state.get('payment_exempt', False)
+    if payment_hold_info is None and not payment_exempt and curr_rental_state.rental_status != ecwr.RentalStatus.INITIALIZING:
+        raise ApiError(500, 'PAYMENT_HOLD_MISSING', f"No payment hold found for {vehicle_id=}, {curr_rental_state=}")
 
     now = time.time()
     end_loc, end_timezone = _get_loc_and_timezone(dock_id)
@@ -399,11 +427,13 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
 
     if curr_rental_state.rental_status == ecwr.RentalStatus.INITIALIZING:
         logger.info(f"Initializing rental for vehicle {curr_rental_state.vehicle_id}, no payment needed")
+    elif payment_exempt and payment_hold_info is None:
+        logger.info(f"Payment-exempt rental for vehicle {vehicle_id}, no payment needed")
     else:
         assert payment_hold_info is not None, f"{curr_rental_state=}"
         payment_hold_id = payment_hold_info.get('id')
         if not payment_hold_id:
-            raise ValueError(409, "No payment hold found for vehicle %s" % vehicle_id)
+            raise ApiError(500, 'PAYMENT_HOLD_MISSING', "No payment hold found for vehicle %s" % vehicle_id)
 
         rental_start_ts = curr_rental_state.start_ts
         duration_hours = max(now - rental_start_ts, 0) / (60 * 60)
@@ -422,7 +452,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
             _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
         except Exception as capture_err:
             logger.error(f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
-            raise ValueError(424, f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
+            raise ApiError(424, 'PAYMENT_CAPTURE_FAILED', f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
 
 
     try:
@@ -432,7 +462,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
         _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
     except Exception as lock_err:
         logger.error(f"Failed to lock dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
-        raise ValueError(424, f"Failed to lock dock for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
+        raise ApiError(424, 'LOCK_FAILED', f"Failed to lock dock for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
 
     # If we get here, we must have successfully completed the rental
     # - if the capture did not work, we raise a error and the rental state is still ACTIVE
@@ -504,10 +534,8 @@ def get_user_setup_status(user_uuid):
     - If a pending session exists, polls the Stripe API for its status.
     - Returns the current status of the setup process to the client.
     """
-    current_payment_state = ss.get_current_payment_state(user_uuid)
-    if current_payment_state is None:
-        current_payment_state = ecwp.PaymentStatus.NOT_STARTED
-    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentStatus.NOT_STARTED)).split(".")[-1],
+    current_payment_state = ss.get_current_payment_state(user_uuid) or {}
+    return {"payment_setup_status": str(current_payment_state.get("payment_setup_status", ecwp.PaymentSetupStatus.NOT_STARTED)).split(".")[-1],
             "is_sandbox": ss.STRIPE_IS_SANDBOX}
 
 ## END: Stripe passthrough integration
