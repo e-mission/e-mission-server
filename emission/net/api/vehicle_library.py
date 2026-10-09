@@ -20,8 +20,6 @@ import emission.core.wrapper.payment as ecwp
 import emission.storage.timeseries.abstract_timeseries as esta
 from emission.net.api.api_error import ApiError
 
-logger = logging.getLogger(__name__)
-
 DEFAULT_HOLD_AMOUNT_CENTS = 100
 VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
 
@@ -69,15 +67,15 @@ def _get_loc_and_timezone(dock_id):
     """Return (geojson.Point, timezone_str) for a dock; falls back to defaults on error."""
     try:
         loc_data = bikeep_service.get_location(dock_id)
-        logger.debug(f"Retrieved location data for dock {dock_id}: {loc_data}")
+        logging.debug(f"Retrieved location data for dock {dock_id}: {loc_data}")
         lat = loc_data["latitude"]
         lng = loc_data["longitude"]
         ret_loc = geojson.Point((lng, lat))
         ret_tz = tzfpy.get_tz(lng, lat)
-        logger.debug(f"Returning location {ret_loc}, timezone {ret_tz}")
+        logging.debug(f"Returning location {ret_loc}, timezone {ret_tz}")
         return ret_loc, ret_tz
     except Exception as e:
-        logger.exception(f"Could not look up location for dock {dock_id} because of {e}, using defaults")
+        logging.exception(f"Could not look up location for dock {dock_id} because of {e}, using defaults")
         # Defaults are 0, 0 = GMT
         lat = 0
         lng = 0
@@ -90,7 +88,7 @@ def _get_active_rental_entry(user_uuid):
         [VEHICLE_RENTAL_KEY],
         extra_query_list=[{"data.rental_status": {"$in": [ecwr.RentalStatus.ACTIVE, ecwr.RentalStatus.INITIALIZING]}}],
     )
-    logger.debug(f"Found {len(active_entries)} active rental entries for user {user_uuid}")
+    logging.debug(f"Found {len(active_entries)} active rental entries for user {user_uuid}")
     if len(active_entries) == 0:
         return None
     return ecwe.Entry(active_entries[-1])
@@ -163,7 +161,7 @@ def stations():
             location['devices'] = {}
         location['devices']['rentable_vehicles'] = rentable_count
 
-    logger.debug("Fetched stations: %s" % locations)
+    logging.debug("Fetched stations: %s" % locations)
     return {'stations': locations}
 
 
@@ -319,7 +317,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents, subgroup=None):
         raise ApiError(402, 'PAYMENT_HOLD_FAILED', "Error occurred while creating hold payment intent for user %s: %s" % (user_uuid, e))
 
     try:
-        logger.debug(f"Unlocking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
+        logging.debug(f"Unlocking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
         bikeep_service.unlock_dock(dock_id)
         new_rental_state['rental_status'] = ecwr.RentalStatus.ACTIVE
         _update_rental_state(user_uuid, new_rental_id, new_rental_state)
@@ -364,7 +362,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents, subgroup=None):
         }},
     )
 
-    logger.info(f"Checked out vehicle {vehicle_id} (dock {dock_id}) for user {user_uuid}")
+    logging.info(f"Checked out vehicle {vehicle_id} (dock {dock_id}) for user {user_uuid}")
     return {'result': new_rental_state.rental_status, 'vehicle_id': vehicle_id}
 
 
@@ -380,31 +378,31 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     - Captures the Stripe hold for the active rental.
     - Updates the active rental entry and Vehicle mapping to point back to the dock.
     """
-    logger.info(f"Checking in vehicle for user {user_uuid} at dock code {dock_code}")
+    logging.info(f"Checking in vehicle for user {user_uuid} at dock code {dock_code}")
     rental_entry = _get_active_rental_entry(user_uuid)
     if rental_entry is None:
         raise ApiError(409, 'NO_ACTIVE_RENTAL', "No vehicle is currently checked out by this user")
     else:
-        logger.info(f"Terminating rental started at {rental_entry.data.start_fmt_time} for user {user_uuid}")
+        logging.info(f"Terminating rental started at {rental_entry.data.start_fmt_time} for user {user_uuid}")
     curr_rental_state = rental_entry.data
 
     vehicle_id = curr_rental_state.vehicle_id
     vehicle_db = edb.get_vehicle_db()
     vehicle = vehicle_db.find_one({'vehicle_id': vehicle_id})
     if vehicle is None:
-        logger.error(f"Vehicle {vehicle_id} not found")
+        logging.error(f"Vehicle {vehicle_id} not found")
         raise ApiError(500, 'RENTAL_VEHICLE_MISSING', "Vehicle %s not found" % vehicle_id)
     else:
-        logger.info(f"Found vehicle {vehicle_id}")
+        logging.info(f"Found vehicle {vehicle_id}")
 
     # Let's map the dock before capturing payment so that we don't end up in
     # one of the error states (e.g. captured-but-not-locked) just because the
     # user put in the wrong station code.
 
     dock_id = bikeep_service.get_device_id_for_code(dock_code)
-    logger.info(f"Resolved dock code {dock_code} to device id {dock_id}")
+    logging.info(f"Resolved dock code {dock_code} to device id {dock_id}")
     if dock_id is None:
-        logger.error(f"Dock not found for code {dock_code}")
+        logging.error(f"Dock not found for code {dock_code}")
         raise ApiError(404, 'DOCK_NOT_FOUND', "No dock found for code %s" % dock_code)
 
     # Similarly, let us verify that the user has an active hold before proceeding with the return
@@ -426,9 +424,9 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     })
 
     if curr_rental_state.rental_status == ecwr.RentalStatus.INITIALIZING:
-        logger.info(f"Initializing rental for vehicle {curr_rental_state.vehicle_id}, no payment needed")
+        logging.info(f"Initializing rental for vehicle {curr_rental_state.vehicle_id}, no payment needed")
     elif payment_exempt and payment_hold_info is None:
-        logger.info(f"Payment-exempt rental for vehicle {vehicle_id}, no payment needed")
+        logging.info(f"Payment-exempt rental for vehicle {vehicle_id}, no payment needed")
     else:
         assert payment_hold_info is not None, f"{curr_rental_state=}"
         payment_hold_id = payment_hold_info.get('id')
@@ -442,7 +440,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
         capture_amount = round(fee_dollars * 100)
         try:
             ss.capture_hold_payment_intent(payment_hold_id, capture_amount)
-            logger.info(f"Successfully captured payment for vehicle {vehicle_id}, amount {capture_amount}")
+            logging.info(f"Successfully captured payment for vehicle {vehicle_id}, amount {capture_amount}")
             edb.get_profile_db().update_one(
                 {'user_id': user_uuid},
                 {'$set': {'payment_hold_expires_ts': None}},
@@ -451,17 +449,17 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
             new_rental_state.rental_status = ecwr.RentalStatus.CAPTURED
             _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
         except Exception as capture_err:
-            logger.error(f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
+            logging.error(f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
             raise ApiError(424, 'PAYMENT_CAPTURE_FAILED', f"Failed to capture payment for vehicle {vehicle_id}, {capture_err=}")
 
 
     try:
-        logger.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
+        logging.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
         bikeep_service.lock_dock(dock_id)
         new_rental_state.rental_status = ecwr.RentalStatus.COMPLETED
         _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
     except Exception as lock_err:
-        logger.error(f"Failed to lock dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
+        logging.error(f"Failed to lock dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
         raise ApiError(424, 'LOCK_FAILED', f"Failed to lock dock for vehicle {vehicle_id} for user {user_uuid}, {lock_err=}")
 
     # If we get here, we must have successfully completed the rental
@@ -479,7 +477,7 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
         }},
     )
 
-    logger.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} (code {dock_code}) for user {user_uuid}")
+    logging.info(f"Checked in vehicle {vehicle_id} to dock {dock_id} (code {dock_code}) for user {user_uuid}")
     return {'result': 'checked_in', 'vehicle_id': vehicle_id, 'dock_id': dock_code}
 
 

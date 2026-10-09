@@ -9,7 +9,6 @@ BIKEEP_API_URL = "https://services.bikeep.com"
 BIKEEP_AUTH_URL = "https://auth.bikeep.com/oauth2/token"
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 _TOKEN_CACHE = {
     "access_token": None,
@@ -32,7 +31,7 @@ def _get_api_credentials():
                 if not credentials[key]:
                     credentials[key] = config.get(key)
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
-        logger.warning(f"Could not load Bikeep config from file: {e}")
+        logging.warning(f"Could not load Bikeep config from file: {e}")
 
     if not bool(credentials["BIKEEP_CLIENT_ID"] and credentials["BIKEEP_CLIENT_SECRET"]):
         raise ValueError(
@@ -114,16 +113,16 @@ def get_locations():
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         data = response.json().get('data', [])
-        logger.debug(f"Retrieved {len(data)} locations from Bikeep")
+        logging.debug(f"Retrieved {len(data)} locations from Bikeep")
         return data
     except Timeout:
-        logger.error(f"Timeout retrieving locations from Bikeep ({url})")
+        logging.error(f"Timeout retrieving locations from Bikeep ({url})")
         raise
     except ConnectionError:
-        logger.error(f"Connection error retrieving locations from Bikeep ({url})")
+        logging.error(f"Connection error retrieving locations from Bikeep ({url})")
         raise
     except RequestException as e:
-        logger.error(f"Error retrieving locations from Bikeep: {e}")
+        logging.error(f"Error retrieving locations from Bikeep: {e}")
         raise
 
 def get_devices(location_id):
@@ -150,16 +149,16 @@ def get_devices(location_id):
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         data = response.json().get('data', [])
-        logger.debug(f"Retrieved {len(data)} devices for location {location_id} from Bikeep")
+        logging.debug(f"Retrieved {len(data)} devices for location {location_id} from Bikeep")
         return data
     except Timeout:
-        logger.error(f"Timeout retrieving devices for location {location_id} from Bikeep")
+        logging.error(f"Timeout retrieving devices for location {location_id} from Bikeep")
         raise
     except ConnectionError:
-        logger.error(f"Connection error retrieving devices for location {location_id} from Bikeep")
+        logging.error(f"Connection error retrieving devices for location {location_id} from Bikeep")
         raise
     except RequestException as e:
-        logger.error(f"Error retrieving devices for location {location_id} from Bikeep: {e}")
+        logging.error(f"Error retrieving devices for location {location_id} from Bikeep: {e}")
         raise
 
 
@@ -184,7 +183,7 @@ def get_locations_and_all_devices():
                 continue
             all_devices.extend(get_devices(location_id))
         except Exception as e:
-            logger.warning(f"Could not fetch devices for location {location_id}: {e}")
+            logging.warning(f"Could not fetch devices for location {location_id}: {e}")
 
     global _all_devices_cache, _all_devices_cache_expiry_ts
     _all_devices_cache = all_devices
@@ -235,16 +234,16 @@ def get_location(device_id):
         location_response = requests.get(location_ref, headers=headers, timeout=10)
         location_response.raise_for_status()
         data = location_response.json()
-        logger.debug(f"Retrieved location for device {device_id} from Bikeep")
+        logging.debug(f"Retrieved location for device {device_id} from Bikeep")
         return data
     except Timeout:
-        logger.error(f"Timeout retrieving location for device {device_id} from Bikeep")
+        logging.error(f"Timeout retrieving location for device {device_id} from Bikeep")
         raise
     except ConnectionError:
-        logger.error(f"Connection error retrieving location for device {device_id} from Bikeep")
+        logging.error(f"Connection error retrieving location for device {device_id} from Bikeep")
         raise
     except RequestException as e:
-        logger.error(f"Error retrieving location for device {device_id} from Bikeep: {e}")
+        logging.error(f"Error retrieving location for device {device_id} from Bikeep: {e}")
         raise
 
 def lock_dock(dock_id):
@@ -265,24 +264,24 @@ def lock_dock(dock_id):
     payload = {"command": "lock"}
     
     try:
-        logger.debug(f"About to lock dock {dock_id}, {headers=}, {payload=}")
+        logging.debug(f"About to lock dock {dock_id}, {headers=}, {payload=}")
         response = requests.post(url, headers=headers, json=payload, timeout=10)
-        logger.debug(f"Response from locking dock {dock_id}: {response}")
+        logging.debug(f"Response from locking dock {dock_id}: {response}")
         if response.status_code != 200:
-            logger.error(f"Response from locking dock {dock_id}: {response}")
-            logger.error(f"Failed to lock dock {dock_id}, status code: {response.status_code}")
+            logging.error(f"Response from locking dock {dock_id}: {response}")
+            logging.error(f"Failed to lock dock {dock_id}, status code: {response.status_code}")
         response.raise_for_status()
         data = response.json()
-        logger.info(f"Locked dock {dock_id} via Bikeep")
+        logging.info(f"Locked dock {dock_id} via Bikeep")
         return data
     except Timeout:
-        logger.error(f"Timeout locking dock {dock_id} via Bikeep")
+        logging.error(f"Timeout locking dock {dock_id} via Bikeep")
         raise
     except ConnectionError:
-        logger.error(f"Connection error locking dock {dock_id} via Bikeep")
+        logging.error(f"Connection error locking dock {dock_id} via Bikeep")
         raise
     except RequestException as e:
-        logger.error(f"Error locking dock {dock_id} via Bikeep: {e}")
+        logging.error(f"Error locking dock {dock_id} via Bikeep: {e}")
         raise
 
 def unlock_dock(dock_id):
@@ -303,25 +302,25 @@ def unlock_dock(dock_id):
     payload = {"command": "unlock"}
     
     try:
-        logger.debug(f"About to unlock dock {dock_id}, {headers=}, {payload=}")
+        logging.debug(f"About to unlock dock {dock_id}, {headers=}, {payload=}")
         response = requests.post(url, headers=headers, json=payload, timeout=10)
-        logger.debug(f"Response from unlocking dock {dock_id}: {response.text}")
+        logging.debug(f"Response from unlocking dock {dock_id}: {response.text}")
         if response.status_code != 200:
             response_json = response.json()
-            logger.error(f"Response from unlocking dock {dock_id}: {response_json}")
-            logger.error(f"Failed to unlock dock {dock_id}, status code: {response.status_code}, response: {response_json.get('error_code')=}, {response_json.get('error_message')=}")
+            logging.error(f"Response from unlocking dock {dock_id}: {response_json}")
+            logging.error(f"Failed to unlock dock {dock_id}, status code: {response.status_code}, response: {response_json.get('error_code')=}, {response_json.get('error_message')=}")
         response.raise_for_status()
         data = response.json()
-        logger.info(f"Unlocked dock {dock_id} via Bikeep")
+        logging.info(f"Unlocked dock {dock_id} via Bikeep")
         return data
     except Timeout:
-        logger.error(f"Timeout unlocking dock {dock_id} via Bikeep")
+        logging.error(f"Timeout unlocking dock {dock_id} via Bikeep")
         raise
     except ConnectionError:
-        logger.error(f"Connection error unlocking dock {dock_id} via Bikeep")
+        logging.error(f"Connection error unlocking dock {dock_id} via Bikeep")
         raise
     except RequestException as e:
-        logger.error(f"Error unlocking dock {dock_id} via Bikeep: {e}")
+        logging.error(f"Error unlocking dock {dock_id} via Bikeep: {e}")
         raise
 
 def take_photo(device_id):
@@ -345,14 +344,14 @@ def take_photo(device_id):
         response = requests.post(url, headers=headers, json=payload, timeout=10)
         response.raise_for_status()
         data = response.json()
-        logger.info(f"Triggered photo capture for device {device_id} via Bikeep")
+        logging.info(f"Triggered photo capture for device {device_id} via Bikeep")
         return data
     except Timeout:
-        logger.error(f"Timeout triggering photo capture for device {device_id} via Bikeep")
+        logging.error(f"Timeout triggering photo capture for device {device_id} via Bikeep")
         raise
     except ConnectionError:
-        logger.error(f"Connection error triggering photo capture for device {device_id} via Bikeep")
+        logging.error(f"Connection error triggering photo capture for device {device_id} via Bikeep")
         raise
     except RequestException as e:
-        logger.error(f"Error triggering photo capture for device {device_id} via Bikeep: {e}")
+        logging.error(f"Error triggering photo capture for device {device_id} via Bikeep: {e}")
         raise

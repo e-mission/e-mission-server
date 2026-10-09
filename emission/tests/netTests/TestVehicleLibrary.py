@@ -20,8 +20,6 @@ os.environ.setdefault('STRIPE_SECRET_KEY', 'sk_test_dummy')
 import emission.net.api.vehicle_library as vl
 import emission.storage.timeseries.abstract_timeseries as esta
 
-logger = logging.getLogger(__name__)
-
 VEHICLE_ID = "test-bike-001"
 DOCK_ID = "test-dock-1"
 ALT_DOCK_ID = "test-dock-2"
