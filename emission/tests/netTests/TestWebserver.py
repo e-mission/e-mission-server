@@ -90,6 +90,41 @@ class TestWebserver(unittest.TestCase):
 
         mock_abort.assert_called_once_with(404, "Vehicle bike-1 not found")
 
+    def test_json_error_handler_returns_abort_message_as_json(self):
+        resp = SimpleNamespace(content_type=None)
+        with self.mock.patch.object(enacw, "request", SimpleNamespace(method="POST", path="/library/checkout")), \
+             self.mock.patch.object(enacw, "response", resp):
+            body = enacw.json_error_handler(enacw.HTTPError(404, "Vehicle bike-1 not found"))
+        self.assertEqual(json.loads(body), {'error': 'Vehicle bike-1 not found'})
+        self.assertEqual(resp.content_type, 'application/json')
+
+    def test_json_error_handler_does_not_send_tracebacks(self):
+        resp = SimpleNamespace(content_type=None)
+        err = enacw.HTTPError(500, "Internal Server Error", RuntimeError("boom"), "Traceback: secret detail")
+        with self.mock.patch.object(enacw, "request", SimpleNamespace(method="POST", path="/library/checkout")), \
+             self.mock.patch.object(enacw, "response", resp):
+            body = enacw.json_error_handler(err)
+        self.assertEqual(json.loads(body), {'error': 'Internal Server Error'})
+        self.assertNotIn('secret detail', body)
+
+    def test_app_uses_json_error_handler(self):
+        self.assertIs(enacw.app.default_error_handler, enacw.json_error_handler)
+
+    def test_404_from_a_route_is_json_but_unknown_url_redirects(self):
+        resp = SimpleNamespace(content_type=None, status=None, set_header=self.mock.MagicMock())
+        err = enacw.HTTPError(404, "Vehicle bike-1 not found")
+        matched = SimpleNamespace(method="POST", path="/library/checkout", environ={'route.handle': object()})
+        with self.mock.patch.object(enacw, "request", matched), self.mock.patch.object(enacw, "response", resp):
+            body = enacw.error404(err)
+        self.assertEqual(json.loads(body), {'error': 'Vehicle bike-1 not found'})
+        resp.set_header.assert_not_called()
+
+        unmatched = SimpleNamespace(method="GET", path="/nope", environ={})
+        with self.mock.patch.object(enacw, "request", unmatched), self.mock.patch.object(enacw, "response", resp):
+            enacw.error404(err)
+        self.assertEqual(resp.status, 301)
+        resp.set_header.assert_called_once_with('Location', enacw.not_found_redirect)
+
     def test_bikeshare_checkout_aborts_on_hold_amount_missing(self):
         test_uuid = uuid.uuid4()
         req = SimpleNamespace(json={"vehicle_id": "bike-1"})

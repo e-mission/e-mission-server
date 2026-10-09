@@ -67,6 +67,15 @@ BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 print("Finished configuring logging for %s" % logging.getLogger())
 app = app()
 
+def json_error_handler(res):
+    # Bottle never sends an HTTPError's own body, so return abort()'s message as JSON; keep tracebacks server-side
+    if res.traceback:
+        logging.error("%s for %s %s:\n%s" % (res.status, request.method, request.path, res.traceback))
+    response.content_type = 'application/json'
+    return json.dumps({'error': str(res.body)})
+
+app.default_error_handler = json_error_handler
+
 # On MacOS, the current working directory is always in the python path However,
 # on ubuntu, it looks like the script directory (api in our case) is in the
 # python path, but the pwd is not. This means that "main" is not seen even if
@@ -493,6 +502,9 @@ def habiticaProxy():
 
 @error(404)
 def error404(error):
+    # only redirect unknown URLs; an abort(404) from a matched route is a real API error
+    if 'route.handle' in request.environ:
+        return json_error_handler(error)
     response.status = 301
     response.set_header('Location', not_found_redirect)
 
