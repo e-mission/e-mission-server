@@ -273,7 +273,10 @@ def capture_hold_payment_intent(payment_intent_id, amount_to_capture_cents):
     if amount_to_capture_cents is None:
         raise ValueError("amount_to_capture_cents is required")
 
-    if int(amount_to_capture_cents) > 0:
+    # If it's less than 50 cents, Stripe won't let us capture it.
+    # This also gives users a grace period: if they change their mind
+    # quickly, they won't be charged a negligible amount
+    if amount_to_capture_cents >= 50:
         payload = {"amount_to_capture": int(amount_to_capture_cents)}
 
         try:

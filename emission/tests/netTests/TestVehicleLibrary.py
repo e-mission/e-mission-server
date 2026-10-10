@@ -57,6 +57,11 @@ class TestVehicleLibrary(unittest.TestCase):
         self._dock_code_patcher.start()
         self._sandbox_patcher = patch.object(vl.ss, 'STRIPE_IS_SANDBOX', True)
         self._sandbox_patcher.start()
+        # docks latch immediately unless a test says otherwise
+        self._device_state_patcher = patch.object(vl.bikeep_service, 'get_device_state', return_value={'value': 'LOCKED', 'changed_at': '2020-01-01T00:00:00Z'})
+        self._device_state_patcher.start()
+        self._poll_patcher = patch.object(vl, 'LOCK_CONFIRM_POLL_SECS', 0)
+        self._poll_patcher.start()
 
         # Clean up any previous test data
 
@@ -76,6 +81,8 @@ class TestVehicleLibrary(unittest.TestCase):
         self._dock_code_patcher.stop()
         self._fee_config_patcher.stop()
         self._sandbox_patcher.stop()
+        self._device_state_patcher.stop()
+        self._poll_patcher.stop()
 
     # ------------------------------------------------------------------
     # Helpers
