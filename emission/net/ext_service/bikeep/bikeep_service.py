@@ -246,6 +246,24 @@ def get_location(device_id):
         logging.error(f"Error retrieving location for device {device_id} from Bikeep: {e}")
         raise
 
+def get_device_state(device_id):
+    """
+    Get a Bikeep device's current state, e.g.
+    {"value": "LOCKING", "changed_at": "2026-02-26T10:30:00Z", "timeout_at": "..."}
+
+    Raises RequestException if the API call fails.
+    """
+    url = f"{BIKEEP_API_URL}/device/v1/devices/{device_id}"
+    headers = _get_headers()
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        return response.json().get('state') or {}
+    except RequestException as e:
+        logging.error(f"Error retrieving state for device {device_id} from Bikeep: {e}")
+        raise
+
 def lock_dock(dock_id):
     """
     Lock a dock via Bikeep API.

@@ -22,6 +22,11 @@ from emission.net.api.api_error import ApiError
 
 DEFAULT_HOLD_AMOUNT_CENTS = 100
 VEHICLE_RENTAL_KEY = "manual/vehicle_rental"
+# a STARTED/HELD checkout older than this can't still be in progress, so it was abandoned partway
+ABANDONED_CHECKOUT_SECS = 5 * 60
+LOCK_CONFIRM_POLL_SECS = 2
+# Android's HTTP client gives up after 60s, so stop waiting for the latch well before then
+LOCK_CONFIRM_MAX_SECS = 45
 
 def get_fee_expression():
     config = edc.get_deployment_config() or {}
@@ -83,10 +88,13 @@ def _get_loc_and_timezone(dock_id):
         ret_tz = tzfpy.get_tz(lng, lat)
         return ret_loc, ret_tz
 
-def _get_active_rental_entry(user_uuid):
+def _get_active_rental_entry(user_uuid, include_captured=False):
+    statuses = [ecwr.RentalStatus.ACTIVE, ecwr.RentalStatus.INITIALIZING]
+    if include_captured:
+        statuses.append(ecwr.RentalStatus.CAPTURED)
     active_entries = _get_rental_ts(user_uuid).find_entries(
         [VEHICLE_RENTAL_KEY],
-        extra_query_list=[{"data.rental_status": {"$in": [ecwr.RentalStatus.ACTIVE, ecwr.RentalStatus.INITIALIZING]}}],
+        extra_query_list=[{"data.rental_status": {"$in": statuses}}],
     )
     logging.debug(f"Found {len(active_entries)} active rental entries for user {user_uuid}")
     if len(active_entries) == 0:
@@ -115,6 +123,76 @@ def _update_rental_state(user_uuid, rental_entry_id, new_rental_state):
         rental_entry_id,
         new_rental_state,
     )
+
+
+def _state_changed_ts(state):
+    changed_at = state.get('changed_at')
+    return arrow.get(changed_at).timestamp() if changed_at else None
+
+
+def _wait_for_dock_to_latch(dock_id, lock_sent_ts):
+    """
+    A lock command only arms the dock; it latches once the user lowers the arm over the bike.
+    Poll until the dock leaves LOCKING: LOCKED means latched, UNLOCKED means it gave up.
+    """
+    deadline = time.time() + LOCK_CONFIRM_MAX_SECS
+    while True:
+        state = bikeep_service.get_device_state(dock_id)
+        value = state.get('value')
+        if value == 'LOCKED':
+            return
+        changed_ts = _state_changed_ts(state)
+        # an UNLOCKED from before the command is just the dock not having picked it up yet
+        if value == 'UNLOCKED' and changed_ts is not None and changed_ts >= lock_sent_ts:
+            raise RuntimeError(f"Dock {dock_id} went back to UNLOCKED without latching")
+        if time.time() >= deadline:
+            bikeep_service.unlock_dock(dock_id)
+            raise RuntimeError(f"Dock {dock_id} still {value} after {LOCK_CONFIRM_MAX_SECS}s")
+        time.sleep(LOCK_CONFIRM_POLL_SECS)
+
+
+def _cancel_abandoned_checkouts(user_uuid):
+    """
+    A checkout that failed partway (e.g. the dock didn't unlock and the hold couldn't be
+    released) is left STARTED or HELD, which would block every later checkout.
+    Release any hold it still has and mark it CANCELLED.
+    """
+    now = time.time()
+    entries = _get_rental_ts(user_uuid).find_entries(
+        [VEHICLE_RENTAL_KEY],
+        extra_query_list=[{"data.rental_status": {"$in": [ecwr.RentalStatus.STARTED, ecwr.RentalStatus.HELD]}}],
+    )
+    for entry in entries:
+        rental_state = ecwr.Rental(entry['data'])
+        # If there is a checkout that is still in progress, we don't want to cancel it
+        if not rental_state.get('checkout_failed') and now - entry['metadata']['write_ts'] < ABANDONED_CHECKOUT_SECS:
+            continue
+        hold_info = rental_state.get('payment_hold_info') or {}
+        hold_id = hold_info.get('id')
+        capture_before = (
+            (hold_info.get('latest_charge') or {})
+            .get('payment_method_details', {})
+            .get('card', {})
+            .get('capture_before')
+        )
+        # stripe releases an uncaptured hold on its own once it expires, and cancelling it then fails
+        hold_expired = capture_before is not None and capture_before < now
+        if hold_id and not hold_expired:
+            try:
+                ss.cancel_hold_payment_intent(hold_id)
+            except Exception as cancel_err:
+                logging.error(f"Failed to cancel hold {hold_id} from abandoned checkout for user {user_uuid}: {cancel_err}")
+                raise ApiError(424, 'UNLOCK_FAILED_HOLD_STUCK',
+                               f"Failed to cancel hold {hold_id} from abandoned checkout of vehicle {rental_state.vehicle_id}, {cancel_err=}")
+        logging.info(f"Cancelling abandoned {rental_state.rental_status} checkout of vehicle {rental_state.vehicle_id} for user {user_uuid}")
+        rental_state['rental_status'] = ecwr.RentalStatus.CANCELLED
+        _update_rental_state(user_uuid, entry['_id'], rental_state)
+        if hold_id:
+            edb.get_profile_db().update_one(
+                {'user_id': user_uuid},
+                {'$set': {'payment_hold_expires_ts': None}},
+                upsert=True,
+            )
 
 # BEGIN: bikeeep passthrough integration
 # The calls in this section are direct passthroughs to the Bikeep service.
@@ -218,6 +296,7 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents, subgroup=None):
     if not dock_code:
         raise ApiError(409, 'VEHICLE_NOT_AVAILABLE', "Vehicle %s has no dock location to unlock" % vehicle_id)
 
+    _cancel_abandoned_checkouts(user_uuid)
     most_recent_rental = _get_most_recent_rental(user_uuid)
 
     # None during startup Completed otherwise
@@ -339,9 +418,16 @@ def checkout_vehicle(user_uuid, vehicle_id, hold_amount_cents, subgroup=None):
             )
         except Exception as cancel_err:
             # TODO: figure out what we should do here
-            logging.error(f"Failed to cancel hold {hold_info.get('id')} after checkout failure: {cancel_err}")
+            logging.error(f"Failed to cancel hold {(hold_info or {}).get('id')} after checkout failure: {cancel_err}")
             last_saved_rental_state = _get_most_recent_rental(user_uuid)
-            assert last_saved_rental_state['rental_status'] == ecwr.RentalStatus.HELD, f"{last_saved_rental_state=}"
+            # payment-exempt rentals never place a hold, so they stay STARTED
+            assert last_saved_rental_state['rental_status'] in [ecwr.RentalStatus.HELD, ecwr.RentalStatus.STARTED], f"{last_saved_rental_state=}"
+            try:
+                new_rental_state['rental_status'] = last_saved_rental_state['rental_status']
+                new_rental_state['checkout_failed'] = True
+                _update_rental_state(user_uuid, new_rental_id, new_rental_state)
+            except Exception as flag_err:
+                logging.error(f"Failed to mark checkout of vehicle {vehicle_id} as failed for user {user_uuid}: {flag_err}")
             raise ApiError(424, 'UNLOCK_FAILED_HOLD_STUCK', f"Failed to cancel hold after dock unlock failure, {cancel_err=}")
         raise ApiError(424, 'UNLOCK_FAILED', f"Failed to unlock dock for vehicle {vehicle_id} for user {user_uuid}, {unlock_err=}")
 
@@ -379,7 +465,8 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
     - Updates the active rental entry and Vehicle mapping to point back to the dock.
     """
     logging.info(f"Checking in vehicle for user {user_uuid} at dock code {dock_code}")
-    rental_entry = _get_active_rental_entry(user_uuid)
+    # CAPTURED means a previous check-in charged the user but failed to lock, so allow retrying the lock
+    rental_entry = _get_active_rental_entry(user_uuid, include_captured=True)
     if rental_entry is None:
         raise ApiError(409, 'NO_ACTIVE_RENTAL', "No vehicle is currently checked out by this user")
     else:
@@ -425,6 +512,8 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
 
     if curr_rental_state.rental_status == ecwr.RentalStatus.INITIALIZING:
         logging.info(f"Initializing rental for vehicle {curr_rental_state.vehicle_id}, no payment needed")
+    elif curr_rental_state.rental_status == ecwr.RentalStatus.CAPTURED:
+        logging.info(f"Payment for vehicle {vehicle_id} was already captured, only retrying the dock lock")
     elif payment_exempt and payment_hold_info is None:
         logging.info(f"Payment-exempt rental for vehicle {vehicle_id}, no payment needed")
     else:
@@ -455,7 +544,9 @@ def check_in_vehicle(user_uuid, dock_code, subgroup=None):
 
     try:
         logging.debug(f"Locking dock {dock_id} (code {dock_code}) for vehicle {vehicle_id} for user {user_uuid}")
+        lock_sent_ts = time.time()
         bikeep_service.lock_dock(dock_id)
+        _wait_for_dock_to_latch(dock_id, lock_sent_ts)
         new_rental_state.rental_status = ecwr.RentalStatus.COMPLETED
         _update_rental_state(user_uuid, rental_entry['_id'], new_rental_state)
     except Exception as lock_err:
