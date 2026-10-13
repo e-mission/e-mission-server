@@ -5,8 +5,8 @@ import time
 import requests
 from requests.exceptions import Timeout, ConnectionError, RequestException
 
-BIKEEP_API_URL = "https://services.bikeep.com"
-BIKEEP_AUTH_URL = "https://auth.bikeep.com/oauth2/token"
+BIKEEP_API_URL = os.environ.get("BIKEEP_API_URL", "https://services.bikeep.com")
+BIKEEP_AUTH_URL = os.environ.get("BIKEEP_AUTH_URL", "https://auth.bikeep.com/oauth2/token")
 
 logging.basicConfig(level=logging.DEBUG)
 

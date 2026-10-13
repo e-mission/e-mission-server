@@ -7,6 +7,7 @@ external API access or credentials.
 
 # Standard imports
 from builtins import *
+import importlib
 import unittest
 import os
 import time
@@ -33,6 +34,30 @@ class _MockResponse:
     def raise_for_status(self):
         if self.status_code >= 400:
             raise Exception(f"HTTP {self.status_code}")
+
+
+class TestBikeepServiceConfig(unittest.TestCase):
+    def tearDown(self):
+        importlib.reload(bikeep)
+
+    def test_reads_bikeep_urls_from_environment(self):
+        with mock.patch.dict(os.environ, {
+            "BIKEEP_API_URL": "https://mock-bikeep-api.example.com",
+            "BIKEEP_AUTH_URL": "https://mock-bikeep-auth.example.com/oauth2/token",
+        }, clear=False):
+            importlib.reload(bikeep)
+
+            self.assertEqual(bikeep.BIKEEP_API_URL, "https://mock-bikeep-api.example.com")
+            self.assertEqual(bikeep.BIKEEP_AUTH_URL, "https://mock-bikeep-auth.example.com/oauth2/token")
+
+    def test_falls_back_to_default_bikeep_urls(self):
+        with mock.patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("BIKEEP_API_URL", None)
+            os.environ.pop("BIKEEP_AUTH_URL", None)
+            importlib.reload(bikeep)
+
+            self.assertEqual(bikeep.BIKEEP_API_URL, "https://services.bikeep.com")
+            self.assertEqual(bikeep.BIKEEP_AUTH_URL, "https://auth.bikeep.com/oauth2/token")
 
 
 class TestBikeepServiceMocked(unittest.TestCase):
