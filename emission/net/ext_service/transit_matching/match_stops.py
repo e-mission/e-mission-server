@@ -5,6 +5,10 @@ import attrdict as ad
 import itertools
 import os
 import time
+import hashlib
+
+# Set up Overpass API and caching configuration
+CACHE_DIR = None
 
 try:
     GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
@@ -13,6 +17,9 @@ try:
 except:
     print("overpass not configured, falling back to public overpass api")
     url = "https://lz4.overpass-api.de/"
+    # Enable cache when using the public API
+    CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache")
+    os.makedirs(CACHE_DIR, exist_ok=True)
 
 try:
     with open('conf/net/ext_service/overpass_transit_stops_query_template', 'r', encoding='UTF-8') as query_file:
@@ -24,8 +31,46 @@ except FileNotFoundError:
 
 RETRY = -1
 
+def query_overpass(overpass_query):
+    """
+    Wrapper function that handles caching of Overpass API responses.
+    If in production mode (CACHE_DIR is None), directly uses make_request_and_catch.
+    Otherwise, tries to use cached response if available, or makes request and caches the result.
+    """
+    if CACHE_DIR is None:
+        return make_request_and_catch(overpass_query)
+    
+    # Create a unique filename based on the query hash
+    query_hash = hashlib.md5(overpass_query.encode()).hexdigest()
+    cache_file = os.path.join(CACHE_DIR, f"{query_hash}.json")
+    
+    # If the cached response exists, use it
+    if os.path.exists(cache_file):
+        logging.info(f"Using cached response from {cache_file}")
+        try:
+            with open(cache_file, 'r') as f:
+                all_results = json.load(f)
+            return all_results
+        except Exception as e:
+            logging.warning(f"Error reading cache file: {e}, falling back to API")
+    
+    # Else, make the request and cache the response before returning
+    all_results = make_request_and_catch(overpass_query)
+    
+    # Only cache successful results (not RETRY signal)
+    if all_results != RETRY and all_results:
+        try:
+            with open(cache_file, 'w') as f:
+                json.dump(all_results, f)
+            logging.info(f"Cached API response to {cache_file}")
+        except Exception as e:
+            logging.warning(f"Error caching response: {e}")
+    
+    return all_results
+
 def make_request_and_catch(overpass_query):
     try:
+        logging.info("Making API request to Overpass")
         response = requests.post(url + "api/interpreter", data=overpass_query)
     except requests.exceptions.ChunkedEncodingError as e:
         logging.info("ChunkedEncodingError while creating request %s" % (e))
@@ -77,7 +122,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     while call_return == RETRY:
         if retry_count > 0:
             logging.info(f"call_return = {call_return}, retrying...")
-        call_return = make_request_and_catch(overpass_query)
+        call_return = query_overpass(overpass_query)
         logging.info(f"after retry, got {'RETRY' if call_return == RETRY else len(call_return)}...")
         if call_return == RETRY:
             retry_count = retry_count + 1
