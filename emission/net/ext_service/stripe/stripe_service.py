@@ -16,11 +16,11 @@ STRIPE_API_BASE = "https://api.stripe.com"
 STRIPE_IS_SANDBOX = STRIPE_SECRET_KEY is None or STRIPE_SECRET_KEY.startswith("sk_test")
 # END DO NOT REFACTOR: I do not want to wrap these accesses
 
-logging.debug("About to configure stripe with STRIPE_SECRET_KEY=%s,\
-               STRIPE_API_BASE=%s" % (
-    STRIPE_SECRET_KEY[:5] + "..." if STRIPE_SECRET_KEY else None,
-    STRIPE_API_BASE,
-))
+logging.debug(f"About to configure stripe with STRIPE_SECRET_KEY={STRIPE_SECRET_KEY[:5] + '...' + STRIPE_SECRET_KEY[-5:] if STRIPE_SECRET_KEY else None},\n\
+               STRIPE_API_BASE={STRIPE_API_BASE},\n\
+               APP_URL_PREFIX={APP_URL_PREFIX},\n\
+               STRIPE_IS_SANDBOX={STRIPE_IS_SANDBOX}")
+
 stripe.api_key = STRIPE_SECRET_KEY
 stripe.api_base = STRIPE_API_BASE
 

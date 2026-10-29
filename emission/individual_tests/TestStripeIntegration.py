@@ -112,21 +112,36 @@ class TestStripeIntegration(unittest.TestCase):
 
         self.assertIsInstance(latest_charge, dict)
 
-        payment_intent_keys = sorted(retrieved.keys())
-        print(f"payment_intent_keys: {payment_intent_keys}")
-
-        latest_charge_keys = sorted(latest_charge.keys())
-        print(f"latest_charge_keys: {latest_charge_keys}")
-        self.assertTrue(latest_charge_keys)
+        self.assertIn("id", latest_charge)
+        self.assertIn("amount", latest_charge)
+        self.assertIn("payment_method_details", latest_charge)
 
         pm_details = latest_charge.get("payment_method_details") or {}
-        pm_details_keys = sorted(pm_details.keys()) if isinstance(pm_details, dict) else []
-        print(f"pm_details_keys: {pm_details_keys}")
+        self.assertIsInstance(pm_details, dict)
+        self.assertIn("card", pm_details)
 
-        card_details = pm_details.get("card") if isinstance(pm_details, dict) else None
-        card_details_keys = sorted(card_details.keys()) if isinstance(card_details, dict) else []
-        print(f"card_details_keys: {card_details_keys}")
-        print(f"capture_before: {card_details.get('capture_before') if isinstance(card_details, dict) else None}")
+        card_details = pm_details.get("card")
+        self.assertIsInstance(card_details, dict)
+        self.assertIn("capture_before", card_details)
+        self.assertIsNotNone(card_details.get("capture_before"))
+
+    def test_cancel_already_cancelled_payment(self):
+        self._setup_payment_method()
+
+        hold_intent = self._create_hold_intent(250)
+        payment_intent_id = hold_intent["id"]
+
+        first_cancel = stripe_service.cancel_hold_payment_intent(payment_intent_id)
+        self._log_stripe_result("stripe first cancel result", first_cancel)
+        self.assertEqual(first_cancel.get("status"), "canceled")
+
+        with self.assertRaises(stripe.error.InvalidRequestError) as err_ctx:
+            stripe_service.cancel_hold_payment_intent(payment_intent_id)
+
+        err_str = str(err_ctx.exception)
+        print(f"already-cancelled cancel error with code: {err_ctx.exception.code} and {err_str}")
+        self._log_stripe_result("stripe cancel already-cancelled result", err_str)
+        self.assertTrue("cancel" in err_str.lower() or "canceled" in err_str.lower())
 
     def test_capture_amount_partial(self):
         self._setup_payment_method()
