@@ -24,6 +24,12 @@ renew_payment_holds = importlib.util.module_from_spec(_SCRIPT_SPEC)
 _SCRIPT_SPEC.loader.exec_module(renew_payment_holds)
 
 
+class FakeInvalidRequestError(RuntimeError):
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.code = code
+
+
 class TestRenewPaymentHolds(unittest.TestCase):
     def setUp(self):
         self.profile_db = edb.get_profile_db()
@@ -74,11 +80,13 @@ class TestRenewPaymentHolds(unittest.TestCase):
         future_user = uuid.uuid4()
         missing_rental_user = uuid.uuid4()
         missing_hold_user = uuid.uuid4()
+        future_capture_user = uuid.uuid4()
 
         self._insert_profile(renewed_user, now + 60)
         self._insert_profile(future_user, now + (2 * renew_payment_holds.RENEWAL_WINDOW_SECS))
         self._insert_profile(missing_rental_user, now + 60)
         self._insert_profile(missing_hold_user, now + 60)
+        self._insert_profile(future_capture_user, now + 60)
 
         self._insert_active_rental(
             renewed_user,
@@ -91,6 +99,20 @@ class TestRenewPaymentHolds(unittest.TestCase):
         self._insert_active_rental(
             missing_hold_user,
             {'amount': 100},
+        )
+        self._insert_active_rental(
+            future_capture_user,
+            {
+                'id': 'pi_hold_future_capture',
+                'amount': 100,
+                'latest_charge': {
+                    'payment_method_details': {
+                        'card': {
+                            'capture_before': now + (2 * renew_payment_holds.RENEWAL_WINDOW_SECS),
+                        },
+                    },
+                },
+            },
         )
 
         new_expires_at = now + 7200
@@ -108,13 +130,119 @@ class TestRenewPaymentHolds(unittest.TestCase):
 
         self.assertEqual(summary, {
             'scanned': 4,
-            'renewed': 1,
-            'skipped': 3,
+            'renewed': 2,
+            'skipped': 2,
             'failures': 0,
         })
 
         profile = self.profile_db.find_one({'user_id': renewed_user})
         self.assertEqual(profile['payment_hold_expires_ts'], new_expires_at)
+
+    def test_renew_hold_for_rental_skips_when_capture_before_is_far_in_future(self):
+        user_uuid = uuid.uuid4()
+        rental_entry = {
+            '_id': 'rental_capture_before_future',
+            'user_id': user_uuid,
+            'data': {
+                'vehicle_id': 'test-vehicle-001',
+                'payment_hold_info': {
+                    'id': 'pi_old_hold',
+                    'amount': 100,
+                    'latest_charge': {
+                        'payment_method_details': {
+                            'card': {
+                                'capture_before': time.time() + (2 * renew_payment_holds.RENEWAL_WINDOW_SECS),
+                            },
+                        },
+                    },
+                },
+            },
+        }
+
+        with patch.object(renew_payment_holds.ss, 'create_hold_payment_intent') as create_mock, \
+             patch.object(renew_payment_holds.ss, 'cancel_hold_payment_intent') as cancel_mock, \
+             patch.object(renew_payment_holds.vl, '_update_rental_state'):
+            result = renew_payment_holds.renew_hold_for_rental(rental_entry)
+
+        self.assertFalse(result)
+        create_mock.assert_not_called()
+        cancel_mock.assert_not_called()
+
+    def test_renew_hold_for_rental_requires_capture_before(self):
+        user_uuid = uuid.uuid4()
+        self._insert_profile(user_uuid, time.time() + 60)
+        self._insert_active_rental(
+            user_uuid,
+            {'id': 'pi_hold_missing_capture', 'amount': 100},
+        )
+
+        with patch.object(renew_payment_holds.ss, 'create_hold_payment_intent', return_value={
+            'id': 'pi_hold_missing_capture_new',
+        }), patch.object(renew_payment_holds.ss, 'cancel_hold_payment_intent', return_value={}):
+            summary = renew_payment_holds.renew_expiring_holds()
+
+        self.assertEqual(summary, {
+            'scanned': 1,
+            'renewed': 1,
+            'skipped': 0,
+            'failures': 0,
+        })
+
+    def test_renew_hold_for_rental_ignores_already_canceled_invalid_request(self):
+        user_uuid = uuid.uuid4()
+        rental_entry = {
+            '_id': 'rental_1',
+            'user_id': user_uuid,
+            'data': {
+                'vehicle_id': 'test-vehicle-001',
+                'payment_hold_info': {'id': 'pi_old_hold', 'amount': 100},
+            },
+        }
+
+        with patch.object(renew_payment_holds.ss, 'InvalidRequestError', FakeInvalidRequestError, create=True), \
+             patch.object(renew_payment_holds.ss, 'create_hold_payment_intent', return_value={
+                 'id': 'pi_new_hold',
+                 'latest_charge': {'payment_method_details': {'card': {'capture_before': 123}}},
+             }), \
+             patch.object(renew_payment_holds.ss, 'cancel_hold_payment_intent', side_effect=[
+                 FakeInvalidRequestError('old hold is unexpected', code='payment_intent_unexpected_state'),
+             ]) as cancel_mock, \
+             patch.object(renew_payment_holds.ss, 'retrieve_payment_intent', return_value={'status': 'canceled'}, create=True), \
+             patch.object(renew_payment_holds.vl, '_update_rental_state'):
+            result = renew_payment_holds.renew_hold_for_rental(rental_entry)
+
+        self.assertTrue(result)
+        self.assertEqual(cancel_mock.call_count, 1)
+        self.assertEqual(cancel_mock.call_args[0][0], 'pi_old_hold')
+
+    def test_renew_hold_for_rental_cancels_new_hold_on_unexpected_old_hold_state(self):
+        user_uuid = uuid.uuid4()
+        rental_entry = {
+            '_id': 'rental_2',
+            'user_id': user_uuid,
+            'data': {
+                'vehicle_id': 'test-vehicle-001',
+                'payment_hold_info': {'id': 'pi_old_hold', 'amount': 100},
+            },
+        }
+
+        with patch.object(renew_payment_holds.ss, 'InvalidRequestError', FakeInvalidRequestError, create=True), \
+             patch.object(renew_payment_holds.ss, 'create_hold_payment_intent', return_value={
+                 'id': 'pi_new_hold',
+                 'latest_charge': {'payment_method_details': {'card': {'capture_before': 456}}},
+             }), \
+             patch.object(renew_payment_holds.ss, 'cancel_hold_payment_intent', side_effect=[
+                 FakeInvalidRequestError('old hold is unexpected', code='payment_intent_unexpected_state'),
+                 None,
+             ]) as cancel_mock, \
+             patch.object(renew_payment_holds.ss, 'retrieve_payment_intent', return_value={'status': 'processing'}, create=True), \
+             patch.object(renew_payment_holds.vl, '_update_rental_state'):
+            result = renew_payment_holds.renew_hold_for_rental(rental_entry)
+
+        self.assertTrue(result)
+        self.assertEqual(cancel_mock.call_count, 2)
+        self.assertEqual(cancel_mock.call_args_list[0].args[0], 'pi_old_hold')
+        self.assertEqual(cancel_mock.call_args_list[1].args[0], 'pi_new_hold')
 
     def test_renew_expiring_holds_counts_failures(self):
         now = int(time.time())
