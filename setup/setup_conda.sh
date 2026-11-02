@@ -42,7 +42,7 @@ case "$UNAME_S:$UNAME_M" in
     *)
         echo "Error: Unsupported platform $UNAME_S/$UNAME_M"
         echo "Supported platform mappings are Linux-x86_64, Linux-aarch64, MacOSX-x86_64, MacOSX-arm64"
-        WINDOWS_INSTALLER_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe"
+        WINDOWS_INSTALLER_URL="https://github.com/conda-forge/miniforge/releases/$EXP_CONDA_VER/download/Miniforge3-Windows-x86_64.exe"
         echo "For Windows, manually download and install $WINDOWS_INSTALLER_URL"
         exit 2
         ;;
@@ -54,7 +54,7 @@ fi
 SOURCE_SCRIPT="$INSTALL_PREFIX/etc/profile.d/conda.sh"
 
 echo "Installing Miniforge for platform $PLATFORM at $INSTALL_PREFIX"
-DOWNLOAD_URL=https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$PLATFORM.sh
+DOWNLOAD_URL=https://github.com/conda-forge/miniforge/releases/download/$EXP_CONDA_VER/Miniforge3-$PLATFORM.sh
 INSTALLER_PATH=$(mktemp "${TMPDIR:-/tmp}/miniforge-XXXXXX.sh")
 echo "Downloading installer from URL ${DOWNLOAD_URL}"
 curl -o "$INSTALLER_PATH" -L ${DOWNLOAD_URL}
