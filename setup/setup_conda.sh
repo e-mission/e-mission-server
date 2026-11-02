@@ -42,7 +42,7 @@ case "$UNAME_S:$UNAME_M" in
     *)
         echo "Error: Unsupported platform $UNAME_S/$UNAME_M"
         echo "Supported platform mappings are Linux-x86_64, Linux-aarch64, MacOSX-x86_64, MacOSX-arm64"
-        WINDOWS_INSTALLER_URL="https://github.com/conda-forge/miniforge/releases/$EXP_CONDA_VER/download/Miniforge3-Windows-x86_64.exe"
+        WINDOWS_INSTALLER_URL="https://github.com/conda-forge/miniforge/releases/download/$EXP_CONDA_VER/Miniforge3-Windows-x86_64.exe"
         echo "For Windows, manually download and install $WINDOWS_INSTALLER_URL"
         exit 2
         ;;

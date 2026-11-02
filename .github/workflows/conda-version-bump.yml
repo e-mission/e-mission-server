@@ -17,20 +17,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install the latest Miniforge toolchain
-        uses: conda-incubator/setup-miniconda@v4
-        with:
-          miniforge-version: latest
-          activate-environment: base
-          auto-update-conda: false
-
-      - name: Get installed conda version
+      - name: Get latest Miniforge release
         id: conda-version
-        shell: bash -el {0}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          version="$(conda --version | awk '{print $2}')"
+          version="$(gh api repos/conda-forge/miniforge/releases/latest --jq .tag_name)"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "Installed conda $version"
+          echo "Latest Miniforge release $version"
 
       - name: Update setup/export_versions.sh if needed
         id: bump
