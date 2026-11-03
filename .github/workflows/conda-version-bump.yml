@@ -23,17 +23,32 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          version="$(gh api repos/conda-forge/miniforge/releases/latest --jq .tag_name)"
+          tag="$(gh api repos/conda-forge/miniforge/releases/latest --jq .tag_name)"
+          if [[ "$tag" =~ ^v?([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+            version="${BASH_REMATCH[1]}"
+            suffix="${BASH_REMATCH[2]}"
+          else
+            version="$tag"
+            suffix=""
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "Latest Miniforge release $version"
+          echo "suffix=$suffix" >> "$GITHUB_OUTPUT"
+          echo "Latest Miniforge release $tag"
 
       - name: Update setup/export_versions.sh if needed
         id: bump
         shell: bash
         run: |
           version="${{ steps.conda-version.outputs.version }}"
+          suffix="${{ steps.conda-version.outputs.suffix }}"
           path="setup/export_versions.sh"
+
           new_text="export EXP_CONDA_VER=${version}\n"
+          if [ -n "$suffix" ]; then
+            new_text+="export EXP_CONDA_VER_SUFFIX=${suffix}\n"
+          fi
 
           if [ -f "$path" ] && printf '%b' "$new_text" | cmp -s - "$path"; then
             echo "updated=false" >> "$GITHUB_OUTPUT"
@@ -43,6 +58,7 @@ jobs:
           printf '%b' "$new_text" > "$path"
           echo "updated=true" >> "$GITHUB_OUTPUT"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "suffix=${suffix}" >> "$GITHUB_OUTPUT"
 
       - name: Create pull request
         if: steps.bump.outputs.updated == 'true'
