@@ -15,7 +15,7 @@ fi
 echo "${DB_HOST:-}"
 
 echo "Setting up conda..."
-source setup/setup_conda.sh
+source setup/setup_conda.sh ""
 
 echo "Setting up the test environment..."
 source setup/setup_tests.sh
