@@ -62,6 +62,7 @@ jobs:
 
       - name: Create pull request
         if: steps.bump.outputs.updated == 'true'
+        id: create-pr
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "Bump Miniforge Conda version to ${{ steps.bump.outputs.version }}"
@@ -72,3 +73,10 @@ jobs:
 
             The workflow captures the actual conda version installed during the run and writes it to the repo pin used by `setup/setup_conda.sh`.
           delete-branch: true
+
+      - name: Trigger docker validation workflow
+        if: steps.bump.outputs.updated == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: test-with-docker.yml
+          ref: ${{ steps.create-pr.outputs.pull-request-branch || format('chore/bump-miniforge-{0}', steps.bump.outputs.version) }}
