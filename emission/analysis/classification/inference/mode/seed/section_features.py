@@ -10,6 +10,7 @@ import emission.core.get_database as edb
 from emission.core.get_database import get_section_db, get_mode_db, get_routeCluster_db,get_transit_db
 from emission.core.common import calDistance, Include_place_2
 from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
+import emission.core.common as ec
 
 Sections = get_section_db()
 from pymongo import MongoClient
@@ -30,24 +31,8 @@ def calSpeed(trackpoint1, trackpoint2):
   else:
     return None
 
-# This formula is from:
-# http://www.movable-type.co.uk/scripts/latlong.html
-# It returns the heading between two points using 
-def calHeading(point1, point2):
-    # points are in GeoJSON format, ie (lng, lat)
-    phi1 = math.radians(point1[1])
-    phi2 = math.radians(point2[1])
-    lambda1 = math.radians(point1[0])
-    lambda2 = math.radians(point2[0])
-
-    y = math.sin(lambda2-lambda1) * math.cos(phi2)
-    x = math.cos(phi1)*math.sin(phi2) - \
-        math.sin(phi1)*math.cos(phi2)*math.cos(lambda2-lambda1)
-    brng = math.degrees(math.atan2(y, x))
-    return brng
-
 def calHC(point1, point2, point3):
-	HC = calHeading(point2, point3) - calHeading(point1, point2)
+	HC = ec.calHeading(point2, point3) - ec.calHeading(point1, point2)
 	return HC
 
 def calHCR(segment):
