@@ -24,9 +24,11 @@ source setup/setup.sh
 conda clean -t
 conda clean -p
 
-# Remove all tests
-find /root/miniforge-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
-find ~/miniforge-25.1.1 -name \*tests\* -path '*/site-packages/*' | grep ".*/site-packages/tests" | xargs rm -rf
+# Remove all tests and dev dependencies
+# This will ensure that we don't have to keep changing the setup scripts, but
+# also that we don't trip up vulnerability checkers on packages that are not actually utilized
+find /root/miniforge-$EXP_CONDA_VER/pkgs -wholename \*info/test\* -type d | xargs rm -rf
+find /root/miniforge-$EXP_CONDA_VER -name \*tests\* -path '*/site-packages/*' | grep ".*/site-packages/tests" | xargs rm -rf
 
 if [ -d "/conf" ]; then
     echo "Found configuration, overriding..."

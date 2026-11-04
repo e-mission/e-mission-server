@@ -8,4 +8,4 @@
 source setup/checks/check_for_conda.sh
 
 echo "Installing using conda now"
-conda env update --name emission --file setup/environment36.yml
+conda env update --name emission --file setup/environment.yml
