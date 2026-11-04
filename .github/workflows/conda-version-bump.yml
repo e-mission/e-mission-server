@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get latest Miniforge release
         id: conda-version
@@ -64,7 +64,7 @@ jobs:
       - name: Create pull request
         if: steps.bump.outputs.updated == 'true'
         id: create-pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "Bump Miniforge Conda version to ${{ steps.bump.outputs.version }}"
           branch: "chore/bump-miniforge-${{ steps.bump.outputs.version }}"
