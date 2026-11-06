@@ -2,6 +2,7 @@ name: emission
 channels:
   - conda-forge
 dependencies:
+  - python=3.12
   - arrow=1.4.0
   - attrdict=2.0.1
   - cheroot=11.1.2
@@ -13,6 +14,7 @@ dependencies:
   - pandas=3.1.1
   - pip=25.1
   - python-dateutil=4.0.0
+  - pytz=2026.3.post1
   - requests=2.34.2
   - scikit-learn=1.9.1
   - scipy=1.18.1
