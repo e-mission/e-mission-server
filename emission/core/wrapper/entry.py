@@ -91,6 +91,8 @@ class Entry(ecwb.WrapperBase):
             "manual/destination_confirm": "userlabel",
             # demographic survey
             "manual/demographic_survey": "onetimesurvey",
+            # vehicle rental lifecycle entry
+            "manual/vehicle_rental": "rental",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **

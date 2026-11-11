@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     # Tests runner is functional
     - name: Workflow test
@@ -24,5 +24,5 @@ jobs:
         GEOFABRIK_OVERPASS_KEY: '${{ secrets.GEOFABRIK_OVERPASS_KEY }}'
       run: |
         echo Testing overpass!
-        chmod +x emission/individual_tests/setup_and_test_overpass.sh
-        ./emission/individual_tests/setup_and_test_overpass.sh
+        chmod +x emission/individual_tests/setup_and_test_integration.sh
+        ./emission/individual_tests/setup_and_test_integration.sh emission/individual_tests/TestOverpass.py

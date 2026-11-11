@@ -15,34 +15,60 @@ if [[ -z $EXP_CONDA_VER ]]; then
     exit 1
 fi
 
-PLATFORM=$1
-INSTALL_PREFIX=$2
+INSTALL_PREFIX=$1
+PLATFORM=""
 
-if [[ -z $PLATFORM ]]; then
-    echo "Usage: setup_conda.sh <platform> [install_prefix]"
-    echo "   Platform options are Linux-x86_64, MacOSX-x86_64, MacOSX-arm64"
-    WINDOWS_INSTALLER_URL="https://repo.anaconda.com/miniconda/Miniconda3-py39_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-Windows-x86_64.exe"
-    echo "   For Windows, manually download and install $WINDOWS_INSTALLER_URL"
-    exit 2
+if [[ $INSTALL_PREFIX == "-h" || $INSTALL_PREFIX == "--help" ]]; then
+    echo "Usage: setup_conda.sh [install_prefix]"
+    echo "   Platform is inferred automatically from uname"
+    exit 0
 fi
 
+if [[ -n ${EXP_CONDA_VER_SUFFIX:-} ]]; then
+    RELEASE_TAG="${EXP_CONDA_VER}-${EXP_CONDA_VER_SUFFIX}"
+else
+    RELEASE_TAG="$EXP_CONDA_VER"
+fi
+echo "Reconstituted release tag: $RELEASE_TAG"
+
+UNAME_S=$(uname -s)
+UNAME_M=$(uname -m)
+case "$UNAME_S:$UNAME_M" in
+    Linux:x86_64)
+        PLATFORM="Linux-x86_64"
+        ;;
+    Linux:aarch64|Linux:arm64)
+        PLATFORM="Linux-aarch64"
+        ;;
+    Darwin:x86_64)
+        PLATFORM="MacOSX-x86_64"
+        ;;
+    Darwin:arm64|Darwin:aarch64)
+        PLATFORM="MacOSX-arm64"
+        ;;
+    *)
+        echo "Error: Unsupported platform $UNAME_S/$UNAME_M"
+        echo "Supported platform mappings are Linux-x86_64, Linux-aarch64, MacOSX-x86_64, MacOSX-arm64"
+        WINDOWS_INSTALLER_URL="https://github.com/conda-forge/miniforge/releases/download/$RELEASE_TAG/Miniforge3-Windows-x86_64.exe"
+        echo "For Windows, manually download and install $WINDOWS_INSTALLER_URL"
+        exit 2
+        ;;
+esac
+
 if [[ -z $INSTALL_PREFIX ]]; then
-    INSTALL_PREFIX=$HOME/miniconda-$EXP_CONDA_VER
+    INSTALL_PREFIX=$HOME/miniforge-$EXP_CONDA_VER
 fi
 SOURCE_SCRIPT="$INSTALL_PREFIX/etc/profile.d/conda.sh"
 
-echo "Installing for version $EXP_CONDA_VER and platform $PLATFORM at $INSTALL_PREFIX"
-DOWNLOAD_URL=https://repo.anaconda.com/miniconda/Miniconda3-py312_$EXP_CONDA_VER-$EXP_CONDA_VER_SUFFIX-$PLATFORM.sh
+echo "Installing Miniforge for platform $PLATFORM at $INSTALL_PREFIX"
+DOWNLOAD_URL=https://github.com/conda-forge/miniforge/releases/download/$RELEASE_TAG/Miniforge3-$PLATFORM.sh
+INSTALLER_PATH=$(mktemp "${TMPDIR:-/tmp}/miniforge-XXXXXX.sh")
 echo "Downloading installer from URL ${DOWNLOAD_URL}"
-curl -o miniconda.sh -L ${DOWNLOAD_URL}
-bash miniconda.sh -b -p $INSTALL_PREFIX
+curl -o "$INSTALLER_PATH" -L ${DOWNLOAD_URL}
+bash "$INSTALLER_PATH" -b -p $INSTALL_PREFIX
+rm -f "$INSTALLER_PATH"
 source $SOURCE_SCRIPT
 hash -r
-echo "About to accept TOS for 'main' and 'r'"
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
-echo "About to install base and libmamba environments"
-conda install -n base conda-libmamba-solver
 conda config --set solver libmamba
 conda config --set always_yes yes
 # Useful for debugging any issues with conda

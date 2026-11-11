@@ -1,0 +1,83 @@
+name: Update Miniforge Conda version
+
+on:
+  schedule:
+    - cron: '0 3 1 * *'  # first day of each month at 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  bump-conda-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Get latest Miniforge release
+        id: conda-version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          tag="$(gh api repos/conda-forge/miniforge/releases/latest --jq .tag_name)"
+          if [[ "$tag" =~ ^v?([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)$ ]]; then
+            version="${BASH_REMATCH[1]}"
+            suffix="${BASH_REMATCH[2]}"
+          else
+            version="$tag"
+            suffix=""
+          fi
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "suffix=$suffix" >> "$GITHUB_OUTPUT"
+          echo "Latest Miniforge release $tag"
+
+      - name: Update setup/export_versions.sh if needed
+        id: bump
+        shell: bash
+        run: |
+          version="${{ steps.conda-version.outputs.version }}"
+          suffix="${{ steps.conda-version.outputs.suffix }}"
+          path="setup/export_versions.sh"
+
+          new_text="export EXP_CONDA_VER=${version}\n"
+          if [ -n "$suffix" ]; then
+            new_text+="export EXP_CONDA_VER_SUFFIX=${suffix}\n"
+          fi
+
+          if [ -f "$path" ] && printf '%b' "$new_text" | cmp -s - "$path"; then
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          printf '%b' "$new_text" > "$path"
+          echo "updated=true" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "suffix=${suffix}" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        if: steps.bump.outputs.updated == 'true'
+        id: create-pr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          commit-message: "Bump Miniforge Conda version to ${{ steps.bump.outputs.version }}"
+          branch: "chore/bump-miniforge-${{ steps.bump.outputs.version }}"
+          title: "Bump Miniforge Conda version to ${{ steps.bump.outputs.version }}"
+          body: |
+            This PR updates the Miniforge version exported by `setup/export_versions.sh`.
+
+            The workflow captures the actual conda version installed during the run and writes it to the repo pin used by `setup/setup_conda.sh`.
+          delete-branch: true
+
+      - name: Trigger docker validation workflow
+        if: steps.bump.outputs.updated == 'true'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: test-with-docker.yml
+          ref: ${{ steps.create-pr.outputs.pull-request-branch || format('chore/bump-miniforge-{0}', steps.bump.outputs.version) }}
