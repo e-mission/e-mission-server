@@ -1,6 +1,8 @@
 # python 3
 FROM ubuntu:jammy-20240227
 
+MAINTAINER K. Shankari (k.shankari@nlr.gov)
+
 WORKDIR /usr/src/app
 
 RUN apt-get -y -qq update
