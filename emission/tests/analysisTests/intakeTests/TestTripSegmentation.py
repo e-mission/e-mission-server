@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import unittest
 import datetime as pydt
@@ -36,8 +30,7 @@ import emission.tests.common as etc
 
 class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
-        self.analysis_conf_path = \
-            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
+        etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
 
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
@@ -51,7 +44,7 @@ class TestTripSegmentation(unittest.TestCase):
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
-        os.remove(self.analysis_conf_path)
+        etc.clear_analysis_config()
         edb.get_timeseries_db().delete_many({"user_id": self.androidUUID}) 
         edb.get_timeseries_db().delete_many({"user_id": self.iosUUID})
         edb.get_pipeline_state_db().delete_many({"user_id": self.androidUUID})
@@ -71,7 +64,10 @@ class TestTripSegmentation(unittest.TestCase):
         dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
-        segmentation_points = dstfsm.segment_into_trips(ts, tq)
+        loc_df = ts.get_data_df("background/filtered_location", tq)
+        transition_df = ts.get_data_df("statemachine/transition", tq)
+        motion_df = ts.get_data_df("background/motion_activity", tq)
+        segmentation_points = dstfsm.segment_into_trips(loc_df, transition_df, motion_df)
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)
@@ -89,7 +85,10 @@ class TestTripSegmentation(unittest.TestCase):
         dstdsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 5 mins
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
-        segmentation_points = dstdsm.segment_into_trips(ts, tq)
+        loc_df = ts.get_data_df("background/filtered_location", tq)
+        transition_df = ts.get_data_df("statemachine/transition", tq)
+        motion_df = ts.get_data_df("background/motion_activity", tq)
+        segmentation_points = dstdsm.segment_into_trips(loc_df, transition_df, motion_df)
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)

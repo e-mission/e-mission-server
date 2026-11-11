@@ -1,19 +1,12 @@
-from __future__ import print_function
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import absolute_import
 
 ## Library to make calls to our Open Trip Planner server
 ## Hopefully similiar to googlemaps.py
 
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import range
 from builtins import *
 from builtins import object
-from past.utils import old_div
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, datetime, time, random
 import geojson as gj
 # This change should be removed in the next server update, by which time hopefully the new geojson version will incorporate the long-term fix for their default precision
@@ -250,7 +243,7 @@ def get_elevation(coordinate):
     return float(elevation)
 
 def otp_time_to_ours(otp_str):
-    return arrow.get(old_div(int(otp_str),1000))
+    return arrow.get(int(otp_str) / 1000)
 
 
 def create_motion_entry_from_leg(leg):

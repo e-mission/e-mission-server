@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import unittest
 import logging
@@ -23,8 +17,7 @@ from emission.net.api import metrics
 
 class TestMetrics(unittest.TestCase):
     def setUp(self):
-        self.analysis_conf_path = \
-            etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
+        etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
         etc.setupRealExample(self,
                              "emission/tests/data/real_examples/shankari_2015-aug-21")
         self.testUUID1 = self.testUUID
@@ -41,7 +34,7 @@ class TestMetrics(unittest.TestCase):
 
     def tearDown(self):
         self.clearRelatedDb()
-        os.remove(self.analysis_conf_path)
+        etc.clear_analysis_config()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})

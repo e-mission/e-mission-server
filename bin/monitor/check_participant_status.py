@@ -5,7 +5,10 @@ import emission.storage.timeseries.timequery as estt
 
 for ue in edb.get_uuid_db().find():
     trip_count = edb.get_analysis_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "analysis/confirmed_trip"})
-    location_count = edb.get_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "background/location"})
+    if trip_count > 0:
+        continue
+    # location_count = edb.get_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "background/location"})
+    location_count = "UNKNOWN"
     first_trip = list(edb.get_analysis_timeseries_db().find({"user_id": ue["uuid"], "metadata.key": "analysis/confirmed_trip"}).sort("data.end_ts", 1).limit(1))
     first_trip_time = first_trip[0]["data"]["end_fmt_time"] if len(first_trip) > 0 else None
     last_trip = list(edb.get_analysis_timeseries_db().find({"user_id": ue["uuid"], "metadata.key": "analysis/confirmed_trip"}).sort("data.end_ts", -1).limit(1))
@@ -14,10 +17,34 @@ for ue in edb.get_uuid_db().find():
     month_ago = now.shift(months=-1)
     last_month_tq = estt.TimeQuery("data.start_ts", month_ago.timestamp(), now.timestamp())
     profile = edb.get_profile_db().find_one({"user_id": ue["uuid"]})
+    if profile is None:
+        profile = {}
+    if profile.get('last_call_ts', 0) is None:
+        profile['last_call_ts'] = 0
+    if (profile.get('last_call_ts', 0) - profile.get('update_ts', 0).timestamp()) > 60 * 60 * 24:
+        location_count = edb.get_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "background/location"})
     if 'computeConfirmed' in vars(ecwu.User):
         confirmed_pct, valid_replacement_pct, score = ecwu.User.computeConfirmed(ue["uuid"], last_month_tq)
-        print(f"For {ue['user_email']} on {profile['curr_platform']} app version {profile['client_app_version']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct ({month_ago} -> {now}) = exactly {confirmed_pct:.2f}")
+        print(f"""For {ue['user_email']} on 
+              {profile.get('curr_platform', 'UNKNOWN')}
+              app version {profile.get('client_app_version', 'UNKNOWN')}
+              signed up at {profile.get('update_ts', 0)}:
+              Trip count = {trip_count}
+              location count = {location_count}
+              first trip = {first_trip_time}
+              last trip = {last_trip_time}
+              confirmed_pct ({month_ago} -> {now}) = exactly {confirmed_pct:.2f}
+              last call {arrow.get(profile.get('last_call_ts', 0))}""")
     else:
         confirmed_count = edb.get_analysis_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "analysis/confirmed_trip", "data.user_input": {"$ne": {}}})
         confirmed_pct = confirmed_count / trip_count if trip_count != 0 else 0
-        print(f"For {ue['user_email']} on {profile['curr_platform']} app version {profile['client_app_version']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct  = approximately {confirmed_pct:.2f}")
+        print(f"""For {ue['user_email']} on
+                {profile.get('curr_platform', 'UNKNOWN')}
+                app version {profile.get('client_app_version', 'UNKNOWN')}
+                signed up at {profile.get('update_ts', 0)}:
+                Trip count = {trip_count}
+                location count = {location_count}
+                first trip = {first_trip_time}
+                last trip = {last_trip_time}
+                confirmed_pct  = approximately {confirmed_pct:.2f}
+                last call {arrow.get(profile.get('last_call_ts', 0))}""")

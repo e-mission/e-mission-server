@@ -1,7 +1,3 @@
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import unicode_literals
-from __future__ import division
 # Phase 1: Build a model for User Utility Function (per Vij, Shankari)
 # First, for each trip, we must obtain alternatives through some method
 # (currently Google Maps API), alongside the actual trips which were taken.
@@ -19,8 +15,6 @@ from __future__ import division
 # set of alternative routes. In Phase 2, this learning is time-dependent (think traffic).
 
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
 from builtins import object

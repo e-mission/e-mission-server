@@ -72,7 +72,7 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool):
     # matched by the default query
     first_place_extra_query = {'$and': [{'data.enter_ts': {'$exists': False}},
                                         {'data.exit_ts': {'$exists': True}}]}
-    first_place_entry_list = list(ts.find_entries(key_list=None, time_query=None, extra_query_list=[first_place_extra_query]))
+    first_place_entry_list = ts.find_entries(key_list=None, time_query=None, extra_query_list=[first_place_extra_query])
     logging.info("First place entry list = %s" % first_place_entry_list)
 
     combined_list = loc_entry_list + trip_entry_list + place_entry_list + first_place_entry_list

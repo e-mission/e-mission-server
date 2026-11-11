@@ -1,9 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import *
 import json
@@ -13,6 +7,7 @@ import arrow
 from uuid import UUID
 import time
 import pymongo
+from datetime import datetime
 
 import emission.core.get_database as edb
 import emission.core.timer as ect
@@ -39,8 +34,9 @@ import emission.net.ext_service.habitica.executor as autocheck
 import emission.storage.decorations.stats_queries as esds
 
 import emission.core.wrapper.user as ecwu
+import emission.analysis.result.user_stat as eaurs
 
-def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
+def run_intake_pipeline(process_number, uuid_list):
     """
     Run the intake pipeline with the specified process number and uuid list.
     Note that the process_number is only really used to customize the log file name
@@ -73,13 +69,57 @@ def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
             continue
 
         try:
-            run_intake_pipeline_for_user(uuid, skip_if_no_new_data)
+            run_intake_pipeline_for_user(uuid)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
                               "for user %s, skipping" % (e, uuid))
 
-def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
+def run_intake_pipeline_for_user(uuid):
+        user_profile = edb.get_profile_db().find_one({"user_id": uuid})
+        # Before this, we used to use a check of "have I moved new entries to long-term"
+        # But that fails if a pipeline has been stuck for a long time, and the user is dormant
+        # Since we added profile-level metrics to display in the admin
+        # dashboard, we can now use those for a more principled check. But in
+        # trip segmentation, we elide the last few location points since there
+        # is a delay of 5-10 minutes while detecting trip end.
+        # - if the user is dormant, we will miss any trips in the last 10 mins, which is NBD
+        # - if the user is not dormant, we will handle the locations as part of the next run
+        last_loc_ts = arrow.get(user_profile.get('last_location_ts', 0))
+        last_proc_time = user_profile.get('pipeline_range', {}).get('end_ts', None)
+        last_proc_ts = arrow.get(last_proc_time) if last_proc_time is not None else arrow.get(0)
+        ts_diff = last_loc_ts.timestamp() - last_proc_ts.timestamp()
+        fmt_dormant_user_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), pipeline has run until {last_proc_ts}({last_proc_ts.timestamp()}), difference = {last_loc_ts - last_proc_ts}({(ts_diff)})"
+        if  ts_diff <= 6 * 60 * 60: # 10 minutes
+            print(f"{fmt_dormant_user_check}, skipping")
+            return
+        else:
+            logging.info(f"{fmt_dormant_user_check}, continuing")
+
+        trip_segment_stage = edb.get_pipeline_state_db().find_one(
+            {"user_id": uuid, "pipeline_stage": ecwp.PipelineStages.TRIP_SEGMENTATION.value})
+        trip_segment_stage = {} if trip_segment_stage is None else trip_segment_stage
+        trip_segment_last_processed_ts = trip_segment_stage.get("last_processed_ts", 0)
+        trip_segment_last_processed_ts = trip_segment_last_processed_ts if trip_segment_last_processed_ts is not None else 0
+        last_trip_segment_processed_ts = arrow.get(trip_segment_last_processed_ts)
+        trip_segment_ts_diff = last_loc_ts.timestamp() - last_trip_segment_processed_ts.timestamp()
+        fmt_squished_trips_at_end_check = f"For {uuid=}, last location entry is at {last_loc_ts}({last_loc_ts.timestamp()}), raw trips have been generated until {last_trip_segment_processed_ts}({last_trip_segment_processed_ts.timestamp()}), difference = {last_loc_ts - last_trip_segment_processed_ts}({(ts_diff)})"
+        if trip_segment_ts_diff <= 6 * 60 * 60:
+            print(f"{fmt_squished_trips_at_end_check}, skipping")
+            return
+        else:
+            logging.info(f"{fmt_squished_trips_at_end_check}, continuing")
+
+        # the pipeline states are a list, so we can directly query for
+        in_progress_stages = edb.get_pipeline_state_db().count_documents({"user_id": uuid, "curr_run_ts": {"$ne": None}})
+        fmt_in_progress_check = f"Pipeline for {uuid} has {in_progress_stages=}"
+        if in_progress_stages > 0:
+            print(f"{fmt_in_progress_check}, skipping")
+            logging.debug(f"The states are {list(edb.get_pipeline_state_db().find({'user_id': uuid, 'curr_run_ts': {'$ne': None}}))}")
+            return
+        else:
+            logging.info(f"{fmt_in_progress_check}, continuing")
+
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
 
         with ect.Timer() as uct:
@@ -90,20 +130,13 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USERCACHE.name,
                                  time.time(), uct.elapsed)
 
-        if skip_if_no_new_data and new_entry_count == 0:
-            print("No new entries, and skip_if_no_new_data = %s, skipping the rest of the pipeline" % skip_if_no_new_data)
-            return
-        else:
-            print("New entry count == %s and skip_if_no_new_data = %s, continuing" %
-                (new_entry_count, skip_if_no_new_data))
-
         with ect.Timer() as uit:
             logging.info("*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)
             eaum.match_incoming_user_inputs(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USER_INPUT_MATCH_INCOMING.name,
-                                 time.time(), uct.elapsed)
+                                 time.time(), uit.elapsed)
 
         # Hack until we delete these spurious entries
         # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
@@ -198,17 +231,10 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_COMPOSITE_OBJECTS.name,
                                  time.time(), crt.elapsed)
 
-        _get_and_store_range(uuid, "analysis/composite_trip")
+        with ect.Timer() as gsr:
+            logging.info("*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: storing user stats " % uuid + "*" * 10)
+            eaurs.get_and_store_pipeline_dependent_user_stats(uuid, "analysis/composite_trip")
 
-def _get_and_store_range(user_id, trip_key):
-    ts = esta.TimeSeries.get_time_series(user_id)
-    start_ts = ts.get_first_value_for_field(trip_key, "data.start_ts", pymongo.ASCENDING)
-    if start_ts == -1:
-        start_ts = None
-    end_ts = ts.get_first_value_for_field(trip_key, "data.end_ts", pymongo.DESCENDING)
-    if end_ts == -1:
-        end_ts = None
-
-    user = ecwu.User(user_id)
-    user.update({"pipeline_range": {"start_ts": start_ts, "end_ts": end_ts}})
-    logging.debug("After updating, new profiles is %s" % user.getProfile())
+        esds.store_pipeline_time(uuid, 'STORE_PIPELINE_DEPENDENT_USER_STATS',
+                                time.time(), gsr.elapsed)

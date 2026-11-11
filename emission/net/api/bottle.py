@@ -129,7 +129,7 @@ if py3k:
     from urllib.parse import urlencode, quote as urlquote, unquote as urlunquote
     urlunquote = functools.partial(urlunquote, encoding='latin1')
     from http.cookies import SimpleCookie, Morsel, CookieError
-    from collections import MutableMapping as DictMixin
+    from collections.abc import MutableMapping as DictMixin
     import pickle
     from io import BytesIO
     import configparser
@@ -974,6 +974,8 @@ class Bottle(object):
         return decorator(callback) if callback else decorator
 
     def default_error_handler(self, res):
+        if isinstance(res, HTTPError):
+            return tob(str(res.status)+" \n" +str(res.exception)+" \n"+ str(res.traceback))
         return tob(template(ERROR_PAGE_TEMPLATE, e=res, template_settings=dict(name='__ERROR_PAGE_TEMPLATE')))
 
     def _handle(self, environ):

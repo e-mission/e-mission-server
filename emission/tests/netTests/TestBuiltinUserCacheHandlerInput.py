@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import range
 from builtins import *
 import unittest
@@ -14,6 +8,7 @@ import json
 import uuid
 import attrdict as ad
 import time
+import copy
 import geojson as gj
 # This change should be removed in the next server update, by which time hopefully the new geojson version will incorporate the long-term fix for their default precision
 # See - jazzband/geojson#177
@@ -89,13 +84,13 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
 
         self.assertEqual(len(self.uc2.getMessage()), 30)
-        self.assertEqual(len(list(self.ts2.find_entries())), 0)
+        self.assertEqual(len(self.ts2.find_entries()), 0)
         
         self.assertEqual(len(self.ucios.getMessage()), 30)
-        self.assertEqual(len(list(self.tsios.find_entries())), 0)
+        self.assertEqual(len(self.tsios.find_entries()), 0)
 
 
         # Then we move entries for user1 into longterm
@@ -103,13 +98,13 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
         
         # Then, we move entries for the ios user into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUIDios).moveToLongTerm()
         
         self.assertEqual(len(self.ucios.getMessage()), 0)
-        self.assertEqual(len(list(self.tsios.find_entries())), 30)
+        self.assertEqual(len(self.tsios.find_entries()), 30)
         
         # 30 entries from android + 30 entries from ios = 60
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 60)
@@ -117,7 +112,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # But all existing entries still in usercache for the second user
         self.assertEqual(len(self.uc2.getMessage()), 30)
-        self.assertEqual(len(list(self.ts2.find_entries())), 0)
+        self.assertEqual(len(self.ts2.find_entries()), 0)
 
     def testMoveWhenEmpty(self):
         # 5 mins of data, every 30 secs = 10 entries per entry type. There are
@@ -125,14 +120,14 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
 
         # Then we move entries for user1 into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
         # Add an invalid type
         edb.get_usercache_db().insert_one({
@@ -155,7 +150,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # That was stored in error_db, no errors in main body
         self.assertEqual(edb.get_timeseries_error_db().count_documents({"user_id": self.testUserUUID1}), 1)
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
     def testMoveDuplicateKey(self):
         # 5 mins of data, every 30 secs = 10 entries per entry type. There are
@@ -163,7 +158,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
 
         # Store the entries before the move so that we can duplicate them later
         entries_before_move = self.uc1.getMessage()
@@ -173,7 +168,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
         # Put the same entries (with the same object IDs into the cache again)
         edb.get_usercache_db().insert_many(entries_before_move)
@@ -187,7 +182,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # Now, we should have 60 entries in the usercache (30 duplicates + 30 from user2)
         self.assertEqual(len(self.uc1.getMessage()), 60)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
 
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUserUUID1})
 
@@ -196,7 +191,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # All the duplicates should have been ignored, and the new entries moved into the timeseries
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 60)
+        self.assertEqual(len(self.ts1.find_entries()), 60)
 
     # The first query for every platform is likely to work 
     # because startTs = None and endTs, at least for iOS, is way out there
@@ -205,23 +200,23 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
     def testTwoLongTermCalls(self):
         # First all the entries are in the usercache
         self.assertEqual(len(self.uc1.getMessage()), 30)
-        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
         
         self.assertEqual(len(self.ucios.getMessage()), 30)
-        self.assertEqual(len(list(self.tsios.find_entries())), 0)
+        self.assertEqual(len(self.tsios.find_entries()), 0)
 
         # Then we move entries for user1 into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
 
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
         
         # Then, we move entries for the ios user into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUIDios).moveToLongTerm()
         
         self.assertEqual(len(self.ucios.getMessage()), 0)
-        self.assertEqual(len(list(self.tsios.find_entries())), 30)
+        self.assertEqual(len(self.tsios.find_entries()), 30)
         
         # 30 entries from android + 30 entries from ios = 60
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 60)
@@ -246,11 +241,11 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # Now, repeat the above tests to ensure that they get moved again
         self.assertEqual(len(self.uc1.getMessage()), 30)
         # We will already have 30 entries in long-term for both android
-        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(len(self.ts1.find_entries()), 30)
         
         self.assertEqual(len(self.ucios.getMessage()), 30)
         # and ios
-        self.assertEqual(len(list(self.tsios.find_entries())), 30)
+        self.assertEqual(len(self.tsios.find_entries()), 30)
 
         # The timequery is 5 secs into the past, to avoid races
         # So let's sleep here for 5 secs
@@ -261,17 +256,204 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         # Now, we have two sets of entries, so we will have 60 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
-        self.assertEqual(len(list(self.ts1.find_entries())), 60)
+        self.assertEqual(len(self.ts1.find_entries()), 60)
         
         # Then, we move entries for the ios user into longterm
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUIDios).moveToLongTerm()
         
         self.assertEqual(len(self.ucios.getMessage()), 0)
-        self.assertEqual(len(list(self.tsios.find_entries())), 60)
+        self.assertEqual(len(self.tsios.find_entries()), 60)
         
         # 60 entries from android + 60 entries from ios = 120
         self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 120)
         self.assertEqual(edb.get_timeseries_error_db().estimated_document_count(), 0)
+
+    def testRemoteDots(self):
+        test_template = {"ts":1735934360.256,
+                  "client_app_version":"1.9.6",
+                  "name":"open_notification",
+                  "client_os_version":"15.5",
+                  "reading":{
+                      "additionalData":{
+                        "google.c.sender.id":"FAKE_SENDER_ID",
+                        "coldstart":False,
+                        "notId":"1122334455667788",
+                        "payload":1122334455667788,
+                        "content-available":1,
+                        "foreground":False,
+                        "google.c.fid":"FAKE_FID",
+                        "gcm.message_id":"FAKE_MESSAGE_ID"}}}
+        test_1 = copy.copy(test_template)
+        self.assertEqual(len(test_1["reading"]["additionalData"]), 8)
+        self.assertIn("google.c.sender.id",
+            test_1["reading"]["additionalData"])
+        self.assertIn("google.c.fid",
+            test_1["reading"]["additionalData"])
+        self.assertIn("gcm.message_id",
+            test_1["reading"]["additionalData"])
+        mauc._remove_dots(test_1)
+        self.assertEqual(len(test_1["reading"]["additionalData"]), 8)
+        self.assertIn("google_c_sender_id",
+            test_1["reading"]["additionalData"])
+        self.assertIn("google_c_fid",
+            test_1["reading"]["additionalData"])
+        self.assertIn("gcm_message_id",
+            test_1["reading"]["additionalData"])
+        self.assertNotIn("google.c.sender.id",
+            test_1["reading"]["additionalData"])
+        self.assertNotIn("google.c.fid",
+            test_1["reading"]["additionalData"])
+        self.assertNotIn("gcm.message_id",
+            test_1["reading"]["additionalData"])
+
+        metadata_template = {'plugin': 'none',
+                         'write_ts': self.curr_ts - 25,
+                         'time_zone': u'America/Los_Angeles',
+                         'platform': u'ios',
+                         'key': u'stats/client_time',
+                         'read_ts': self.curr_ts - 27,
+                         'type': u'message'}
+
+        # there are 30 entries in the setup function
+        self.assertEqual(len(self.uc1.getMessage()), 30)
+
+        three_entries_with_dots = []
+        for i in range(3):
+            curr_md = copy.copy(metadata_template)
+            curr_md['write_ts'] = self.curr_ts - 25 + i
+            three_entries_with_dots.append({
+                'user_id': self.testUserUUID1,
+                'data': copy.copy(test_template),
+                'metadata': curr_md})
+
+        print(f"AFTER {[e.get('metadata', None) for e in three_entries_with_dots]}")
+
+        mauc.sync_phone_to_server(self.testUserUUID1, three_entries_with_dots)
+        # we have munged, so these new entries should also be saved
+        # and we should have 33 entries in the usercache
+        self.assertEqual(len(self.uc1.getMessage()), 33)
+        self.assertEqual(len(self.ts1.find_entries()), 0)
+        enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
+        # since they were munged before saving into the usercache,
+        # there should be no errors while copying to the timeseries
+        self.assertEqual(len(self.uc1.getMessage()), 0)
+        self.assertEqual(len(self.ts1.find_entries()), 33)
+
+    def testRemoteDotsIterateWhileModifyingSingleKey(self):
+        test_with_single_key = {'ts': 1734661726.167,
+            'client_app_version': '1.9.4',
+            'name': 'open_notification',
+            'client_os_version': '18.1.1',
+            'reading': {'message': 'Please label your recent trips',
+            'title': 'Trip labels requested',
+            'additionalData': {
+                'coldstart': True, 'title': 'Trip labels requested',
+                'message': 'Please label your recent trips',
+                'foreground': False,
+                'google.c.fid': 'TEST_FID',
+                'gcm_message_id': 'TEST_MESSAGE',
+                'google_c_sender_id': 'TEST_SENDER',
+                'google_c_a_e': '1'}}}
+        self.assertEqual(len(test_with_single_key["reading"]["additionalData"]), 8)
+        self.assertIn("google.c.fid",
+            test_with_single_key["reading"]["additionalData"])
+        mauc._remove_dots(test_with_single_key)
+        self.assertEqual(len(test_with_single_key["reading"]["additionalData"]), 8)
+        self.assertIn("google_c_fid",
+            test_with_single_key["reading"]["additionalData"])
+        self.assertNotIn("google.c.fid",
+            test_with_single_key["reading"]["additionalData"])
+
+    def testRemoteDotsIterateWhileModifyingMultiKey(self):
+        test_with_multiple_keys = {'ts': 1734661726.167,
+            'client_app_version': '1.9.4',
+            'name': 'open_notification',
+            'client_os_version': '18.1.1',
+            'reading': {'message': 'Please label your recent trips',
+            'title': 'Trip labels requested',
+            'additionalData': {'coldstart': True,
+                'title': 'Trip labels requested',
+                'message': 'Please label your recent trips',
+                'foreground': False,
+                'gcm.message_id': 'TEST_MESSAGE',
+                'google.c.sender.id': 'TEST_SENDER',
+                'google.c.a.e': '1',
+                'google.c.fid': 'TEST_FID'}}}
+
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        mauc._remove_dots(test_with_multiple_keys)
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm_message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_sender_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_a_e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+        self.assertNotIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+    def testRemoteDotsIterateWhileModifyingMultiKey2(self):
+        test_with_multiple_keys = {'ts': 1738001143.67,
+            'client_app_version': '1.9.6',
+            'name': 'open_notification',
+            'client_os_version': '18.1.1',
+            'reading': {'message': 'Please label your recent trips',
+            'title': 'Trip labels requested',
+            'additionalData': {'coldstart': True,
+                'title': 'Trip labels requested',
+                'message': 'Please label your recent trips',
+                'foreground': False,
+                'gcm.message_id': 'TEST_MESSAGE',
+                'google.c.sender.id': 'TEST_SENDER',
+                'google.c.a.e': '1',
+                'google.c.fid': 'TEST_FID'}}}
+
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        mauc._remove_dots(test_with_multiple_keys)
+        self.assertEqual(len(test_with_multiple_keys["reading"]["additionalData"]), 8)
+        self.assertIn("gcm_message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_sender_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_a_e",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertIn("google_c_fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+
+        self.assertNotIn("google.c.fid",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("gcm.message_id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.sender.id",
+            test_with_multiple_keys["reading"]["additionalData"])
+        self.assertNotIn("google.c.a.e",
+            test_with_multiple_keys["reading"]["additionalData"])
+
 
 if __name__ == '__main__':
     import emission.tests.common as etc

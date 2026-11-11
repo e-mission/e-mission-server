@@ -6,12 +6,6 @@ https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312464984
 Can be made a little less general but a lot more performant by using the trick
 below.
 """
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 

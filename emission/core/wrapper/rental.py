@@ -1,0 +1,47 @@
+"""
+Vehicle data model for deployments that utilize a library or fleet of shared vehicles.
+Tracks vehicle location (dock/bay/parking spot ID or user UUID if checked out) and active reservations.
+"""
+from builtins import *
+import logging
+import enum
+import emission.core.wrapper.wrapperbase as ecwb
+
+class RentalStatus(str, enum.Enum):
+    INITIALIZING = "initializing"
+    ACTIVE = "active"
+    CAPTURED = "captured"
+    COMPLETED = "completed"
+    STARTED = "started"
+    HELD = "held"
+    UNLOCKED = "unlocked"
+    CANCELLED = "cancelled"
+
+class Rental(ecwb.WrapperBase):
+    props = {
+        "vehicle_id": ecwb.WrapperBase.Access.WORM,  # unique identifier
+        "vehicle_name": ecwb.WrapperBase.Access.WORM,  # display name/description
+        "payment_hold_info": ecwb.WrapperBase.Access.WORM,  # Stripe PaymentIntent id for the active hold
+        "payment_exempt": ecwb.WrapperBase.Access.WORM,
+        "checkout_failed": ecwb.WrapperBase.Access.WORM,  # set when checkout errored out with the hold still in place
+        "start_ts": ecwb.WrapperBase.Access.WORM,
+        "start_local_dt": ecwb.WrapperBase.Access.WORM,
+        "start_fmt_time": ecwb.WrapperBase.Access.WORM,
+        "end_ts": ecwb.WrapperBase.Access.WORM,
+        "end_local_dt": ecwb.WrapperBase.Access.WORM,
+        "end_fmt_time": ecwb.WrapperBase.Access.WORM,
+        "start_dock_id": ecwb.WrapperBase.Access.WORM,
+        "start_loc": ecwb.WrapperBase.Access.WORM,  # start location (dock/bay/parking spot ID or user UUID if checked out)
+        "end_dock_id": ecwb.WrapperBase.Access.WORM,
+        "end_loc": ecwb.WrapperBase.Access.WORM,  # end location (dock/bay/parking spot ID or user UUID if checked out)
+        "rental_status": ecwb.WrapperBase.Access.RW,
+    }
+
+    enums = { "rental_status": RentalStatus }
+    geojson = ['start_loc', 'end_loc']
+    nullable = ['end_loc']
+    local_dates = ['start_local_dt', 'end_local_dt']
+
+    def _populateDependencies(self):
+        pass
+

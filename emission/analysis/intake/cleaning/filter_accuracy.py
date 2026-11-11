@@ -13,14 +13,8 @@ The high level algorithm is to:
         is idempotent. That ensures that we can simply reset the pipeline state
         and re-run everything if we have any changes that we need to make.
 """ 
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 
@@ -83,7 +77,7 @@ def filter_accuracy(user_id):
     SEL_FIELDS_FOR_DUP = ["latitude", "longitude", "ts", "accuracy"]
 
     try:
-        unfiltered_points_list = list(timeseries.find_entries(["background/location"], time_query))
+        unfiltered_points_list = timeseries.find_entries(["background/location"], time_query)
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
         if len(unfiltered_points_df) == 0:
             epq.mark_accuracy_filtering_done(user_id, None) 

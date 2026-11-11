@@ -43,13 +43,7 @@ For each of the representative trips, open them in MyMaps, and then adjust, add,
 * Maps will then be created of for each of these modified sections that compare the original section with its ground truth. If any issues are observed, then they can be modified and this importing process can be repeated.
 
 """
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import input
 from builtins import str
 from builtins import *

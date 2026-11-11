@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # This test compares the output of the intake pipeline
 # with known ground truth output.
 # The way to add a new test is:
@@ -25,8 +21,6 @@ from __future__ import absolute_import
 # Copy it back and add the test to this file
 # $ mv /tmp/iphone_2016-02-22.ground_truth emission/tests/data/real_examples
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
 import unittest
@@ -60,8 +54,7 @@ class TestPipelineRealData(unittest.TestCase):
     def setUp(self):
         # Thanks to M&J for the number!
         np.random.seed(61297777)
-        self.analysis_conf_path = \
-            etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
+        etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
         logging.info("setUp complete")
 
     def tearDown(self):
@@ -76,8 +69,7 @@ class TestPipelineRealData(unittest.TestCase):
             # to determine whether to switch to a new implementation
             if not hasattr(self, "evaluation") or not self.evaluation:
                 self.clearRelatedDb()
-            if hasattr(self, "analysis_conf_path"):
-                os.remove(self.analysis_conf_path)
+            etc.clear_analysis_config()
             if hasattr(self, "seed_mode_path"):
                 os.remove(self.seed_mode_path)
             logging.info("tearDown complete")
@@ -735,7 +727,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile+".expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -744,15 +736,14 @@ class TestPipelineRealData(unittest.TestCase):
 
     def testJackUntrackedTimeMar12InferredSections(self):
         # Setup to use the inferred sections
-        self.analysis_conf_path = \
-            etc.set_analysis_config("analysis.result.section.key", "analysis/inferred_section")
+        etc.set_analysis_config("analysis.result.section.key", "analysis/inferred_section")
         # along with the proper random seed
         self.seed_mode_path = etc.copy_dummy_seed_for_inference()
         dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile+".inferred_section.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -772,7 +763,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         end_run = time.time()
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         for ct in composite_trips:
             # for this data, every composite trip should come from a confirmed trip,
             # NOT from untracked time
@@ -788,7 +779,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         end_run = time.time()
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         countUntrackedTime = 0
         for ct in composite_trips:
             if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
@@ -805,7 +796,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         end_run = time.time()
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         countUntrackedTime = 0
         for ct in composite_trips:
             logging.debug("composite trip metadata %s = " % ct['metadata'])
@@ -815,6 +806,57 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
         self.assertEqual(countUntrackedTime, 0)
 
+    def testMultiOutOfOrderAug6(self):
+        # https://github.com/e-mission/e-mission-docs/issues/1122
+        # https://github.com/e-mission/e-mission-server/pull/1040
+        dataFile = "emission/tests/data/real_examples/multi_ooo_aug_6_2024"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+
+        raw_trips = ts.find_entries(["segmentation/raw_trip"], None)
+        self.assertEqual(len(raw_trips), 15)
+        # No trips with negative duration (start_ts > end_ts)
+        for rt in raw_trips:
+            self.assertGreaterEqual(rt["data"]["duration"], 0)
+        
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        self.assertEqual(len(confirmed_trips), 11)
+
+    def testMultiOutOfOrderAug11(self):
+        # https://github.com/e-mission/e-mission-docs/issues/1122
+        # https://github.com/e-mission/e-mission-server/pull/1040
+        dataFile = "emission/tests/data/real_examples/multi_ooo_aug_11_2024"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+
+        raw_trips = ts.find_entries(["segmentation/raw_trip"], None)
+        self.assertEqual(len(raw_trips), 4)
+        # No trips with negative duration (start_ts > end_ts)
+        for rt in raw_trips:
+            self.assertGreaterEqual(rt["data"]["duration"], 0)
+
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        self.assertEqual(len(confirmed_trips), 3)
+
+    def testMultiOutOfOrderSep9(self):
+        # https://github.com/e-mission/e-mission-docs/issues/1122
+        # https://github.com/e-mission/e-mission-server/pull/1040
+        dataFile = "emission/tests/data/real_examples/multi_ooo_sep_09_2024"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+
+        raw_trips = ts.find_entries(["segmentation/raw_trip"], None)
+        self.assertEqual(len(raw_trips), 7)
+        # No trips with negative duration (start_ts > end_ts)
+        for rt in raw_trips:
+            self.assertGreaterEqual(rt["data"]["duration"], 0)
+
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        self.assertEqual(len(confirmed_trips), 5)
+    
     def testCompositeTripIncremental(self):
         # Test for 545114feb5ac15caac4110d39935612525954b71
         dataFile_1 = "emission/tests/data/real_examples/shankari_2016-08-04"
@@ -824,7 +866,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -836,7 +878,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         # They should all match the final place
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -849,7 +891,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         # The place additions should be dispersed to the actual places
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".spread-across-aug-5.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -863,7 +905,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         # They should all match the actual entries
         # Trip matches should also work
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".trip-matches-check-aug-4.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -879,7 +921,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".before-user-inputs.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -894,7 +936,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         # They should all match the final place
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".all-match-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
@@ -907,7 +949,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         # The place additions should be dispersed to the actual places
-        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        composite_trips = ts.find_entries(["analysis/composite_trip"], None)
         with open(dataFile_1+".retained-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))

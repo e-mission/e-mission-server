@@ -1,7 +1,3 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # We need to decide whether the functions will return the cleaned entries or
 # just save them directly. Returning makes it easier to test, saving makes it
 # easier to code because you can work locally and just save the results.
@@ -13,11 +9,8 @@ from __future__ import absolute_import
 # TODO: We can revisit once we see what the structures look like.
 
 # General imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
-from past.utils import old_div
 import logging
 import numpy as np
 import pandas as pd
@@ -41,6 +34,7 @@ import emission.core.wrapper.localdate as ecwld
 import emission.storage.decorations.place_queries as esdp
 
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.timequery as estt
 
 import emission.storage.pipeline_queries as epq
 
@@ -111,10 +105,18 @@ def save_cleaned_segments_for_ts(user_id, start_ts, end_ts):
     if tl.is_empty():
         logging.info("Raw timeline is empty, early return")
         return None
-    return save_cleaned_segments_for_timeline(user_id, tl)
-
-def save_cleaned_segments_for_timeline(user_id, tl):
+    
     ts = esta.TimeSeries.get_time_series(user_id)
+    tq = estt.TimeQuery("data.ts", start_ts, end_ts)
+    loc_df = ts.get_data_df("background/filtered_location", tq)
+    tq.timeType = "data.enter_ts"
+    stops_entries = [ecwe.Entry(s) for s in ts.find_entries([esda.RAW_STOP_KEY], tq)]
+    tq.timeType = "data.start_ts"
+    sections_entries = [ecwe.Entry(s) for s in ts.find_entries([esda.RAW_SECTION_KEY], tq)]
+
+    return save_cleaned_segments_for_timeline(user_id, tl, ts, loc_df, stops_entries, sections_entries)
+
+def save_cleaned_segments_for_timeline(user_id, tl, ts, loc_df, stops_entries, sections_entries):
     trip_map = {}
     id_or_none = lambda wrapper: wrapper.get_id() if wrapper is not None else None
     for trip in tl.trips:
@@ -122,7 +124,7 @@ def save_cleaned_segments_for_timeline(user_id, tl):
             if trip.metadata.key == esda.RAW_UNTRACKED_KEY:
                 filtered_trip = get_filtered_untracked(ts, trip)
             else:
-                filtered_trip = get_filtered_trip(ts, trip)
+                filtered_trip = get_filtered_trip(ts, trip, tl, loc_df, stops_entries, sections_entries)
             logging.debug("For raw trip %s, found filtered trip %s" %
                           (id_or_none(trip), id_or_none(filtered_trip)))
             if filtered_trip is not None:
@@ -163,9 +165,12 @@ def get_filtered_untracked(ts, untracked):
                                                   create_id = True)
     return filtered_untracked_entry
 
-def get_filtered_trip(ts, trip):
+def get_filtered_trip(ts, trip, tl, loc_df, stops_entries, sections_entries):
     logging.debug("Filtering trip %s" % trip)
-    trip_tl = esdtq.get_raw_timeline_for_trip(trip.user_id, trip.get_id())
+    trip_stops_entries = [e for e in stops_entries if e.data.trip_id == trip.get_id()]
+    trip_sections_entries = [e for e in sections_entries if e.data.trip_id == trip.get_id()]
+    trip_tl = esdtl.Timeline(esda.RAW_STOP_KEY, esda.RAW_SECTION_KEY,
+                            trip_stops_entries, trip_sections_entries)
     # trip_tl is the timeline for this particular trip, which contains the
     # section_entries and trip_entries
     if len(trip_tl.trips) == 0:
@@ -188,7 +193,7 @@ def get_filtered_trip(ts, trip):
     section_map = {}
     point_map = {}
     for section in trip_tl.trips:
-        (filtered_section_entry, point_list) = get_filtered_section(filtered_trip_entry, section)
+        (filtered_section_entry, point_list) = get_filtered_section(filtered_trip_entry, section, tl, loc_df)
         section_map[section.get_id()] = filtered_section_entry
         point_map[section.get_id()] = point_list
 
@@ -269,7 +274,7 @@ def get_filtered_place(raw_place):
                                                      create_id=True)
     return curr_cleaned_end_place
 
-def get_filtered_section(new_trip_entry, section):
+def get_filtered_section(new_trip_entry, section, tl, loc_df):
     """
     Save the filtered points associated with this section.
     Do I need a cleaned section as well?
@@ -294,7 +299,7 @@ def get_filtered_section(new_trip_entry, section):
 
     # Now that we have constructed the section object, we have to filter and
     # store the related data points
-    with_speeds_df = get_filtered_points(section, filtered_section_data)
+    with_speeds_df = get_filtered_points(section, filtered_section_data, tl, loc_df)
     speeds = list(with_speeds_df.speed)
     distances = list(with_speeds_df.distance)
     filtered_section_data.speeds = [float(s) for s in speeds]
@@ -340,15 +345,11 @@ def get_filtered_stop(new_trip_entry, stop):
     return ecwe.Entry.create_entry(stop.user_id, esda.CLEANED_STOP_KEY,
                                    filtered_stop_data, create_id=True)
 
-def get_filtered_points(section, filtered_section_data):
+def get_filtered_points(section, filtered_section_data, tl, loc_df):
     logging.debug("Getting filtered points for section %s" % section)
     logging.debug("Saving entries into cleaned section %s" % filtered_section_data)
     ts = esta.TimeSeries.get_time_series(section.user_id)
-    loc_entry_it = ts.find_entries(["background/filtered_location"],
-                                   esda.get_time_query_for_trip_like(
-                                       esda.RAW_SECTION_KEY, section.get_id()))
-
-    loc_entry_list = [ecwe.Entry(e) for e in loc_entry_it]
+    section_loc_df = loc_df.query("ts >= @section.data.start_ts & ts <= @section.data.end_ts").reset_index()
 
     # We know that the assertion fails in the geojson conversion code and we
     # handle it there, so we are just going to comment this out for now.
@@ -357,6 +358,11 @@ def get_filtered_points(section, filtered_section_data):
     #         (loc_entry_list[-1].data.loc, section.data.end_loc))
 
     # Find the list of points to filter
+
+    # Note: get_entry_at_ts is a generic function not limited to timestamp fields.
+    # In this case, "data.section" is given as the ts_key, which is kinda misleading
+    # and makes this function more like "get entry where x=y" than "get entry at ts".
+    # May be a future TODO to refactor.
     filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing",
                                                    "data.section",
                                                    section.get_id())
@@ -371,15 +377,11 @@ def get_filtered_points(section, filtered_section_data):
         logging.debug("deleting %s points from section points" % len(
             filtered_point_id_list))
 
-    filtered_loc_df = remove_outliers(loc_entry_list, filtered_point_id_list)
+    filtered_loc_df = remove_outliers(section_loc_df, filtered_point_id_list)
     if len(filtered_loc_df) == 0:
-        import emission.storage.timeseries.builtin_timeseries as estb
-
         logging.info("Removed all locations from the list."
             "Setting cleaned start + end = raw section start, so effectively zero distance")
-        section_start_loc = ts.get_entry_at_ts("background/filtered_location",
-                                               "data.ts", section.data.start_ts)
-        section_start_loc_df = ts.to_data_df("background/filtered_location", [section_start_loc])
+        section_start_loc_df = loc_df[loc_df.ts == section.data.start_ts]
         logging.debug("section_start_loc_df = %s" % section_start_loc_df.iloc[0])
         _set_extrapolated_vals_for_section(filtered_section_data,
                                            section_start_loc_df.iloc[0],
@@ -388,12 +390,12 @@ def get_filtered_points(section, filtered_section_data):
         logging.info("Early return with df = %s" % with_speeds_df)
         return with_speeds_df
 
+    raw_trip = tl.get_object(section.data.trip_id)
     if section.data.start_stop is None:
         logging.debug("Found first section, may need to extrapolate start point")
-        raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
-        raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
-        if not is_place_bogus(loc_entry_list, 0, filtered_point_id_list, raw_start_place):
-            filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts, section.data.sensed_mode)
+        raw_start_place = tl.get_object(raw_trip.data.start_place)
+        if not is_place_bogus(section_loc_df, 0, filtered_point_id_list, raw_start_place):
+            filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts, section.data.sensed_mode, section_loc_df)
             if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
                 # UGLY! UGLY! Fix when we fix
                 # https://github.com/e-mission/e-mission-server/issues/388
@@ -401,10 +403,9 @@ def get_filtered_points(section, filtered_section_data):
 
     if section.data.end_stop is None:
         logging.debug("Found last section, may need to extrapolate end point")
-        raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
-        raw_end_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.end_place)
-        if not is_place_bogus(loc_entry_list, -1, filtered_point_id_list, raw_end_place):
-            filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
+        raw_end_place = tl.get_object(raw_trip.data.end_place)
+        if not is_place_bogus(section_loc_df, -1, filtered_point_id_list, raw_end_place):
+            filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts, section_loc_df)
 
     # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
@@ -450,24 +451,26 @@ def get_filtered_points(section, filtered_section_data):
     logging.info("removed %d entries containing n/a" % 
         (len(with_speeds_df_nona) - len(with_speeds_df)))
     logging.debug("get_filtered_points(%s points) = %s points" %
-                  (len(loc_entry_list), len(with_speeds_df_nona)))
+                  (len(section_loc_df), len(with_speeds_df_nona)))
     return with_speeds_df_nona
 
-def is_place_bogus(loc_entry_list, loc_index, filtered_point_id_list, raw_start_place):
-    curr_loc = loc_entry_list[loc_index]
-    logging.debug("At index %s, loc is %s" % (loc_index, curr_loc.get_id()))
-    if curr_loc.get_id() in filtered_point_id_list:
+def is_place_bogus(section_loc_df, loc_index, filtered_point_id_list, raw_start_place):
+    curr_loc = section_loc_df.iloc[loc_index]
+    logging.debug("At index %s, loc is %s" % (loc_index, curr_loc["_id"]))
+    if curr_loc["_id"] in filtered_point_id_list:
         logging.debug("First point %s (%s) was filtered, raw_start_place %s (%s) may be bogus" %
-                      (curr_loc.get_id(), curr_loc.data.loc.coordinates,
+                      (curr_loc["_id"], gj.GeoJSON(curr_loc["loc"]).coordinates,
                       raw_start_place.get_id(), raw_start_place.data.location.coordinates))
-        place_to_point_dist = ecc.calDistance(curr_loc.data.loc.coordinates,
+        place_to_point_dist = ecc.calDistance(gj.GeoJSON(curr_loc["loc"]).coordinates,
                                               raw_start_place.data.location.coordinates)
         # If the start place is also bogus, no point in joining to it
         if place_to_point_dist < 100:
             logging.debug("place_to_point_dist = %s, previous place is also bogus, skipping extrapolation" %
                           place_to_point_dist)
+            logging.debug(f"is_place_bogus({len(section_loc_df)}, {loc_index}, {len(filtered_point_id_list)}, {raw_start_place.get_id()}), returning True")
             return True
     #else
+    logging.debug(f"is_place_bogus({len(section_loc_df)}, {loc_index}, {len(filtered_point_id_list)}, {raw_start_place.get_id()}), returning False")
     return False
 
 def _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
@@ -512,9 +515,9 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     if is_air_section(filtered_section_data, with_speeds_df):
         return ecwm.MotionTypes.AIR_OR_HSR
 
-    overall_speed = old_div(end_to_end_distance, end_to_end_time)
-    TEN_KMPH = old_div(float(10 * 1000), (60 * 60)) # m/s
-    TWENTY_KMPH = old_div(float(20 * 1000), (60 * 60)) # m/s
+    overall_speed = end_to_end_distance / end_to_end_time
+    TEN_KMPH = (10 * 1000) / (60 * 60) # m/s
+    TWENTY_KMPH = (20 * 1000) / (60 * 60) # m/s
     logging.debug("end_to_end_distance = %s, end_to_end_time = %s, overall_speed = %s" %
                   (end_to_end_distance, end_to_end_time, overall_speed))
 
@@ -535,11 +538,11 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     return None
 
 def is_air_section(filtered_section_data,with_speeds_df):
-    HUNDRED_KMPH = old_div(float(100 * 1000), (60 * 60)) # m/s
-    ONE_FIFTY_KMPH = old_div(float(150 * 1000), (60 * 60)) # m/s
+    HUNDRED_KMPH = (100 * 1000) / (60 * 60) # m/s
+    ONE_FIFTY_KMPH = (150 * 1000) / (60 * 60) # m/s
     end_to_end_distance = filtered_section_data.distance
     end_to_end_time = filtered_section_data.duration
-    end_to_end_speed = old_div(end_to_end_distance, end_to_end_time)
+    end_to_end_speed = end_to_end_distance / end_to_end_time
     logging.debug("air check: end_to_end_distance = %s, end_to_end_time = %s, so end_to_end_speed = %s" %
                   (end_to_end_distance, end_to_end_time, end_to_end_speed))
     if end_to_end_speed > ONE_FIFTY_KMPH:
@@ -563,8 +566,8 @@ def is_air_section(filtered_section_data,with_speeds_df):
                    with_speeds_df.speed.quantile(0.9), ONE_FIFTY_KMPH))
     return False
 
-def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode):
-    raw_start_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_start_place)
+def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode, loc_df):
+    raw_start_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_start_place, loc_df)
 
     curr_first_point = filtered_loc_df.iloc[0]
     curr_first_loc = gj.GeoJSON.to_instance(curr_first_point["loc"])
@@ -641,7 +644,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode):
                              (raw_start_place.get_id(), ending_trip_entry.get_id()))
             new_start_ts = raw_start_place.data.enter_ts
         else:
-            new_start_ts = min(raw_start_place.data.enter_ts + old_div(raw_start_place.data.duration, 2),
+            new_start_ts = min(raw_start_place.data.enter_ts + (raw_start_place.data.duration / 2),
                                   raw_start_place.data.enter_ts + 3 * 60)
 
         logging.debug("changed new_start_ts to %s" % (new_start_ts))
@@ -665,8 +668,8 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode):
                             new_first_point_data)
     return _insert_new_entry(-1, filtered_loc_df, new_first_point)
 
-def _add_end_point(filtered_loc_df, raw_end_place, ts):
-    raw_end_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_end_place)
+def _add_end_point(filtered_loc_df, raw_end_place, ts, loc_df):
+    raw_end_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_end_place, loc_df)
     curr_last_point = filtered_loc_df.iloc[-1]
     curr_last_loc = gj.GeoJSON.to_instance(curr_last_point["loc"])
     add_dist = ecc.calDistance(curr_last_loc.coordinates,
@@ -694,11 +697,18 @@ def _add_end_point(filtered_loc_df, raw_end_place, ts):
                    raw_end_place_enter_loc_entry.data.loc.coordinates, raw_end_place_enter_loc_entry.data.fmt_time, raw_end_place_enter_loc_entry.data.ts))
     return _insert_new_entry(filtered_loc_df.index[-1]+1, filtered_loc_df, raw_end_place_enter_loc_entry)
 
-def _get_raw_place_enter_loc_entry(ts, raw_place):
+def _get_raw_place_enter_loc_entry(ts, raw_place, loc_df):
     if raw_place.data.enter_ts is not None:
-        raw_start_place_enter_loc_entry = ecwe.Entry(
-            ts.get_entry_at_ts("background/filtered_location", "data.ts",
-                               raw_place.data.enter_ts))
+            matching_entries = loc_df[loc_df.ts == raw_place.data.enter_ts]
+            if not matching_entries.empty:
+                raw_place_enter_loc_entry = ecwe.Entry.create_entry(raw_place.user_id,
+                                                                "background/filtered_location",
+                                                                matching_entries.iloc[0])
+            else:
+                logging.debug(f"raw place enter was not in loc_df; fallback to ts lookup")
+                raw_place_enter_loc_entry = ecwe.Entry(
+                    ts.get_entry_at_ts("background/filtered_location", "data.ts",
+                                    raw_place.data.enter_ts))
     else:
         # These are not strictly accurate because the exit ts for the place
         # corresponds to the ts of the first point in the section. We are trying
@@ -716,12 +726,12 @@ def _get_raw_place_enter_loc_entry(ts, raw_place):
             "fmt_time": raw_place.data.exit_fmt_time,
             "local_dt": raw_place.data.exit_local_dt
         }
-        raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_place.user_id,
-                                                                  "background/filtered_location",
-                                                                  dummy_section_start_loc_doc)
+        raw_place_enter_loc_entry = ecwe.Entry.create_entry(raw_place.user_id,
+                                                            "background/filtered_location",
+                                                            dummy_section_start_loc_doc)
     logging.debug("Raw place is %s and corresponding location is %s" %
-                  (raw_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
-    return raw_start_place_enter_loc_entry
+                  (raw_place.get_id(), raw_place_enter_loc_entry.get_id()))
+    return raw_place_enter_loc_entry
 
 def _insert_new_entry(index, loc_df, entry):
     import emission.storage.timeseries.builtin_timeseries as estb
@@ -769,19 +779,15 @@ def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
     filtered_trip_like[prefix+"_fmt_time"] = arrow.get(float(ts)).to(tz).isoformat()
     filtered_trip_like[prefix+"_loc"] = loc
 
-def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
-    import emission.storage.timeseries.builtin_timeseries as estb
-
-    loc_df = estb.BuiltinTimeSeries.to_data_df("background/filtered_location",
-                                               raw_loc_entry_list)
-    valid_loc_df = loc_df[np.logical_not(loc_df._id.isin(filtered_point_id_list))]
-    cols_to_drop = set(filtered_location_excluded).intersection(set(loc_df.columns))
+def remove_outliers(raw_loc_df, filtered_point_id_list):
+    valid_loc_df = raw_loc_df[np.logical_not(raw_loc_df._id.isin(filtered_point_id_list))]
+    cols_to_drop = set(filtered_location_excluded).intersection(set(raw_loc_df.columns))
     logging.debug("from %s, excluding %s, columns to drop = %s" %
-                  (loc_df.columns, filtered_location_excluded, cols_to_drop))
+                  (raw_loc_df.columns, filtered_location_excluded, cols_to_drop))
     filtered_loc_df = valid_loc_df.drop(cols_to_drop, axis=1)
     logging.debug("After filtering, rows went from %s -> %s, cols from %s -> %s" %
-                  (len(loc_df), len(valid_loc_df),
-                   len(loc_df.columns), len(filtered_loc_df.columns)))
+                  (len(raw_loc_df), len(valid_loc_df),
+                   len(raw_loc_df.columns), len(filtered_loc_df.columns)))
     return filtered_loc_df
 
 def link_trip_timeline(tl, section_map, stop_map):
@@ -1107,7 +1113,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     # [0.0, 0.45757476285455007, 0.4575750402006284, -> [0.0, distance_delta/30, 0.45757476285455007, 0.4575750402006284,
     speed_list = first_section_data["speeds"]
     logging.debug("fix_squished_place: before inserting, speeds = %s" % speed_list[:10])
-    speed_list.insert(1, old_div(float(distance_delta),30))
+    speed_list.insert(1, distance_delta / 30)
     logging.debug("fix_squished_place: after inserting, speeds = %s" % speed_list[:10])
     first_section_data["distances"] = distances_list
     first_section_data["speeds"] = speed_list
@@ -1145,7 +1151,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     curr_first_loc_data = curr_first_loc.data
     logging.debug("fix_squished_place: before updating, old first location data = %s" % loc_row)
     curr_first_loc_data["distance"] = distance_delta
-    curr_first_loc_data["speed"] = old_div(float(distance_delta), 30)
+    curr_first_loc_data["speed"] = distance_delta / 30
     curr_first_loc["data"] = curr_first_loc_data
     logging.debug("fix_squished_place: after updating, old first location data = %s" % curr_first_loc)
     ts.update(curr_first_loc)
