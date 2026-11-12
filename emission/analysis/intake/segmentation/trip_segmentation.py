@@ -1,12 +1,10 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 from builtins import object
 import logging
+import time
+import arrow
+import numpy as np
+import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.place_queries as esdp
@@ -23,9 +21,12 @@ import emission.core.wrapper.untrackedtime as ecwut
 import emission.analysis.intake.segmentation.restart_checking as eaisr
 
 import emission.core.common as ecc
+import emission.storage.decorations.stats_queries as esds
+import emission.core.timer as ect
+import emission.core.wrapper.pipelinestate as ecwp
 
 class TripSegmentationMethod(object):
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self, loc_df, transition_df, motion_df):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -52,29 +53,40 @@ def segment_current_trips(user_id):
 
     import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_time_filter as dstf
     import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_dist_filter as dsdf
-    dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
-                                              point_threshold = 9,
-                                              distance_threshold = 100) # 100 m
 
-    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 10 mins
-                                              point_threshold = 9,
-                                              distance_threshold = 50) # 50 m
+
+    dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold=5 * 60,  # 5 mins
+                                                point_threshold=9,
+                                                distance_threshold=100)  # 100 m
+
+    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold=10 * 60,  # 10 mins
+                                                point_threshold=9,
+                                                distance_threshold=50)  # 50 m
 
     filter_methods = {"time": dstfsm, "distance": dsdfsm}
     filter_method_names = {"time": "DwellSegmentationTimeFilter", "distance": "DwellSegmentationDistFilter"}
+
     # We need to use the appropriate filter based on the incoming data
     # So let's read in the location points for the specified query
-    loc_df = ts.get_data_df("background/filtered_location", time_query)
+    with ect.Timer() as t_get_data_df:
+        loc_df = ts.get_data_df("background/filtered_location", time_query)
+    esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/get_data_df", time.time(), t_get_data_df.elapsed)
+
     if len(loc_df) == 0:
         # no new segments, no need to keep looking at these again
         logging.debug("len(loc_df) == 0, early return")
         epq.mark_segmentation_done(user_id, None)
         return
 
-    out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    # Reading in the other sensor data
+    transition_df = ts.get_data_df("statemachine/transition", time_query)
+    motion_df = ts.get_data_df("background/motion_activity", time_query)
+
+    ts_values = loc_df['ts'].to_numpy()
+    ts_cummax = np.maximum.accumulate(ts_values)
+    out_of_order_points = loc_df[ts_values != ts_cummax]
     if len(out_of_order_points) > 0:
-        logging.info("Found out of order points!")
-        logging.info("%s" % out_of_order_points)
+        logging.info("Found out of order points! %s" % out_of_order_points.index)
         # drop from the table
         loc_df = loc_df.drop(out_of_order_points.index.tolist())
         loc_df.reset_index(inplace=True)
@@ -84,17 +96,37 @@ def segment_current_trips(user_id):
         for ooid in out_of_order_id_list:
             ts.invalidate_raw_entry(ooid)
 
+    after_out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    logging.info("After filtering, found out of order points! %s" % after_out_of_order_points.index)
+
+    if len(after_out_of_order_points) > 0:
+        logging.info(f"{after_out_of_order_points.index.intersection(out_of_order_points.index)=}")
+        before_index = after_out_of_order_points.index - 1
+        after_index = after_out_of_order_points.index + 1
+        with pd.option_context('display.float_format', '{:.2f}'.format,
+                                'display.max_columns', None,
+                                'display.max_rows', None):
+            before_after_indices = before_index.append(after_out_of_order_points.index)\
+                                        .append(after_index).sort_values()
+            before_after_loc_df = loc_df.loc[before_after_indices]
+            before_after_loc_df["metadata_write_fmt_time"] = before_after_loc_df.metadata_write_ts.apply(arrow.get)
+            logging.info(f"{before_after_loc_df[['_id', 'ts', 'metadata_write_ts', 'fmt_time', 'metadata_write_fmt_time']]}")
+
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
+
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
-        
-        segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(ts,
-            time_query)
+        with ect.Timer() as t_segment_trips:
+            segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(loc_df, transition_df, motion_df)
+        esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/segment_into_trips", time.time(), t_segment_trips.elapsed)
     else:
-        segmentation_points = get_combined_segmentation_points(ts, loc_df, time_query,
-                                                               filters_in_df,
-                                                               filter_methods)
+        with ect.Timer() as t_get_combined_segmentation:
+            segmentation_points = get_combined_segmentation_points(loc_df, transition_df, motion_df, time_query,
+                                                                   filters_in_df,
+                                                                   filter_methods)
+        esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/get_combined_segmentation_points", time.time(), t_get_combined_segmentation.elapsed)
+
     # Create and store trips and places based on the segmentation points
     if segmentation_points is None:
         epq.mark_segmentation_failed(user_id)
@@ -103,14 +135,16 @@ def segment_current_trips(user_id):
         logging.debug("len(segmentation_points) == 0, early return")
         epq.mark_segmentation_done(user_id, None)
     else:
-        try:
-            create_places_and_trips(user_id, segmentation_points, filter_method_names[filters_in_df[0]])
-            epq.mark_segmentation_done(user_id, get_last_ts_processed(filter_methods))
-        except:
-            logging.exception("Trip generation failed for user %s" % user_id)
-            epq.mark_segmentation_failed(user_id)
-            
-def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filter_methods):
+        with ect.Timer() as t_create_places_trips:
+            try:
+                create_places_and_trips(user_id, segmentation_points, transition_df, filter_method_names[filters_in_df[0]])
+                epq.mark_segmentation_done(user_id, get_last_ts_processed(filter_methods))
+            except:
+                logging.exception("Trip generation failed for user %s" % user_id)
+                epq.mark_segmentation_failed(user_id)
+        esds.store_pipeline_time(user_id, ecwp.PipelineStages.TRIP_SEGMENTATION.name + "/create_places_and_trips", time.time(), t_create_places_trips.elapsed)
+
+def get_combined_segmentation_points(loc_df, transition_df, motion_df, time_query, filters_in_df, filter_methods):
     """
     We can have mixed filters in a particular time range for multiple reasons.
     a) user switches phones from one platform to another
@@ -149,7 +183,13 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
             time_query.endTs = loc_df.iloc[endIndex+1].ts
         logging.debug("for filter %s, startTs = %d and endTs = %d" %
             (curr_filter, time_query.startTs, time_query.endTs))
-        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)
+        curr_filter_loc_df = loc_df.loc[startIndex:endIndex]
+        curr_filter_loc_df.reset_index(drop=True, inplace=True)
+        curr_filter_transition_df = transition_df.query("@time_query.startTs <= metadata_write_ts <= @time_query.endTs")
+        curr_filter_transition_df.reset_index(drop=True, inplace=True)
+        curr_filter_motion_df = motion_df.query("@time_query.startTs <= metadata_write_ts <= @time_query.endTs")
+        curr_filter_motion_df.reset_index(drop=True, inplace=True)
+        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(curr_filter_loc_df, curr_filter_transition_df, curr_filter_motion_df)
     logging.debug("After filtering, segmentation_map has keys %s" % list(segmentation_map.keys()))
     sortedStartTsList = sorted(segmentation_map.keys())
     segmentation_points = []
@@ -171,7 +211,7 @@ def get_last_ts_processed(filter_methods):
     logging.info("Returning last_ts_processed = %s" % last_ts_processed)
     return last_ts_processed
 
-def create_places_and_trips(user_id, segmentation_points, segmentation_method_name):
+def create_places_and_trips(user_id, segmentation_points, transition_df, segmentation_method_name):
     # new segments, need to deal with them
     # First, retrieve the last place so that we can stitch it to the newly created trip.
     # Again, there are easy and hard. In the easy case, the trip was
@@ -214,7 +254,7 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
         new_place_entry = ecwe.Entry.create_entry(user_id,
                             "segmentation/raw_place", new_place, create_id = True)
 
-        if found_untracked_period(ts, last_place_entry.data, start_loc, segmentation_method_name):
+        if found_untracked_period(transition_df, last_place_entry.data, start_loc, segmentation_method_name):
             # Fill in the gap in the chain with an untracked period
             curr_untracked = ecwut.Untrackedtime()
             curr_untracked.source = segmentation_method_name
@@ -254,7 +294,7 @@ def _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start
     # it will be lost
     ts.update(last_place_entry)
 
-def found_untracked_period(timeseries, last_place, start_loc, segmentation_method_name):
+def found_untracked_period(transition_df, last_place, start_loc, segmentation_method_name):
     """
     Check to see whether the two places are the same.
     This is a fix for https://github.com/e-mission/e-mission-server/issues/378
@@ -270,7 +310,7 @@ def found_untracked_period(timeseries, last_place, start_loc, segmentation_metho
         logging.debug("start of a chain, unable to check for restart from previous trip end, assuming not restarted")
         return False
 
-    if _is_tracking_restarted(last_place, start_loc, timeseries):
+    if _is_tracking_restarted(last_place, start_loc, transition_df):
         logging.debug("tracking has been restarted, returning True")
         return True
 
@@ -378,6 +418,6 @@ def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     new_place_entry["data"] = new_place
     curr_trip_entry["data"] = curr_trip
 
-def _is_tracking_restarted(last_place, start_loc, timeseries):
-    return eaisr.is_tracking_restarted_in_range(last_place.enter_ts, start_loc.ts, timeseries)
+def _is_tracking_restarted(last_place, start_loc, transition_df):
+    return eaisr.is_tracking_restarted_in_range(last_place.enter_ts, start_loc.ts, transition_df)
 

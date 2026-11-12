@@ -133,8 +133,8 @@ class TestUserInput(unittest.TestCase):
             etc.setupRealExampleWithEntries(self)
             etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        confirmed_trips = list(ts.find_entries(["analysis/confirmed_trip"], None))
-        confirmed_places = list(ts.find_entries(["analysis/confirmed_place"], None))
+        confirmed_trips = ts.find_entries(["analysis/confirmed_trip"], None)
+        confirmed_places = ts.find_entries(["analysis/confirmed_place"], None)
 
         with open(dataFile+".expected_confirmed_trips"+ct_suffix) as dect:
             expected_confirmed_trips = json.load(dect, object_hook = esj.wrapped_object_hook)

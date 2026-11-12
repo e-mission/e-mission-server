@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import unittest
 import datetime as pydt
@@ -35,7 +29,7 @@ class TestModelStorage(unittest.TestCase):
     '''
     def setUp(self):
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-        level=logging.DEBUG)
+            level=logging.DEBUG)
 
         # configuration for randomly-generated test data
         self.user_id = user_id = 'TestRunGreedyModel-TestData'

@@ -7,6 +7,8 @@ name: test-with-docker
 on:
   pull_request:
     branches: [ master ]
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '5 4 * * 0'
@@ -17,6 +19,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -24,7 +27,7 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
 
     - name: Make sure that the workflow works
       run: echo Smoke test

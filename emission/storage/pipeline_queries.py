@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 import datetime as pydt
@@ -77,7 +71,7 @@ def mark_sectioning_done(user_id, last_trip_done):
         mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, None)
     else:
         mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION,
-                        last_trip_done.data.end_ts + END_FUZZ_AVOID_LTE)
+                        last_trip_done['data']['end_ts'] + END_FUZZ_AVOID_LTE)
 
 def mark_sectioning_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.SECTION_SEGMENTATION)

@@ -1,7 +1,7 @@
 # python 3
 FROM ubuntu:jammy-20240227
 
-MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
+MAINTAINER K. Shankari (k.shankari@nlr.gov)
 
 LABEL org.opencontainers.image.source=https://github.com/e-mission/e-mission-server
 
@@ -17,6 +17,12 @@ RUN apt-get install -y -qq git
 
 # install jq to parse json within bash scripts
 RUN apt-get install -y jq
+
+# Upgrade to resolve KEVs
+# TODO: Switch to more recent LTS
+# we are currently on jammy (22.04)
+# most recent LTS is numbat (24.04)
+RUN apt-get -y upgrade
 
 # cleanup
 RUN apt-get -y remove --purge build-essential

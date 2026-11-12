@@ -2,13 +2,7 @@
 Construct user utility model or retrieve from database and update with
 augmented trips. Store in database and return the model.
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import zip
 from builtins import *
 from builtins import object

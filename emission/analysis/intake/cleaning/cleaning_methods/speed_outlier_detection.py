@@ -1,13 +1,7 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Techniques for outlier detection of speeds. Each of these returns a speed threshold that 
 # can be used with outlier detection techniques.
 
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 from builtins import object
 import logging
@@ -24,7 +18,7 @@ class BoxplotOutlier(object):
             df_to_use = with_speeds_df[with_speeds_df.speed > 0]
         else:
             df_to_use = with_speeds_df
-        quartile_vals = df_to_use.quantile([0.25, 0.75]).speed
+        quartile_vals = df_to_use["speed"].quantile([0.25, 0.75])
         logging.debug("quartile values are %s" % quartile_vals)
         iqr = quartile_vals.iloc[1] - quartile_vals.iloc[0]
         logging.debug("iqr %s" % iqr)

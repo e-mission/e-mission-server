@@ -1,13 +1,7 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-from __future__ import division
-from __future__ import absolute_import
 # Converts user emails -> UUIDs
 # The UUIDs can be used to extract data for moving across servers
 # Typically used as the file input to the
 # extract_timeline_for_day_range_and_user.py script
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import *
 import sys

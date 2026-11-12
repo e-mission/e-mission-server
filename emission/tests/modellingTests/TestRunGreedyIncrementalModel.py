@@ -54,13 +54,13 @@ class TestRunGreedyIncrementalModel(unittest.TestCase):
             "incremental_evaluation": True
         }
 
-        existing_entries_for_user = list(self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]))  
+        existing_entries_for_user = self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY])
         if len(existing_entries_for_user) != 0:
             raise Exception(f"test invariant failed, there should be no entries for user {self.user_id}")
 
         # write trips to database and confirm that they were written
         self.ts.bulk_insert(test_trips)
-        self.initial_data = list(self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]))
+        self.initial_data = self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY])
         if len(self.initial_data) == 0:
             logging.debug(f'test setup failed while loading trips from file')
             self.fail()
@@ -170,7 +170,7 @@ class TestRunGreedyIncrementalModel(unittest.TestCase):
         )
         
         self.ts.bulk_insert(new_trips)
-        all_trips = list(self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]))
+        all_trips = self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY])
         logging.debug(f'total of {len(all_trips)} now stored in database')
 
         # train the new model on the complete collection of trips

@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 import pymongo
@@ -64,11 +58,10 @@ def get_entries(key, user_id, time_query, untracked_key = None,
     if untracked_key is not None:
         logging.debug("after appending untracked_key %s, key_list is %s" %
                       (untracked_key, key_list))
-    doc_cursor = ts.find_entries(key_list, time_query, geo_query, extra_query_list)
+    curr_entry_list = ts.find_entries(key_list, time_query, geo_query, extra_query_list)
     # TODO: Fix "TripIterator" and return it instead of this list
-    curr_entry_list = [ecwe.Entry(doc) for doc in doc_cursor]
     logging.debug("Returning entry with length %d result" % len(curr_entry_list))
-    return curr_entry_list
+    return [ecwe.Entry(e) for e in curr_entry_list]
 
 def get_data_df(key, user_id, time_query, geo_query=None,
                 extra_query_list=None):

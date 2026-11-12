@@ -2,7 +2,7 @@ name: docker image
 
 on:
   push:
-    branches: [ master, gis-based-mode-detection, cleanup-cicd ]
+    branches: [ master, gis-based-mode-detection, '**_image_build_**' ]
   release:
     types: [published]
 
@@ -56,7 +56,7 @@ jobs:
             branch: main
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
     - name: Trigger workflow in admin-dash, public-dash
       run: |

@@ -7,7 +7,6 @@ import emission.core.wrapper.localdate as ecwld
 import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.cache_series as estcs
 import emission.storage.timeseries.abstract_timeseries as esta
-from past.utils import old_div
 import arrow
 import geocoder
 import requests

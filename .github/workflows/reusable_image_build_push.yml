@@ -10,16 +10,12 @@ on:
         required: true
         type: string
 
-env:
-  DOCKER_USER: ${{secrets.DOCKER_USER}}
-  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: e-mission/${{ inputs.repo }}
           ref: ${{ inputs.branch }}
@@ -157,8 +153,14 @@ jobs:
             echo "Latest server image tag (${{ github.event_name }}): ${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}"
           fi
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -171,78 +173,79 @@ jobs:
       - name: Run a one-line script
         run: echo running image build for repo ${{ inputs.repo }} branch ${{ inputs.branch }} on ${{ steps.date.outputs.date }}
 
-      - name: build docker image
+      - name: Set image tag
+        id: image-tag
         run: |
-          if [ "${{ inputs.repo }}" = "e-mission-server" ]; then
-            docker build -t ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.fetch-latest-release-tags.outputs.tag_name }} .
-          elif [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
-            docker build -t ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.fetch-latest-release-tags.outputs.tag_name }} ./frontend
-          elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
-            SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }} docker compose -f docker-compose-prod.yml build
-          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then            
-            SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }} docker compose -f docker-compose.yml build
-          fi
-          docker images
-
-      - name: rename docker image
-        if: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
-        run: |
-          if [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then 
-            if [ "${{ github.event_name }}" == "release" ]; then
-              docker tag e-mission/opdash:0.0.1 ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
-            elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-              docker tag e-mission/opdash:0.0.1 ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.increment-release-tag.outputs.new_repo_version }}
-            fi
-          elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then      
-            if [ "${{ github.event_name }}" == "release" ]; then
-              docker tag em-pub-dash-prod/frontend:latest ghcr.io/e-mission/${{ inputs.repo }}_frontend:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
-              docker tag em-pub-dash-prod/viz-scripts:latest ghcr.io/e-mission/${{ inputs.repo }}_notebook:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
-            elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-              docker tag em-pub-dash-prod/viz-scripts:latest ghcr.io/e-mission/${{ inputs.repo }}_notebook:${{ steps.increment-release-tag.outputs.new_repo_version }}
-            fi
-          fi
-  
-      - name: push docker image
-        if: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
-        run: |
-          if [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then      
-            if [ "${{ github.event_name }}" == "release" ]; then
-              docker push ghcr.io/e-mission/${{ inputs.repo }}_frontend:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
-              docker push ghcr.io/e-mission/${{ inputs.repo }}_notebook:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
-            elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-              docker push ghcr.io/e-mission/${{ inputs.repo }}_notebook:${{ steps.increment-release-tag.outputs.new_repo_version }}
-            fi
-          elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
-            if [ "${{ github.event_name }}" == "release" ]; then
-              docker push ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
-            elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-              docker push ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.increment-release-tag.outputs.new_repo_version }}
-            fi
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "tag=${{ steps.increment-release-tag.outputs.new_repo_version }}" >> "$GITHUB_OUTPUT"
           else
-            docker push ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.fetch-latest-release-tags.outputs.tag_name }}
+            echo "tag=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Update .env file 
+      - name: build and push server image
+        if: ${{ inputs.repo == 'e-mission-server' }}
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64/v8
+          push: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+          tags: ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.image-tag.outputs.tag }}
+
+      - name: build and push join page image
+        if: ${{ inputs.repo == 'nrel-openpath-join-page' }}
+        uses: docker/build-push-action@v7
+        with:
+          context: ./frontend
+          platforms: linux/amd64,linux/arm64/v8
+          push: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+          tags: ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.image-tag.outputs.tag }}
+
+      - name: build and push admin dashboard image
+        if: ${{ inputs.repo == 'op-admin-dashboard' }}
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: docker/Dockerfile
+          build-args: SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}
+          platforms: linux/amd64,linux/arm64/v8
+          push: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+          tags: ghcr.io/e-mission/${{ inputs.repo }}:${{ steps.image-tag.outputs.tag }}
+
+      - name: build and push public dashboard frontend image
+        if: ${{ inputs.repo == 'em-public-dashboard' && github.event_name != 'workflow_dispatch' }}
+        uses: docker/build-push-action@v7
+        with:
+          context: frontend
+          platforms: linux/amd64,linux/arm64/v8
+          push: ${{ github.ref_type == 'tag' }}
+          tags: ghcr.io/e-mission/${{ inputs.repo }}_frontend:${{ steps.image-tag.outputs.tag }}
+
+      - name: build and push public dashboard notebook image
+        if: ${{ inputs.repo == 'em-public-dashboard' }}
+        uses: docker/build-push-action@v7
+        with:
+          context: viz_scripts
+          build-args: SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}
+          platforms: linux/amd64,linux/arm64/v8
+          push: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
+          tags: ghcr.io/e-mission/${{ inputs.repo }}_notebook:${{ steps.image-tag.outputs.tag }}
+
+      - name: Update .env file
         if: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' }}
         run: |
           if [ "${{ inputs.repo }}" = "e-mission-server" ]; then
-            echo "SERVER_IMAGE_TAG=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" > .env
+            echo "SERVER_IMAGE_TAG=${{ steps.image-tag.outputs.tag }}" > .env
           elif [ "${{ inputs.repo }}" = "nrel-openpath-join-page" ]; then
-            echo "JOIN_IMAGE_TAG=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" > .env
+            echo "JOIN_IMAGE_TAG=${{ steps.image-tag.outputs.tag }}" > .env
           elif [ "${{ inputs.repo }}" = "op-admin-dashboard" ]; then
-            if [ "${{ github.event_name }}" == "release" ]; then
-              echo "ADMIN_DASH_IMAGE_TAG=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" > .env
-            elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-              echo "ADMIN_DASH_IMAGE_TAG=${{ steps.increment-release-tag.outputs.new_repo_version }}" > .env
-            fi
+            echo "ADMIN_DASH_IMAGE_TAG=${{ steps.image-tag.outputs.tag }}" > .env
             echo "SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}" >> .env
           elif [ "${{ inputs.repo }}" = "em-public-dashboard" ]; then
-            if [ "${{ github.event_name }}" == "release" ]; then
-              echo "PUBLIC_DASH_NOTEBOOK_IMAGE_TAG=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" > .env
-              echo "PUBLIC_DASH_FRONTEND_IMAGE_TAG=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" >> .env
-            elif [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-              echo "PUBLIC_DASH_NOTEBOOK_IMAGE_TAG=${{ steps.increment-release-tag.outputs.new_repo_version }}" > .env
+            echo "PUBLIC_DASH_NOTEBOOK_IMAGE_TAG=${{ steps.image-tag.outputs.tag }}" > .env
+            if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
               echo "PUBLIC_DASH_FRONTEND_IMAGE_TAG=${{ steps.set-tags.outputs.PUBLIC_DASH_FRONTEND_IMAGE_TAG }}" >> .env
+            else
+              echo "PUBLIC_DASH_FRONTEND_IMAGE_TAG=${{ steps.image-tag.outputs.tag }}" >> .env
             fi
             echo "SERVER_IMAGE_TAG=${{ steps.get-server-tag.outputs.SERVER_IMAGE_TAG }}" >> .env
           fi

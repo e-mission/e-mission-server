@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 import pandas as pd
@@ -11,6 +5,7 @@ import arrow
 
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ecwp
+import emission.analysis.result.user_stat as earus
 import emission.storage.decorations.place_queries as esdp
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
@@ -145,7 +140,7 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
         logging.info("this is a dry-run, returning from del_objects_after without modifying anything")
     else:
         result = edb.get_analysis_timeseries_db().delete_many(del_query)
-        logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result)
+        logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result.raw_result)
 
 def reset_last_place(last_place, is_dry_run):
     if is_dry_run:
@@ -174,7 +169,7 @@ def reset_last_place(last_place, is_dry_run):
     logging.debug("reset_query = %s" % reset_query)
 
     result = edb.get_analysis_timeseries_db().update_one(match_query, reset_query)
-    logging.debug("this is not a dry run, result of update in reset_last_place = %s" % result)
+    logging.debug("this is not a dry run, result of update in reset_last_place = %s" % result.raw_result)
 
     logging.debug("after update, entry is %s" %
                   edb.get_analysis_timeseries_db().find_one(match_query))
@@ -223,18 +218,29 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
             edb.get_pipeline_state_db().count_documents(reset_pipeline_query),
             user_id, reset_ts))
 
+    profile_update_query = earus.get_pipeline_dependent_user_query(user_id, "analysis/composite_trip")
+    assert sorted(list(profile_update_query.keys())) == ["labeled_trips", "pipeline_range", "total_trips"]
+    last_trip_from_update = profile_update_query["pipeline_range"]["end_ts"]
+    if last_trip_from_update != reset_ts:
+        logging.info(f"WARNING: the computed reset timestamp is {reset_ts}({arrow.get(reset_ts)}) but the last trip is {last_trip_from_update}({arrow.get(last_trip_from_update)})")
+        profile_update_query["pipeline_range"]["end_ts"] = reset_ts
+    logging.info(f"Resetting profile copy of state with query {profile_update_query}")
+
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_pipeline_state without modifying anything")
     else:
         result = edb.get_pipeline_state_db().update_many(
                     trip_seg_reset_pipeline_query, trip_seg_update_pipeline_query,
                     upsert=False)
-        logging.debug("this is not a dry run, result of updating trip_segmentation stage in reset_pipeline_state = %s" % result)
+        logging.debug("this is not a dry run, result of updating trip_segmentation stage in reset_pipeline_state = %s" % result.raw_result)
 
         result = edb.get_pipeline_state_db().update_many(
                     reset_pipeline_query, update_pipeline_query,
                     upsert=False)
-        logging.debug("this is not a dry run, result of updating all other stages in reset_pipeline_state = %s" % result)
+        logging.debug("this is not a dry run, result of updating all other stages in reset_pipeline_state = %s" % result.raw_result)
+
+        result = edb.get_profile_db().update_one({"user_id": user_id}, {"$set": profile_update_query})
+        logging.debug("this is not a dry run, result of updating the profile in reset_pipeline_state = %s" % result.raw_result)
 
 
 def reset_curr_run_state(user_id, is_dry_run):
@@ -247,7 +253,7 @@ def reset_curr_run_state(user_id, is_dry_run):
     else:
         result = edb.get_pipeline_state_db().update_many(
                     reset_curr_run_ts_query, reset_curr_run_ts_update)
-        logging.debug("this is not a dry run, result of removing any curr_run_ts entries = %s" % result)
+        logging.debug("this is not a dry run, result of removing any curr_run_ts entries = %s" % result.raw_result)
 # 
 # END: reset_user_to_ts
 # 
@@ -275,14 +281,23 @@ def _del_entries_for_query(del_query, is_dry_run):
     logging.info("About to delete %s pipeline states" % 
             (edb.get_pipeline_state_db().count_documents(del_query)))
 
+    reset_profile_ts_update = {"$set": {
+            "pipeline_range.start_ts": None,
+            "pipeline_range.end_ts": None,
+            "labeled_trips": 0,
+            "total_trips": 0
+        }
+    }
+
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_user_to-start without modifying anything")
     else: 
         result = edb.get_analysis_timeseries_db().delete_many(del_query)
-        logging.info("this is not a dry run, result of removing analysis objects = %s" % result)
+        logging.info("this is not a dry run, result of removing analysis objects = %s" % result.raw_result)
         result = edb.get_pipeline_state_db().delete_many(del_query)
-        logging.info("this is not a dry run, result of removing pipeline states = %s" % result)
-
+        logging.info("this is not a dry run, result of removing pipeline states = %s" % result.raw_result)
+        result = edb.get_profile_db().update_one(del_query,  reset_profile_ts_update)
+        logging.info("this is not a dry run, result of resetting profile = %s" % result.raw_result)
 
 # 
 # END: reset_to_start
@@ -342,10 +357,10 @@ def get_all_resets(all_invalid_states):
 
 def auto_reset(dry_run, only_calc):
     # Only read all states that are not for `OUTPUT_GEN` since we are not going to reset that state
-    # Also only read states which have been running for more than three hours
+    # Also only read states which have been running for more than six hours
     # If we are running the pipeline every hour, then having a run_ts that is
     # more than three hours old indicates that it is likely invalid
-    three_hours_ago = arrow.utcnow().shift(hours=-3).int_timestamp
+    three_hours_ago = arrow.utcnow().shift(hours=-6).int_timestamp
     all_invalid_states = pd.json_normalize(list(edb.get_pipeline_state_db().find({"$and": [
         {"curr_run_ts": {"$lt": three_hours_ago}},
         {"pipeline_stage": {"$ne": 9}}]})))

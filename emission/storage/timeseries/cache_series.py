@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Simple decorator that pulls data from a combination of the usercache and the timeseries.
 # We could avoid this if we put data directly into the timeseries when it came in instead of
 # buffering
@@ -10,8 +6,6 @@ from __future__ import absolute_import
 # We may also be able to remove this if we run the pipeline more frequently, but would
 # need to test that
 
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 
 import emission.core.get_database as edb

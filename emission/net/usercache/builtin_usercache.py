@@ -1,10 +1,4 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 import logging
 import time
@@ -57,13 +51,15 @@ https://github.com/e-mission/e-mission-data-collection/wiki/User-cache-data-form
     }
 """
 
+cached_db_conn = edb.get_usercache_db()
+
 class BuiltinUserCache(ucauc.UserCache):
     def __init__(self, user_id):
         super(BuiltinUserCache, self).__init__(user_id)
         self.key_query = lambda key: {"metadata.key": key};
         self.ts_query = lambda tq: BuiltinUserCache._get_ts_query(tq)
         self.type_query = lambda entry_type: {"metadata.type": entry_type}
-        self.db = edb.get_usercache_db()
+        self.db = cached_db_conn
 
     @staticmethod
     def _get_ts_query(tq):

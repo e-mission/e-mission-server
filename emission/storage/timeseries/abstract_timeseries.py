@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
 from builtins import object
 import logging
@@ -38,7 +32,7 @@ class TimeSeries(object):
         return bits.BuiltinTimeSeries.get_uuid_list()
 
     def find_entries(self, key_list=None, time_query=None, geo_query=None,
-                     extra_query_list=None):
+                     extra_query_list=None) -> list:
         """
         Find the entries for the specified time query
         :param geo_query:

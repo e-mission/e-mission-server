@@ -1,14 +1,7 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import range
 from builtins import *
 from builtins import object
-from past.utils import old_div
 import logging
 import math
 import numpy
@@ -267,7 +260,7 @@ class similarity(object):
         new_y = []
         for i in range(0, N):
             p = numpy.array([x[i], y[i]])
-            dist = old_div(norm(numpy.cross(p-a,p-b)),n)
+            dist = norm(numpy.cross(p-a, p-b)) / n
             new_y.append(dist)
             if dist > max:
                 max = dist

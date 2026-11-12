@@ -1,12 +1,5 @@
-from __future__ import division
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import absolute_import
 # Standard imports
-from future import standard_library
-standard_library.install_aliases()
 from builtins import *
-from past.utils import old_div
 import math
 import logging
 import numpy as np
@@ -49,7 +42,7 @@ def calSpeed(point1, point2):
   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
   if timeDelta != 0:
-    return old_div(distanceDelta, timeDelta.total_seconds())
+    return distanceDelta / timeDelta.total_seconds()
   else:
     return None
 
@@ -78,7 +71,7 @@ def calHCR(section_entry):
 
     ts = esta.TimeSeries.get_time_series(section_entry.user_id)
     tq = esda.get_time_query_for_trip_like_object(section)
-    locations = list(ts.find_entries(["analysis/recreated_location"], tq))
+    locations = ts.find_entries(["analysis/recreated_location"], tq)
 
     if len(locations) < 3:
         return 0
@@ -370,7 +363,7 @@ def get_mode_share_by_count(list_idx):
         # print(MODE2)
     else:
         for mode in AllModeList:
-            MODE2[mode['mode_id']]=old_div(MODE[mode['mode_id']],sum(MODE.values()))
+            MODE2[mode['mode_id']] = MODE[mode['mode_id']] / sum(MODE.values())
     return MODE2
 
 def cluster_route_match_score(section,step1=100000,step2=100000,method='lcs',radius1=2000,threshold=0.5):
