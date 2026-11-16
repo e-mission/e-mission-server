@@ -84,6 +84,7 @@ class NominatimTest(unittest.TestCase):
         NominatimTest.nominatim("geofabrik")
         expected_result = {'place_id': 132490, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 141567710, 'boundingbox': ['41.8325787', '41.8332278', '-71.4161848', '-71.4152064'], 'lat': '41.8330097', 'lon': '-71.41568124868104', 'display_name': 'State of Rhode Island Department of Administration, 1, Park Street, Downtown, Providence, Providence County, Rhode Island, 02908, United States', 'class': 'building', 'type': 'civic', 'importance': 1.75001}
         actual_result = eco.Geocoder.get_json_geo("State of Rhode Island Department of Administration, 1, Park Street, Downtown, Providence, Providence County, 02908, United States")[0]
+        print(f'actual result is {actual_result}')
         key_list = ['osm_id', 'boundingbox', 'display_name']
         for k in key_list:
             self.assertEqual(expected_result[k], actual_result[k])

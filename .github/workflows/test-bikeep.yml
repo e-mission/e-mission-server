@@ -1,4 +1,4 @@
-name: overpass-test
+name: bikeep-test
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -27,4 +27,4 @@ jobs:
       run: |
         echo Testing Bikeep integration...
         chmod +x emission/individual_tests/setup_and_test_integration.sh
-        ./emission/individual_tests/setup_and_test_integration.sh emission/tests/netTests/TestBikeepServiceIntegration.py
+        ./emission/individual_tests/setup_and_test_integration.sh emission/individual_tests/TestBikeepServiceIntegration.py
