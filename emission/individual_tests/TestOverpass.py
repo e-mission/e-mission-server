@@ -39,9 +39,11 @@ class OverpassTest(unittest.TestCase):
     #Test utilizes the functions get_stops_near, get_public_transit_stops, and make_request_and_catch.  
     def test_get_stops_near(self):
         actual_result = enetm.get_stops_near(loc1, 150.0)[0]['routes'][0]['tags']
+        print(f"Received result {actual_result}")
         # This will probably fail once the name changes in OSM, but RTD hasn't even changed the name of the stop yet so it may be a while
         # I say let's just let that happen - it's proof that the tests are working!
-        expected_result = {'from': 'National Renewable Energy Lab', 'name': 'RTD Route 125: Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
+        # tests failed! OSM was finally updated! Fixing...
+        expected_result = {'description': 'RTD Route 125: Red Rocks College','from': 'National Renewable Energy Lab', 'name': 'Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator:short': 'RTD', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
         self.assertEqual(expected_result, actual_result)
    
     #Get_stops_near generates two stops from the given coordinates.
