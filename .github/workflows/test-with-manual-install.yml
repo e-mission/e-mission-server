@@ -39,10 +39,6 @@ jobs:
       with:
         mongodb-version: 8.0.19
 
-    - name: Check existing version of miniconda
-      shell: bash -l {0}
-      run: conda info -a
-
     - name: Install miniconda
       shell: bash -l {0}
       run: |
