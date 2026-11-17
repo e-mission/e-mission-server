@@ -11,7 +11,41 @@ on:
         type: string
 
 jobs:
+  latest-release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.fetch-latest-release-tags.outputs.tag_name }}
+      target_commitish: ${{ steps.fetch-latest-release-tags.outputs.target_commitish }}
+    steps:
+      - name: Fetch latest repository release tag
+        id: fetch-latest-release-tags
+        run: |
+          response_file=$(mktemp)
+          trap 'rm -f "$response_file"' EXIT
+          status=$(curl --silent --show-error -L \
+              --output "$response_file" --write-out '%{http_code}' \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/e-mission/${{ inputs.repo }}/releases/latest")
+
+          if [ "$status" = "404" ]; then
+            echo "::notice::No existing release for e-mission/${{ inputs.repo }}; skipping build and push."
+            exit 0
+          elif [ "$status" != "200" ]; then
+            echo "::error::Failed to fetch latest release (HTTP $status)."
+            exit 1
+          fi
+
+          tag_name=$(jq -er '.tag_name | strings | select(length > 0)' "$response_file")
+          target_commitish=$(jq -er '.target_commitish | strings | select(length > 0)' "$response_file")
+
+          echo "tag_name=$tag_name" >> "$GITHUB_OUTPUT"
+          echo "target_commitish=$target_commitish" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: latest-release
+    if: ${{ needs.latest-release.outputs.tag_name != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -21,20 +55,6 @@ jobs:
           ref: ${{ inputs.branch }}
           token: ${{ secrets.GH_FG_PAT_TAGS }}
           fetch-depth: 0
-
-      - name: Fetch latest repository release tag
-        id: fetch-latest-release-tags
-        run: |
-          response=$(curl -L -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
-              -H "X-GitHub-Api-Version: 2022-11-28" \
-              "https://api.github.com/repos/e-mission/${{ inputs.repo }}/releases/latest")
-
-          tag_name=$(echo "$response" | jq -r '.tag_name')
-          target_commitish=$(echo "$response" | jq -r '.target_commitish')
-          
-          echo "tag_name=$(echo "$response" | jq -r '.tag_name')" >> "$GITHUB_OUTPUT"
-          echo "target_commitish=$(echo "$response" | jq -r '.target_commitish')" >> "$GITHUB_OUTPUT"
 
       - name: Fetch latest server image tag
         id: get-server-tag
@@ -86,7 +106,7 @@ jobs:
 
           echo "name=version_change::$version_change"
 
-          current_repo_version=${{ steps.fetch-latest-release-tags.outputs.tag_name }}
+          current_repo_version=${{ needs.latest-release.outputs.tag_name }}
           current_repo_version_only=${current_repo_version:1}
 
           IFS='.' read -r -a version_parts <<< "${current_repo_version_only}"
@@ -112,7 +132,7 @@ jobs:
   
       - name: Print fetched tags
         run: |
-          echo "Current image tag: ${{ steps.fetch-latest-release-tags.outputs.tag_name }} ; target_commit branch: ${{ steps.fetch-latest-release-tags.outputs.target_commitish }}"
+          echo "Current image tag: ${{ needs.latest-release.outputs.tag_name }} ; target_commit branch: ${{ needs.latest-release.outputs.target_commitish }}"
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "Incremented image tag: ${{ steps.increment-release-tag.outputs.new_repo_version }}"
           fi
@@ -179,7 +199,7 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "tag=${{ steps.increment-release-tag.outputs.new_repo_version }}" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${{ steps.fetch-latest-release-tags.outputs.tag_name }}" >> "$GITHUB_OUTPUT"
+            echo "tag=${{ needs.latest-release.outputs.tag_name }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: build and push server image
