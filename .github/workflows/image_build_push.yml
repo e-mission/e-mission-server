@@ -1,15 +1,12 @@
 name: docker image
 
 on:
-  push:
-    branches: [ master, gis-based-mode-detection, '**_image_build_**' ]
   release:
     types: [published]
 
-#Dockerhub credentials are set as environment variables
-env:
-  DOCKER_USER: ${{secrets.DOCKER_USER}}
-  DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   test-with-docker:
@@ -18,52 +15,29 @@ jobs:
   test-with-manual-install:
     uses: e-mission/e-mission-server/.github/workflows/test-with-manual-install.yml@master
 
-  get-branch-name:
-    runs-on: ubuntu-latest
-    outputs:
-      branch_name: ${{ steps.get-branch-name.outputs.branch_name }}
-    steps:
-      - name: Get branch name based on ref_type
-        id: get-branch-name
-        run: |
-          if [ "${{ github.ref_type }}" == "tag" ]; then
-            target_branch=${{ github.event.release.target_commitish }}
-            echo "branch_name=${target_branch}" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.ref_type }}" == "branch" ]; then
-            echo "branch_name=${GITHUB_REF##*/}" >> "$GITHUB_OUTPUT"    
-          fi
-
   build:
-    if: ${{ !contains(github.event.head_commit.author.name, 'Github Actions bot') }}
-    needs: [test-with-docker, test-with-manual-install, get-branch-name]
-    uses: e-mission/e-mission-server/.github/workflows/reusable_image_build_push.yml@master
-    with:
-      repo: ${{ github.event.repository.name }}
-      branch: ${{ needs.get-branch-name.outputs.branch_name }}
-    secrets: inherit
-
-  dispatch:
-    if: ${{ github.ref_type == 'tag' }}
-    needs: [build]
+    needs: [test-with-docker, test-with-manual-install]
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        include:
-          - repo: e-mission/op-admin-dashboard
-            branch: master
-          - repo: e-mission/em-public-dashboard
-            branch: main
-
     steps:
     - uses: actions/checkout@v7
 
-    - name: Trigger workflow in admin-dash, public-dash
-      run: |
-        curl -L \
-          -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ matrix.repo }}/actions/workflows/image_build_push.yml/dispatches \
-          -d '{"ref":"${{ matrix.branch }}"}'
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v4
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push server image
+      uses: docker/build-push-action@v7
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64/v8
+        push: true
+        tags: ghcr.io/e-mission/e-mission-server:${{ github.event.release.tag_name }}
