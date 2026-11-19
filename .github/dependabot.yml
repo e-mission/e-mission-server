@@ -1,6 +1,13 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 30
+
   - package-ecosystem: "conda"
     directory: "/setup"
     schedule:
