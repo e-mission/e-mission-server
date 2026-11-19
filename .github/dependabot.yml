@@ -5,6 +5,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 30
 
   - package-ecosystem: "conda"
     directory: "/setup"
