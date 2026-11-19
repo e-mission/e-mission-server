@@ -2,9 +2,9 @@
 
 name: ubuntu-only-test-with-manual-install
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
+  push:
+    branches: [master, gis-based-mode-detection, '**_image_build_**']
   pull_request:
     branches: 
         - master
