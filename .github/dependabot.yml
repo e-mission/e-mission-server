@@ -6,11 +6,6 @@ updates:
     schedule:
       interval: "weekly"
 
-  - package-ecosystem: "docker"
-    directory: "/setup/tests"
-    schedule:
-      interval: "weekly"
-
   - package-ecosystem: "conda"
     directory: "/setup"
     schedule:
