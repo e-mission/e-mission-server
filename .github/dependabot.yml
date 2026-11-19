@@ -1,6 +1,16 @@
 version: 2
 enable-beta-ecosystems: true
 updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "docker"
+    directory: "/setup/tests"
+    schedule:
+      interval: "weekly"
+
   - package-ecosystem: "conda"
     directory: "/setup"
     schedule:
