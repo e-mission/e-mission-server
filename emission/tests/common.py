@@ -210,6 +210,15 @@ def runIntakePipeline(uuid):
     eapcc.create_composite_objects(uuid)
     eaurs.get_and_store_pipeline_dependent_user_stats(uuid, "analysis/composite_trip")
 
+def mockOverpass(testCase):
+    from unittest.mock import patch
+
+    overpass_patcher = patch(
+        "emission.analysis.classification.inference.mode.rule_engine.enetm.get_stops_near",
+        return_value=[])
+    overpass_patcher.start()
+    testCase.addCleanup(overpass_patcher.stop)
+
 def configLogging():
     """
     Standard function to be called from the test cases to turn on logging.
