@@ -36,9 +36,16 @@ class OverpassTest(unittest.TestCase):
         else:
             print("status_gfbk", r_gfbk.status_code, type(r_gfbk.status_code), "status_public", r_public.status_code)
 
-    #Test utilizes the functions get_stops_near, get_public_transit_stops, and make_request_and_catch.  
+    # This exercises the live Overpass request and route matching path.
     def test_get_stops_near(self):
-        actual_result = enetm.get_stops_near(loc1, 150.0)[0]['routes'][0]['tags']
+        stops = enetm.get_stops_near(loc1, 150.0)
+        self.assertTrue(stops, "Overpass returned no stops near NLR East Gate")
+        route_125 = next(
+            (route for stop in stops for route in stop["routes"]
+             if route["tags"].get("ref") == "125"),
+            None)
+        self.assertIsNotNone(route_125, "Overpass results did not include RTD route 125")
+        actual_result = route_125["tags"]
         print(f"Received result {actual_result}")
         # This will probably fail once the name changes in OSM, but RTD hasn't even changed the name of the stop yet so it may be a while
         # I say let's just let that happen - it's proof that the tests are working!
@@ -46,11 +53,12 @@ class OverpassTest(unittest.TestCase):
         expected_result = {'description': 'RTD Route 125: Red Rocks College','from': 'National Renewable Energy Lab', 'name': 'Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator:short': 'RTD', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
         self.assertEqual(expected_result, actual_result)
    
-    #Get_stops_near generates two stops from the given coordinates.
-    # Get_predicted_transit_mode finds a common route between them (train).
+    # Get_stops_near finds stops at both ends; matching their live data predicts train.
     def test_get_predicted_transit_mode(self):
         stop1 = enetm.get_stops_near(loc2, 400.0)
         stop2 = enetm.get_stops_near(loc3, 400.0)
+        self.assertTrue(stop1, "Overpass returned no stops near Denver Union Station")
+        self.assertTrue(stop2, "Overpass returned no stops near Grand Junction Station")
         actual_result = enetm.get_predicted_transit_mode(stop1, stop2)
         expected_result = ['train', 'train']
         self.assertEqual(actual_result, expected_result)
