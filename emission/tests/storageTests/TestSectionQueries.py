@@ -25,6 +25,7 @@ import emission.tests.storageTests.analysis_ts_common as etsa
 
 class TestSectionQueries(unittest.TestCase):
     def setUp(self):
+        etc.mockOverpass(self)
         self.testUserId = uuid.uuid3(uuid.NAMESPACE_URL, "mailto:test@test.me")
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
         self.test_trip_id = "test_trip_id"

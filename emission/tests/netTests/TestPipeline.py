@@ -12,6 +12,7 @@ from emission.net.api import pipeline
 
 class TestPipeline(unittest.TestCase):
     def setUp(self):
+        etc.mockOverpass(self)
         self.testEmail="foo@foo.com"
         etc.setupRealExample(self,
                              "emission/tests/data/real_examples/shankari_2015-aug-21")

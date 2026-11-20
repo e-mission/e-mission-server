@@ -22,6 +22,7 @@ import emission.tests.common as etc
 
 class TestPipelineCornerCases(unittest.TestCase):
     def setUp(self):
+        etc.mockOverpass(self)
         self.testUUID = uuid.uuid4()
         # this happens consistently during user creation now, and we rely on it to run the pipeline
         print(f"Created profile {ecwu.User._createInitialProfile(self.testUUID)} for {self.testUUID=}")
