@@ -2,6 +2,7 @@ from builtins import *
 import unittest
 import os
 import uuid
+import json
 import requests
 import emission.net.ext_service.transit_matching.match_stops as enetm
 import logging
@@ -65,32 +66,38 @@ class OverpassTest(unittest.TestCase):
         self.assertEqual(actual_result, expected_result)
 
     def test_intake_pipeline_with_live_overpass(self):
-        import emission.analysis.intake.domain_assumptions as eaid
         import emission.core.get_database as edb
         import emission.pipeline.intake_stage as epi
         import emission.storage.decorations.analysis_timeseries_queries as esda
         import emission.tests.common as etc
 
+        data_file = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
+        with open(data_file + ".inferred_section.expected_composite_trips") as expected_file:
+            expected_trips = json.load(expected_file)
+        expected_bus_intervals = [
+            (section["data"]["start_ts"], section["data"]["end_ts"])
+            for trip in expected_trips
+            for section in trip["data"].get("sections", [])
+            if section["data"].get("sensed_mode_str") == "BUS"
+        ]
+        self.assertTrue(expected_bus_intervals, "Ground truth contains no BUS sections")
+
         self.testEmail = f"overpass-pipeline-{uuid.uuid4()}@example.com"
         try:
-            etc.setupRealExample(
-                self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+            etc.setupRealExample(self, data_file)
             epi.run_intake_pipeline_for_user(self.testUUID)
-
-            cleaned_sections = esda.get_entries(
-                esda.CLEANED_SECTION_KEY, self.testUUID, time_query=None)
-            self.assertTrue(cleaned_sections, "Pipeline produced no cleaned sections")
-            motorized_sections = [
-                section for section in cleaned_sections
-                if eaid.is_motorized(section.data.sensed_mode)
-            ]
-            self.assertTrue(
-                motorized_sections,
-                "Test data produced no motorized sections to exercise Overpass")
 
             predictions = esda.get_entries(
                 "inference/prediction", self.testUUID, time_query=None)
-            self.assertEqual(len(predictions), len(cleaned_sections))
+            predicted_bus_intervals = {
+                (prediction.data.start_ts, prediction.data.end_ts)
+                for prediction in predictions
+                if "BUS" in prediction.data.predicted_mode_map
+            }
+            for interval in expected_bus_intervals:
+                self.assertIn(
+                    interval, predicted_bus_intervals,
+                    f"Expected live pipeline to infer BUS for interval {interval}")
         finally:
             if hasattr(self, "testUUID"):
                 for collection in (
