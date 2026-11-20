@@ -1,5 +1,5 @@
 # python 3
-FROM ubuntu:jammy-20260930
+FROM ubuntu:jammy-20261110
 
 MAINTAINER K. Shankari (k.shankari@nlr.gov)
 
