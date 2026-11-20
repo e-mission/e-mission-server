@@ -1,6 +1,7 @@
 from builtins import *
 import unittest
 import os
+import uuid
 import requests
 import emission.net.ext_service.transit_matching.match_stops as enetm
 import logging
@@ -62,6 +63,45 @@ class OverpassTest(unittest.TestCase):
         actual_result = enetm.get_predicted_transit_mode(stop1, stop2)
         expected_result = ['train', 'train']
         self.assertEqual(actual_result, expected_result)
+
+    def test_intake_pipeline_with_live_overpass(self):
+        import emission.analysis.intake.domain_assumptions as eaid
+        import emission.core.get_database as edb
+        import emission.pipeline.intake_stage as epi
+        import emission.storage.decorations.analysis_timeseries_queries as esda
+        import emission.tests.common as etc
+
+        self.testEmail = f"overpass-pipeline-{uuid.uuid4()}@example.com"
+        try:
+            etc.setupRealExample(
+                self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+            epi.run_intake_pipeline_for_user(self.testUUID)
+
+            cleaned_sections = esda.get_entries(
+                esda.CLEANED_SECTION_KEY, self.testUUID, time_query=None)
+            self.assertTrue(cleaned_sections, "Pipeline produced no cleaned sections")
+            motorized_sections = [
+                section for section in cleaned_sections
+                if eaid.is_motorized(section.data.sensed_mode)
+            ]
+            self.assertTrue(
+                motorized_sections,
+                "Test data produced no motorized sections to exercise Overpass")
+
+            predictions = esda.get_entries(
+                "inference/prediction", self.testUUID, time_query=None)
+            self.assertEqual(len(predictions), len(cleaned_sections))
+        finally:
+            if hasattr(self, "testUUID"):
+                for collection in (
+                    edb.get_timeseries_db(),
+                    edb.get_analysis_timeseries_db(),
+                    edb.get_profile_db(),
+                    edb.get_usercache_db(),
+                    edb.get_pipeline_state_db(),
+                ):
+                    collection.delete_many({"user_id": self.testUUID})
+                edb.get_uuid_db().delete_one({"user_email": self.testEmail})
 
 if __name__ == '__main__':
     unittest.main()
