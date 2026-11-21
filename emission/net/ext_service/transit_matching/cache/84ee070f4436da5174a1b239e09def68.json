@@ -1,0 +1,1 @@
+[{"type": "node", "id": 5276670016, "lat": -23.644483, "lon": -46.5300362, "tags": {"bench": "yes", "bin": "yes", "bus": "yes", "highway": "bus_stop", "public_transport": "platform", "shelter": "yes"}}, {"type": "node", "id": 6465215585, "lat": -23.6445726, "lon": -46.5308135, "tags": {"bus": "yes", "highway": "bus_stop", "public_transport": "platform"}}]
