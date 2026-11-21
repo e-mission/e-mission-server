@@ -5,21 +5,21 @@ import logging
 import copy
 
 # sklearn imports
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.impute import SimpleImputer
-from sklearn.metrics.pairwise import haversine_distances
-from sklearn.cluster import DBSCAN
-from sklearn import svm
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.exceptions import NotFittedError
+import sklearn.pipeline as sklpl
+import sklearn.preprocessing as sklpp
+import sklearn.impute as skli
+import sklearn.metrics.pairwise as sklmp
+import sklearn.cluster as sklc
+import sklearn.svm as skls
+import sklearn.ensemble as sklen
+import sklearn.tree as sklt
+import sklearn.exceptions as sklex
 
 # our imports
-from emission.analysis.modelling.trip_model.clustering import get_distance_matrix, single_cluster_purity
+import emission.analysis.modelling.trip_model.clustering as eamtcl
 import emission.analysis.modelling.trip_model.data_wrangling as eamtd
 import emission.storage.decorations.trip_queries as esdtq
-from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
+import emission.analysis.classification.inference.labels.inferrers as eacili
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
 import emission.core.common as ecc
@@ -28,7 +28,6 @@ import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.run_model as eamur
 
 
-import emission.analysis.modelling.trip_model.clustering as eamtc
 # NOTE: tour_model_extended.similarity is on the
 # eval-private-data-compatibility branch in e-mission-server
 
@@ -334,7 +333,7 @@ class RefactoredNaiveCluster(Cluster):
           
         # fit the bins
         self.sim_model= eamtg.GreedySimilarityBinning(model_config)
-        cleaned_trip_entry= eamtc.cleanEntryTypeData(self.train_df,train_entry_list)
+        cleaned_trip_entry= eamtcl.cleanEntryTypeData(self.train_df,train_entry_list)
         self.sim_model.fit(cleaned_trip_entry)
 
         labels = [int(l) for l in self.sim_model.tripLabels]
@@ -526,8 +525,8 @@ class DBSCANSVMCluster(Cluster):
         #########################
         ### get base clusters ###
         #########################
-        dist_matrix_meters = get_distance_matrix(self.train_df, self.loc_type)
-        self.base_model = DBSCAN(self.radius,
+        dist_matrix_meters = eamtcl.get_distance_matrix(self.train_df, self.loc_type)
+        self.base_model = sklc.DBSCAN(self.radius,
                                  metric="precomputed",
                                  min_samples=1).fit(dist_matrix_meters)
         base_clusters = self.base_model.labels_
@@ -557,7 +556,7 @@ class DBSCANSVMCluster(Cluster):
                     continue
 
                 # only do SVM if purity is below threshold
-                purity = single_cluster_purity(points_in_cluster,
+                purity = eamtcl.single_cluster_purity(points_in_cluster,
                                                label_col='purpose_true')
                 if purity < self.purity_thresh:
                     X = points_in_cluster[[
@@ -565,9 +564,9 @@ class DBSCANSVMCluster(Cluster):
                     ]]
                     y = points_in_cluster.purpose_true.to_list()
 
-                    svm_model = make_pipeline(
-                        StandardScaler(),
-                        svm.SVC(
+                    svm_model = sklpl.make_pipeline(
+                        sklpp.StandardScaler(),
+                        skls.SVC(
                             kernel='rbf',
                             gamma=self.gamma,
                             C=self.C,
@@ -655,7 +654,7 @@ class DBSCANSVMCluster(Cluster):
             new_loc_radians = np.radians(
                 row[[self.loc_type + "_lat", self.loc_type + "_lon"]].to_list())
             new_loc_radians = np.reshape(new_loc_radians, (1, 2))
-            dist_matrix_meters = haversine_distances(
+            dist_matrix_meters = sklmp.haversine_distances(
                 new_loc_radians, train_radians) * EARTH_RADIUS
 
             shortest_dist_idx = np.argmin(dist_matrix_meters)
@@ -738,7 +737,7 @@ class NaiveBinningClassifier(TripClassifier):
         replaced_distribs = []
 
         for trip in test_trips:
-            trip_prediction = predict_cluster_confidence_discounting(trip)
+            trip_prediction = eacili.predict_cluster_confidence_discounting(trip)
 
             if len(trip_prediction) == 0:
                 # model could not find cluster for the trip
@@ -1259,7 +1258,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
 
             mode_proba, replaced_proba = self._try_predict_proba_mode_replaced()
 
-        except NotFittedError as e:
+        except sklex.NotFittedError as e:
             # if we can't predict purpose, we can still try to predict mode and
             # replaced-mode without one-hot encoding the purpose
 
@@ -1277,7 +1276,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
                 and replaced_pred.dtype == np.float64):
             # this indicates that all the predictions are np.nan so none of the
             # random forest classifiers were fitted
-            raise NotFittedError
+            raise sklex.NotFittedError
 
         # TODO: move this to a Mixin for cluster-based predictors and use the
         # 'cluster' column of the proba_df outputs
@@ -1379,7 +1378,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
                 [self.X_test_for_mode, onehot_mode_df], axis=1)
             replaced_proba = self._try_predict_proba_replaced()
 
-        except NotFittedError as e:
+        except sklex.NotFittedError as e:
             mode_proba_raw = np.full((len(self.X_test_for_mode), 1), 0)
             mode_proba = pd.DataFrame(mode_proba_raw, columns=[np.nan])
 
@@ -1409,7 +1408,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
             replaced_proba = pd.DataFrame(
                 replaced_proba_raw, columns=self.replaced_predictor.classes_)
 
-        except NotFittedError as e:
+        except sklex.NotFittedError as e:
             replaced_proba_raw = np.full((len(self.X_test_for_replaced), 1), 0)
             replaced_proba = pd.DataFrame(replaced_proba_raw, columns=[np.nan])
 
@@ -1436,7 +1435,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
             # haversine distance, so we have to reimplement it ourselves
             new_loc_radians = np.radians(row[["end_lat", "end_lon"]].to_list())
             new_loc_radians = np.reshape(new_loc_radians, (1, 2))
-            dist_matrix_meters = haversine_distances(
+            dist_matrix_meters = sklmp.haversine_distances(
                 new_loc_radians, train_radians) * EARTH_RADIUS
 
             shortest_dist = np.min(dist_matrix_meters)
@@ -1514,7 +1513,7 @@ class ForestClassifier(EnsembleClassifier):
         self.C = C
         self.n_estimators = n_estimators
         self.criterion = criterion
-        self.max_depth = max_depth
+        self.max_depth = max_depth if max_depth!= 'null' else None
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_features = max_features
@@ -1524,36 +1523,42 @@ class ForestClassifier(EnsembleClassifier):
         self.use_start_clusters = use_start_clusters
         self.use_trip_clusters = use_trip_clusters
 
-        if self.loc_feature == 'cluster':
-            # clustering algorithm to generate end clusters
-            self.end_cluster_model = DBSCANSVMCluster(
-                loc_type='end',
-                radius=self.radius,
-                size_thresh=self.size_thresh,
-                purity_thresh=self.purity_thresh,
-                gamma=self.gamma,
-                C=self.C)
+        ######### Not Tested #########
+        # The below code is used when we cluster the coordinates (loc_cluster parameter = True)
+        # before passing to Random Forest. Commenting this for now since it is not tested.
+        ###############################
+        # if self.loc_feature == 'cluster':
+        #     # clustering algorithm to generate end clusters
+        #     self.end_cluster_model = DBSCANSVMCluster(
+        #         loc_type='end',
+        #         radius=self.radius,
+        #         size_thresh=self.size_thresh,
+        #         purity_thresh=self.purity_thresh,
+        #         gamma=self.gamma,
+        #         C=self.C)
 
-            if self.use_start_clusters or self.use_trip_clusters:
-                # clustering algorithm to generate start clusters
-                self.start_cluster_model = DBSCANSVMCluster(
-                    loc_type='start',
-                    radius=self.radius,
-                    size_thresh=self.size_thresh,
-                    purity_thresh=self.purity_thresh,
-                    gamma=self.gamma,
-                    C=self.C)
+        #     if self.use_start_clusters or self.use_trip_clusters:
+        #         # clustering algorithm to generate start clusters
+        #         self.start_cluster_model = DBSCANSVMCluster(
+        #             loc_type='start',
+        #             radius=self.radius,
+        #             size_thresh=self.size_thresh,
+        #             purity_thresh=self.purity_thresh,
+        #             gamma=self.gamma,
+        #             C=self.C)
 
-                if self.use_trip_clusters:
-                    # helper class to generate trip-level clusters
-                    self.trip_grouper = TripGrouper(
-                        start_cluster_col='start_cluster_idx',
-                        end_cluster_col='end_cluster_idx')
+        #         if self.use_trip_clusters:
+        #             # helper class to generate trip-level clusters
+        #             self.trip_grouper = TripGrouper(
+        #                 start_cluster_col='start_cluster_idx',
+        #                 end_cluster_col='end_cluster_idx')
 
-            # wrapper class to generate one-hot encodings for cluster indices
-            self.cluster_enc = OneHotWrapper(sparse=False,
-                                             handle_unknown='ignore')
+        #     # wrapper class to generate one-hot encodings for cluster indices
+        #     self.cluster_enc = OneHotWrapper(sparse=False,
+        #                                      handle_unknown='ignore')
+        #############################################################################
 
+        
         # wrapper class to generate one-hot encodings for purposes and modes
         self.purpose_enc = OneHotWrapper(impute_missing=True,
                                          sparse=False,
@@ -1563,7 +1568,7 @@ class ForestClassifier(EnsembleClassifier):
                                       handle_unknown='error')
 
         # ensemble classifiers for each label category
-        self.purpose_predictor = RandomForestClassifier(
+        self.purpose_predictor = sklen.RandomForestClassifier(
             n_estimators=self.n_estimators,
             criterion=self.criterion,
             max_depth=self.max_depth,
@@ -1572,7 +1577,7 @@ class ForestClassifier(EnsembleClassifier):
             max_features=self.max_features,
             bootstrap=self.bootstrap,
             random_state=self.random_state)
-        self.mode_predictor = RandomForestClassifier(
+        self.mode_predictor = sklen.RandomForestClassifier(
             n_estimators=self.n_estimators,
             criterion=self.criterion,
             max_depth=self.max_depth,
@@ -1581,7 +1586,7 @@ class ForestClassifier(EnsembleClassifier):
             max_features=self.max_features,
             bootstrap=self.bootstrap,
             random_state=self.random_state)
-        self.replaced_predictor = RandomForestClassifier(
+        self.replaced_predictor = sklen.RandomForestClassifier(
             n_estimators=self.n_estimators,
             criterion=self.criterion,
             max_depth=self.max_depth,
@@ -1836,33 +1841,33 @@ class AdaBoostClassifier(EnsembleClassifier):
                                       sparse=False,
                                       handle_unknown='error')
 
-        self.purpose_predictor = AdaBoostClassifier(
+        self.purpose_predictor = sklen.AdaBoostClassifier(
             n_estimators=self.n_estimators,
             learning_rate=self.learning_rate,
             random_state=self.random_state,
-            base_estimator=DecisionTreeClassifier(
+            base_estimator=sklt.DecisionTreeClassifier(
                 criterion=self.criterion,
                 max_depth=self.max_depth,
                 min_samples_split=self.min_samples_split,
                 min_samples_leaf=self.min_samples_leaf,
                 max_features=self.max_features,
                 random_state=self.random_state))
-        self.mode_predictor = AdaBoostClassifier(
+        self.mode_predictor = sklen.AdaBoostClassifier(
             n_estimators=self.n_estimators,
             learning_rate=self.learning_rate,
             random_state=self.random_state,
-            base_estimator=DecisionTreeClassifier(
+            base_estimator=sklt.DecisionTreeClassifier(
                 criterion=self.criterion,
                 max_depth=self.max_depth,
                 min_samples_split=self.min_samples_split,
                 min_samples_leaf=self.min_samples_leaf,
                 max_features=self.max_features,
                 random_state=self.random_state))
-        self.replaced_predictor = AdaBoostClassifier(
+        self.replaced_predictor = sklen.AdaBoostClassifier(
             n_estimators=self.n_estimators,
             learning_rate=self.learning_rate,
             random_state=self.random_state,
-            base_estimator=DecisionTreeClassifier(
+            base_estimator=sklt.DecisionTreeClassifier(
                 criterion=self.criterion,
                 max_depth=self.max_depth,
                 min_samples_split=self.min_samples_split,
@@ -2018,13 +2023,13 @@ class OneHotWrapper():
     ):
         self.impute_missing = impute_missing
         if self.impute_missing:
-            self.encoder = make_pipeline(
-                SimpleImputer(missing_values=np.nan,
+            self.encoder = sklpl.make_pipeline(
+                skli.SimpleImputer(missing_values=np.nan,
                               strategy='constant',
                               fill_value='missing'),
-                OneHotEncoder(sparse=False, handle_unknown=handle_unknown))
+                sklpp.OneHotEncoder(sparse=False, handle_unknown=handle_unknown))
         else:
-            self.encoder = OneHotEncoder(sparse=sparse,
+            self.encoder = sklpp.OneHotEncoder(sparse=sparse,
                                          handle_unknown=handle_unknown)
 
     def fit_transform(self, train_df, output_col_prefix=None):

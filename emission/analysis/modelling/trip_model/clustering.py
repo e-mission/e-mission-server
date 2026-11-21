@@ -6,12 +6,12 @@ import numpy as np
 import logging
 
 # import clustering algorithms
-import sklearn.metrics.pairwise as smp
-import sklearn.cluster as sc
-from sklearn import metrics
-from sklearn import svm
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+import sklearn.metrics.pairwise as sklmp
+import sklearn.cluster as sklc
+import sklearn.metrics.cluster as sklmc
+import sklearn.svm as skls
+import sklearn.pipeline as sklpl
+import sklearn.preprocessing as sklpp
 
 # our imports
 # NOTE: this requires changing the branch of e-mission-server to
@@ -102,7 +102,7 @@ def add_loc_clusters(
         dist_matrix_meters = get_distance_matrix(loc_df, loc_type)
 
         for r in radii:
-            model = sc.DBSCAN(r, metric="precomputed",
+            model = sklc.DBSCAN(r, metric="precomputed",
                               min_samples=min_samples).fit(dist_matrix_meters)
             labels = model.labels_
             # print(model.n_features_in_)
@@ -150,7 +150,7 @@ def add_loc_clusters(
         dist_matrix_meters = get_distance_matrix(loc_df, loc_type)
 
         for r in radii:
-            labels = sc.OPTICS(
+            labels = sklc.OPTICS(
                 min_samples=optics_min_samples,
                 max_eps=r,
                 xi=optics_xi,
@@ -178,7 +178,7 @@ def add_loc_clusters(
             dist_matrix_meters = get_distance_matrix(p_loc_df, loc_type)
 
             for r in radii:
-                labels = sc.DBSCAN(
+                labels = sklc.DBSCAN(
                     r, metric="precomputed",
                     min_samples=min_samples).fit(dist_matrix_meters).labels_
 
@@ -231,7 +231,7 @@ def add_loc_clusters(
             # what the bandwidth roughly corresponds to in the real world/make
             # the value a little more interpretable.
             LATLON_TO_M = 1 / 111139
-            labels = sc.MeanShift(
+            labels = sklc.MeanShift(
                 bandwidth=LATLON_TO_M * r,
                 min_bin_freq=min_samples,
                 cluster_all=False,
@@ -325,9 +325,9 @@ def add_loc_SVM(loc_df,
                 ]]
                 y_train = labeled_points_in_cluster.purpose_confirm.to_list()
 
-                labels = make_pipeline(
-                    StandardScaler(),
-                    svm.SVC(
+                labels = sklpl.make_pipeline(
+                    sklpp.StandardScaler(),
+                    skls.SVC(
                         kernel='rbf',
                         gamma=svm_gamma,
                         C=svm_C,
@@ -381,7 +381,7 @@ def get_distance_matrix(loc_df, loc_type):
     radians_lat_lon = np.radians(loc_df[[loc_type + "_lat", loc_type + "_lon"]])
 
     dist_matrix_meters = pd.DataFrame(
-        smp.haversine_distances(radians_lat_lon, radians_lat_lon) *
+        sklmp.haversine_distances(radians_lat_lon, radians_lat_lon) *
         EARTH_RADIUS)
     return dist_matrix_meters
 
@@ -404,7 +404,7 @@ def single_cluster_purity(points_in_cluster, label_col='purpose_confirm'):
 
 
 def purity_score(y_true, y_pred):
-    contingency_matrix = metrics.cluster.contingency_matrix(y_true, y_pred)
+    contingency_matrix = sklmc.contingency_matrix(y_true, y_pred)
     purity = np.sum(np.amax(contingency_matrix,
                             axis=0)) / np.sum(contingency_matrix)
     return purity
