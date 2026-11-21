@@ -36,6 +36,7 @@ import emission.tests.common as etc
 class TestPipelineReset(unittest.TestCase):
     def setUp(self):
         np.random.seed(61297777)
+        etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
 
     def tearDown(self):
         if os.environ.get("SKIP_TEARDOWN", False):
@@ -53,6 +54,7 @@ class TestPipelineReset(unittest.TestCase):
                     self.testUUID = uuid
                     logging.info("Deleting entries for %s" % self.testUUID)
                     self.clearRelatedDb()
+            etc.clear_analysis_config()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -539,7 +541,6 @@ class TestPipelineReset(unittest.TestCase):
         del(last_place_gt_props["exit_local_dt"])
         del(last_place_gt_props["exit_fmt_time"])
         del(last_place_gt_props["starting_trip"])
-        del(last_place_gt_props["duration"])
         self.assertEqual(len(modified_gt), 3)
 
         # Checking that the modified ground truth is correct
