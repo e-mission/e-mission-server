@@ -1,14 +1,27 @@
 name: overpass-test
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   schedule:
 
     # Run every Sunday at 6:05 am
     - cron:  '5 6 * * 0'
 jobs:
-  build:
+  api:
+    name: Overpass API integration
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Test Overpass API
+      env:
+        GEOFABRIK_OVERPASS_KEY: '${{ secrets.GEOFABRIK_OVERPASS_KEY }}'
+      run: |
+        chmod +x emission/individual_tests/setup_and_test_integration.sh
+        ./emission/individual_tests/setup_and_test_integration.sh emission/individual_tests/TestOverpass.py
+
+  consumption:
+    name: Overpass consumption integration
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -19,15 +32,9 @@ jobs:
       with:
         mongodb-version: 8.0.19
 
-    # Tests runner is functional
-    - name: Workflow test
-      run: echo Good morning!
-      
-      # Runs TestOverpass.py to check for API functionality
-    - name: Test Overpass
+    - name: Test Overpass consumption and intake pipeline
       env:
         GEOFABRIK_OVERPASS_KEY: '${{ secrets.GEOFABRIK_OVERPASS_KEY }}'
       run: |
-        echo Testing overpass!
         chmod +x emission/individual_tests/setup_and_test_integration.sh
-        ./emission/individual_tests/setup_and_test_integration.sh emission/individual_tests/TestOverpass.py
+        ./emission/individual_tests/setup_and_test_integration.sh emission/individual_tests/TestOverpassConsumption.py
