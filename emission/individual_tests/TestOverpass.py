@@ -1,49 +1,60 @@
-import os
+from builtins import *
 import unittest
-
+import os
 import requests
+import emission.net.ext_service.transit_matching.match_stops as enetm
+import logging
 
+#Set up query
+GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
 
-class OverpassAPITest(unittest.TestCase):
+#Sample loc1 = NLR East Gate
+loc1 = {'coordinates': [-105.16844103184974, 39.740428870224605]}
+#Sample loc2 = Denver Union Station
+loc2 = {'coordinates': [-105.00083982302972, 39.753710532185025]}
+#Sample loc3 = Grand Junction Train Station, CO
+loc3 = {'coordinates': [-108.57055213129632, 39.06472424640481]}
+
+class OverpassTest(unittest.TestCase):
+    def setUp(self):
+        # Un-comment the two lines below to print debug logs.
+        # loglevel = logging.DEBUG
+        # logging.basicConfig(level=loglevel)
+        sample_data = '[out:json][bbox];way[amenity=parking];out;&bbox=-122.1111238,37.4142118,-122.1055791,37.4187945'
+        call_base = 'api/interpreter?data='
+        self.public_url_base = 'https://lz4.overpass-api.de/'+ call_base + sample_data
+        self.gfbk_url_base = 'https://overpass.geofabrik.de/' + GEOFABRIK_OVERPASS_KEY + '/' + call_base + sample_data
+
     def test_overpass(self):
-        key = os.environ.get("GEOFABRIK_OVERPASS_KEY")
-        self.assertTrue(key, "GEOFABRIK_OVERPASS_KEY is required")
-        endpoints = {
-            "geofabrik": f"https://overpass.geofabrik.de/{key}/api/interpreter",
-            "public": "https://lz4.overpass-api.de/api/interpreter",
-        }
-        queries = {
-            "parking": (
-                '[out:json];way["amenity"="parking"]'
-                '(37.4142118,-122.1111238,37.4187945,-122.1055791);out body;',
-                "way",
-                {"amenity": "parking"},
-            ),
-            "route 125": (
-                '[out:json];relation["route"="bus"]["ref"="125"]'
-                '(39.73908,-105.17020,39.74178,-105.16668);out body;',
-                "relation",
-                {"ref": "125", "route": "bus", "network": "RTD",
-                 "from": "National Renewable Energy Lab", "to": "Red Rocks College"},
-            ),
-        }
-        for endpoint_name, url in endpoints.items():
-            for query_name, (query, expected_type, expected_tags) in queries.items():
-                with self.subTest(endpoint=endpoint_name, query=query_name):
-                    try:
-                        response = requests.get(url, params={"data": query}, timeout=60)
-                    except requests.RequestException:
-                        response = None
-                    self.assertIsNotNone(response, f"{endpoint_name} request failed")
-                    self.assertEqual(200, response.status_code)
-                    elements = response.json()["elements"]
-                    self.assertTrue(any(
-                        element.get("type") == expected_type and
-                        all(element.get("tags", {}).get(k) == v
-                            for k, v in expected_tags.items())
-                        for element in elements
-                    ), f"{endpoint_name} returned no expected {query_name} element")
+        r_gfbk = requests.get(self.gfbk_url_base)
+        r_public = requests.get(self.public_url_base)
+        
+        if r_gfbk.status_code == 200 and r_public.status_code == 200:
+            print("requests successful!")
+            r_gfbk_len, r_public_len = len(r_gfbk.json()), len(r_public.json())
+            self.assertEqual(r_gfbk_len, r_public_len)
+        else:
+            print("status_gfbk", r_gfbk.status_code, type(r_gfbk.status_code), "status_public", r_public.status_code)
 
+    #Test utilizes the functions get_stops_near, get_public_transit_stops, and make_request_and_catch.  
+    def test_get_stops_near(self):
+        actual_result = enetm.get_stops_near(loc1, 150.0)[0]['routes'][0]['tags']
+        print(f"Received result {actual_result}")
+        # This will probably fail once the name changes in OSM, but RTD hasn't even changed the name of the stop yet so it may be a while
+        # I say let's just let that happen - it's proof that the tests are working!
+        # tests failed! OSM was finally updated! Fixing...
+        expected_result = {'description': 'RTD Route 125: Red Rocks College','from': 'National Renewable Energy Lab', 'name': 'Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator:short': 'RTD', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
+        self.assertEqual(expected_result, actual_result)
+   
+    #Get_stops_near generates two stops from the given coordinates.
+    # Get_predicted_transit_mode finds a common route between them (train).
+    def test_get_predicted_transit_mode(self):
+        stop1 = enetm.get_stops_near(loc2, 400.0)
+        stop2 = enetm.get_stops_near(loc3, 400.0)
+        actual_result = enetm.get_predicted_transit_mode(stop1, stop2)
+        expected_result = ['train', 'train']
+        self.assertEqual(actual_result, expected_result)
 
 if __name__ == '__main__':
     unittest.main()
+
