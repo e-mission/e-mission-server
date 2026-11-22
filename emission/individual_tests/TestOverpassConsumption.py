@@ -28,7 +28,7 @@ class OverpassConsumptionTest(unittest.TestCase):
         # tests failed! OSM was finally updated! Fixing...
         expected_result = {'description': 'RTD Route 125: Red Rocks College','from': 'National Renewable Energy Lab', 'name': 'Red Rocks College', 'network': 'RTD', 'network:wikidata': 'Q7309183', 'network:wikipedia': 'en:Regional Transportation District', 'operator:short': 'RTD', 'operator': 'Regional Transportation District', 'public_transport:version': '1', 'ref': '125', 'route': 'bus', 'to': 'Red Rocks College', 'type': 'route'}
         self.assertEqual(expected_result, actual_result)
-   
+
     # Get_stops_near finds stops at both ends; matching their live data predicts train.
     def test_get_predicted_transit_mode(self):
         stop1 = enetm.get_stops_near(loc2, 400.0)
