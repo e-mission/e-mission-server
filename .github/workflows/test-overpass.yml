@@ -24,6 +24,7 @@ jobs:
 
   consumption:
     name: Overpass consumption integration
+    needs: api
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
