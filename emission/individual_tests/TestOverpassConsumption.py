@@ -48,7 +48,7 @@ class OverpassConsumptionTest(unittest.TestCase):
         predicted_bus_intervals = {
             (prediction.data.start_ts, prediction.data.end_ts)
             for prediction in predictions
-            if "BUS" in prediction.data.predicted_mode_map
+            if "BUS" in prediction.data["predicted_mode_map"]
         }
         for interval in expected_bus_intervals:
             self.assertIn(
