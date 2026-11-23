@@ -1,6 +1,9 @@
 name: overpass-test
 
 on:
+  pull_request:
+    branches:
+      - 'overpass-integration-checks-*'
   schedule:
 
     # Run every Sunday at 6:05 am
