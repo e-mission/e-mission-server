@@ -1,9 +1,12 @@
 import json
 import unittest
 import uuid
+from unittest import mock
 
+import emission.analysis.classification.inference.mode.rule_engine as erme
 import emission.core.get_database as edb
 import emission.pipeline.intake_stage as epi
+import emission.net.ext_service.transit_matching.match_stops as enetm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.tests.common as etc
 
@@ -41,7 +44,83 @@ class OverpassConsumptionTest(unittest.TestCase):
         ]
         self.assertTrue(expected_bus_intervals, "Ground truth contains no BUS sections")
 
-        epi.run_intake_pipeline_for_user(self.testUUID)
+        transit_diagnostics = []
+        original_transit_prediction = erme._get_transit_prediction
+        original_get_stops_near = enetm.get_stops_near
+        original_get_predicted_transit_mode = enetm.get_predicted_transit_mode
+
+        def summarize_stops(stops):
+            route_tags = [
+                route.get("tags", {})
+                for stop in stops
+                for route in stop.get("routes", [])
+            ]
+            return {
+                "stop_count": len(stops),
+                "bus_stop_count": sum(
+                    stop.get("tags", {}).get("highway") == "bus_stop"
+                    for stop in stops
+                ),
+                "route_ref_count": sum(
+                    "route_ref" in stop.get("tags", {}) for stop in stops
+                ),
+                "attached_route_count": len(route_tags),
+                "route_types": sorted({
+                    tags["route"] for tags in route_tags if "route" in tags
+                }),
+                "railway_types": sorted({
+                    stop.get("tags", {})["railway"]
+                    for stop in stops
+                    if "railway" in stop.get("tags", {})
+                }),
+            }
+
+        def capture_transit_prediction(index, section_entry):
+            stop_results = []
+            candidate_modes = []
+
+            def capture_stops_near(location, radius):
+                stops = original_get_stops_near(location, radius)
+                stop_results.append(summarize_stops(stops))
+                return stops
+
+            def capture_candidate_modes(start_stops, end_stops):
+                modes = original_get_predicted_transit_mode(start_stops, end_stops)
+                candidate_modes.append(modes)
+                return modes
+
+            collapsed_mode = None
+            error_type = None
+            try:
+                with mock.patch.object(
+                    enetm, "get_stops_near", side_effect=capture_stops_near
+                ), mock.patch.object(
+                    enetm,
+                    "get_predicted_transit_mode",
+                    side_effect=capture_candidate_modes,
+                ):
+                    collapsed_mode = original_transit_prediction(index, section_entry)
+            except Exception as error:
+                error_type = type(error).__name__
+                raise
+            finally:
+                transit_diagnostics.append({
+                    "interval": (
+                        section_entry.data.start_ts,
+                        section_entry.data.end_ts,
+                    ),
+                    "start_stops": stop_results[0] if stop_results else None,
+                    "end_stops": stop_results[1] if len(stop_results) > 1 else None,
+                    "candidate_modes": candidate_modes[0] if candidate_modes else None,
+                    "collapsed_mode": collapsed_mode,
+                    "error_type": error_type,
+                })
+            return collapsed_mode
+
+        with mock.patch.object(
+            erme, "_get_transit_prediction", side_effect=capture_transit_prediction
+        ):
+            epi.run_intake_pipeline_for_user(self.testUUID)
 
         predictions = esda.get_entries(
             "inference/prediction", self.testUUID, time_query=None)
@@ -50,10 +129,15 @@ class OverpassConsumptionTest(unittest.TestCase):
             for prediction in predictions
             if "BUS" in prediction.data["predicted_mode_map"]
         }
+        diagnostic_by_interval = {
+            diagnostic["interval"]: diagnostic
+            for diagnostic in transit_diagnostics
+        }
         for interval in expected_bus_intervals:
             self.assertIn(
                 interval, predicted_bus_intervals,
-                f"Expected live pipeline to infer BUS for interval {interval}")
+                f"Expected live pipeline to infer BUS for interval {interval}; "
+                f"transit diagnostics: {diagnostic_by_interval.get(interval)}")
 
 if __name__ == '__main__':
     unittest.main()
