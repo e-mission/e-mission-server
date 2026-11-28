@@ -178,8 +178,10 @@ def _get_transit_prediction(i, section_entry):
     # Let's make the start a little more forgiving than the end
     start_radius = eac.get_config()["section.startStopRadius"]
     end_radius = eac.get_config()["section.startStopRadius"]
-    start_transit_stops = enetm.get_stops_near(section_entry.data.start_loc, start_radius)
-    end_transit_stops = enetm.get_stops_near(section_entry.data.end_loc, end_radius)
+    start_transit_stops = enetm.get_stops_near(
+        section_entry.data.start_loc, start_radius, section_entry.data.start_ts)
+    end_transit_stops = enetm.get_stops_near(
+        section_entry.data.end_loc, end_radius, section_entry.data.end_ts)
     predicted_transit_modes = enetm.get_predicted_transit_mode(start_transit_stops,
         end_transit_stops)
     logging.debug("Got predicted transit mode %s" % predicted_transit_modes)

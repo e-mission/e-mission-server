@@ -12,8 +12,18 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.tests.common as etc
 
 
+class _SuppressPyMongoLogs(logging.Filter):
+    def filter(self, record):
+        return not record.name.startswith("pymongo")
+
+
 class OverpassConsumptionTest(unittest.TestCase):
     def setUp(self):
+        self.pymongo_filter = _SuppressPyMongoLogs()
+        self.pymongo_handlers = tuple(logging.getLogger().handlers)
+        for handler in self.pymongo_handlers:
+            handler.addFilter(self.pymongo_filter)
+        self.addCleanup(self.remove_pymongo_filter)
         self.data_file = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
         self.testEmail = f"overpass-pipeline-{uuid.uuid4()}@example.com"
         self.addCleanup(self.clearRelatedDb)
@@ -21,6 +31,10 @@ class OverpassConsumptionTest(unittest.TestCase):
 
     def tearDown(self):
         self.doCleanups()
+
+    def remove_pymongo_filter(self):
+        for handler in self.pymongo_handlers:
+            handler.removeFilter(self.pymongo_filter)
 
     def clearRelatedDb(self):
         if hasattr(self, "testUUID"):
@@ -78,11 +92,13 @@ class OverpassConsumptionTest(unittest.TestCase):
 
         def capture_transit_prediction(index, section_entry):
             stop_results = []
+            query_timestamps = []
             candidate_modes = []
 
-            def capture_stops_near(location, radius):
-                stops = original_get_stops_near(location, radius)
+            def capture_stops_near(location, radius, timestamp=None):
+                stops = original_get_stops_near(location, radius, timestamp)
                 stop_results.append(summarize_stops(stops))
+                query_timestamps.append(timestamp)
                 return stops
 
             def capture_candidate_modes(start_stops, end_stops):
@@ -110,6 +126,7 @@ class OverpassConsumptionTest(unittest.TestCase):
                         section_entry.data.start_ts,
                         section_entry.data.end_ts,
                     ),
+                    "query_timestamps": query_timestamps,
                     "start_stops": stop_results[0] if stop_results else None,
                     "end_stops": stop_results[1] if len(stop_results) > 1 else None,
                     "candidate_modes": candidate_modes[0] if candidate_modes else None,
@@ -119,9 +136,9 @@ class OverpassConsumptionTest(unittest.TestCase):
             return collapsed_mode
 
         with mock.patch.object(
-            logging.getLogger("pymongo"), "level", logging.WARNING
-        ), mock.patch.object(
-            erme, "_get_transit_prediction", side_effect=capture_transit_prediction
+            erme,
+            "_get_transit_prediction",
+            side_effect=capture_transit_prediction,
         ):
             epi.run_intake_pipeline_for_user(self.testUUID)
 
@@ -135,9 +152,8 @@ class OverpassConsumptionTest(unittest.TestCase):
             diagnostic["interval"]: diagnostic
             for diagnostic in transit_diagnostics
         }
-        # The fixture records historical labels, while Overpass reflects current
-        # OSM data. Require the pipeline to query and consume live results without
-        # treating changes to the map as pipeline regressions.
+        # Querying OSM at the fixture timestamps makes these historical labels
+        # comparable with the live Overpass results.
         for interval in expected_bus_intervals:
             diagnostic = diagnostic_by_interval.get(interval)
             self.assertIn(
@@ -152,12 +168,21 @@ class OverpassConsumptionTest(unittest.TestCase):
                 diagnostic["error_type"],
                 f"Expected live transit inference to complete for interval "
                 f"{interval}; transit diagnostics: {diagnostic}")
-            if diagnostic["collapsed_mode"] is not None:
-                self.assertIn(
-                    diagnostic["collapsed_mode"],
-                    prediction_by_interval[interval].data["predicted_mode_map"],
-                    f"Expected prediction to consume live transit inference for "
-                    f"interval {interval}; transit diagnostics: {diagnostic}")
+            self.assertEqual(
+                diagnostic["query_timestamps"],
+                list(interval),
+                f"Expected Overpass lookups at the trip's historical timestamps "
+                f"for interval {interval}; transit diagnostics: {diagnostic}")
+            self.assertEqual(
+                diagnostic["collapsed_mode"],
+                "BUS",
+                f"Expected historical Overpass data to infer BUS for interval "
+                f"{interval}; transit diagnostics: {diagnostic}")
+            self.assertIn(
+                "BUS",
+                prediction_by_interval[interval].data["predicted_mode_map"],
+                f"Expected prediction to consume the historical Overpass BUS "
+                f"match for interval {interval}; transit diagnostics: {diagnostic}")
 
 if __name__ == '__main__':
     unittest.main()
