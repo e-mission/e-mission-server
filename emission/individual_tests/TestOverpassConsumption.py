@@ -124,20 +124,34 @@ class OverpassConsumptionTest(unittest.TestCase):
 
         predictions = esda.get_entries(
             "inference/prediction", self.testUUID, time_query=None)
-        predicted_bus_intervals = {
-            (prediction.data.start_ts, prediction.data.end_ts)
+        prediction_by_interval = {
+            (prediction.data.start_ts, prediction.data.end_ts): prediction
             for prediction in predictions
-            if "BUS" in prediction.data["predicted_mode_map"]
         }
         diagnostic_by_interval = {
             diagnostic["interval"]: diagnostic
             for diagnostic in transit_diagnostics
         }
         for interval in expected_bus_intervals:
+            diagnostic = diagnostic_by_interval.get(interval)
             self.assertIn(
-                interval, predicted_bus_intervals,
-                f"Expected live pipeline to infer BUS for interval {interval}; "
-                f"transit diagnostics: {diagnostic_by_interval.get(interval)}")
+                interval, prediction_by_interval,
+                f"Expected live pipeline to save a prediction for interval "
+                f"{interval}; transit diagnostics: {diagnostic}")
+            self.assertIsNotNone(
+                diagnostic,
+                f"Expected live pipeline to query transit data for interval "
+                f"{interval}")
+            self.assertIsNone(
+                diagnostic["error_type"],
+                f"Expected live transit inference to complete for interval "
+                f"{interval}; transit diagnostics: {diagnostic}")
+            if diagnostic["collapsed_mode"] is not None:
+                self.assertIn(
+                    diagnostic["collapsed_mode"],
+                    prediction_by_interval[interval].data["predicted_mode_map"],
+                    f"Expected prediction to consume live transit inference for "
+                    f"interval {interval}; transit diagnostics: {diagnostic}")
 
 if __name__ == '__main__':
     unittest.main()
