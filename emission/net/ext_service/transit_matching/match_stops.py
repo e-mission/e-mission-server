@@ -5,6 +5,7 @@ import attrdict as ad
 import itertools
 import os
 import time
+from datetime import datetime, timezone
 
 try:
     GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
@@ -67,11 +68,22 @@ def make_request_and_catch(overpass_query):
             all_results = []
     return all_results
 
-def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
+def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon, timestamp=None):
     bbox_string = "%s,%s,%s,%s" % (min_lat, min_lon, max_lat, max_lon)
     logging.debug("bbox_string = %s" % bbox_string)
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
+    if timestamp is not None:
+        historical_date = datetime.fromtimestamp(
+            timestamp, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        settings_end = overpass_query.find(";")
+        if settings_end == -1:
+            raise ValueError("Overpass query must start with global settings")
+        overpass_query = (
+            overpass_query[:settings_end]
+            + f'[date:"{historical_date}"]'
+            + overpass_query[settings_end:]
+        )
     call_return = RETRY
     retry_count = 0
     while call_return == RETRY:
@@ -110,7 +122,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     return stops
 
 # https://gis.stackexchange.com/a/19761
-def get_stops_near(loc, distance_in_meters):
+def get_stops_near(loc, distance_in_meters, timestamp=None):
     COORDS = "coordinates"
     # 10001.965729km = 90 degrees
     # 1km = 90/10001.965729 degrees
@@ -120,7 +132,13 @@ def get_stops_near(loc, distance_in_meters):
     bbox_delta = meter2deg * distance_in_meters
     lon = loc[COORDS][0]
     lat = loc[COORDS][1]
-    stops = get_public_transit_stops(lat - bbox_delta, lon - bbox_delta, lat + bbox_delta, lon + bbox_delta)
+    stops = get_public_transit_stops(
+        lat - bbox_delta,
+        lon - bbox_delta,
+        lat + bbox_delta,
+        lon + bbox_delta,
+        timestamp,
+    )
     logging.debug("Found %d stops" % len(stops))
     for i, stop in enumerate(stops):
         logging.debug("STOP %d: %s" % (i, stop))
