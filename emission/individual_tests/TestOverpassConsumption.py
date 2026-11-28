@@ -132,6 +132,9 @@ class OverpassConsumptionTest(unittest.TestCase):
             diagnostic["interval"]: diagnostic
             for diagnostic in transit_diagnostics
         }
+        # The fixture records historical labels, while Overpass reflects current
+        # OSM data. Require the pipeline to query and consume live results without
+        # treating changes to the map as pipeline regressions.
         for interval in expected_bus_intervals:
             diagnostic = diagnostic_by_interval.get(interval)
             self.assertIn(
