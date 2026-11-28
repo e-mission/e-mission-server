@@ -1,4 +1,5 @@
 import json
+import logging
 import unittest
 import uuid
 from unittest import mock
@@ -118,6 +119,8 @@ class OverpassConsumptionTest(unittest.TestCase):
             return collapsed_mode
 
         with mock.patch.object(
+            logging.getLogger("pymongo"), "level", logging.WARNING
+        ), mock.patch.object(
             erme, "_get_transit_prediction", side_effect=capture_transit_prediction
         ):
             epi.run_intake_pipeline_for_user(self.testUUID)
